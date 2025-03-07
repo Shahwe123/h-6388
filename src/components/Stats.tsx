@@ -1,5 +1,5 @@
 
-import { Trophy, Users, Clock, Award } from "lucide-react";
+import { Trophy, Users, Clock, Gamepad } from "lucide-react";
 
 const stats = [
   {
