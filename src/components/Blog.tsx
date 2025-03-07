@@ -1,19 +1,22 @@
+
+import { ArrowRight } from "lucide-react";
+
 const blogPosts = [
   {
-    title: "A dynamic bank offers a few fresh moves",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+    title: "How to Platinum Elden Ring in Under 60 Hours",
+    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop",
     date: "Mar 16, 2024",
     readTime: "5 min read"
   },
   {
-    title: "The simple economy goes global",
-    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+    title: "The Secret Achievements Every Hunter Misses",
+    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=400&fit=crop",
     date: "Mar 15, 2024",
     readTime: "3 min read"
   },
   {
-    title: "How fintech builds interactive tech stack",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
+    title: "Building Your Trophy Collection: Expert Tips",
+    image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=600&h=400&fit=crop",
     date: "Mar 14, 2024",
     readTime: "4 min read"
   }
@@ -21,14 +24,14 @@ const blogPosts = [
 
 const Blog = () => {
   return (
-    <section className="py-16 container-padding">
+    <section className="py-16 container-padding bg-gradient-to-b from-black to-primary">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-          Learn From The Blog
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
+          Trophy Hunting Tips & Guides
         </h2>
         <div className="grid md:grid-cols-3 gap-8 mt-12">
           {blogPosts.map((post, index) => (
-            <div key={index} className="glass-card rounded-xl overflow-hidden group cursor-pointer">
+            <div key={index} className="glass-card rounded-xl overflow-hidden group cursor-pointer border border-neon-purple/10 hover:border-neon-purple/30 transition-colors">
               <div className="aspect-video overflow-hidden">
                 <img 
                   src={post.image} 
@@ -37,14 +40,17 @@ const Blog = () => {
                 />
               </div>
               <div className="p-6">
-                <div className="flex items-center gap-2 text-sm text-neutral-500 mb-2">
+                <div className="flex items-center gap-2 text-sm text-neon-purple mb-2">
                   <span>{post.date}</span>
                   <span>•</span>
                   <span>{post.readTime}</span>
                 </div>
-                <h3 className="font-semibold group-hover:text-accent transition-colors">
+                <h3 className="font-semibold text-white group-hover:text-neon-pink transition-colors">
                   {post.title}
                 </h3>
+                <button className="mt-4 text-sm text-neon-purple flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Read More <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}
