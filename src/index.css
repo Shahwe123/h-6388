@@ -36,6 +36,20 @@
   .cyber-button {
     @apply bg-gradient-game text-white px-6 py-3 rounded-md hover:brightness-110 transition-all duration-300 font-bold shadow-lg;
   }
+  
+  .spinner {
+    @apply w-10 h-10 border-4 border-neon-purple/20 border-t-neon-purple rounded-full;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fade-in {

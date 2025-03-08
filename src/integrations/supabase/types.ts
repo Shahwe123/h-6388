@@ -9,6 +9,186 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          created_at: string
+          description: string | null
+          game_id: string
+          id: string
+          image_url: string | null
+          points: number | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          game_id: string
+          id?: string
+          image_url?: string | null
+          points?: number | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          game_id?: string
+          id?: string
+          image_url?: string | null
+          points?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friendships: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      games: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          platform: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          platform: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          platform?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          total_points: number | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          total_points?: number | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          total_points?: number | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_games: {
+        Row: {
+          completion_percentage: number | null
+          created_at: string
+          game_id: string
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          completion_percentage?: number | null
+          created_at?: string
+          game_id: string
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          completion_percentage?: number | null
+          created_at?: string
+          game_id?: string
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_games_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       waitlist: {
         Row: {
           created_at: string
