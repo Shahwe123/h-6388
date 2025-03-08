@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -51,7 +50,7 @@ const Settings = () => {
           throw error;
         }
 
-        setProfile(data);
+        setProfile(data as Profile);
         setUsername(data.username || '');
         setBio(data.bio || '');
         setEmail(session.user.email || '');
@@ -143,7 +142,7 @@ const Settings = () => {
         
       if (error) throw error;
       
-      setProfile(data);
+      setProfile(data as Profile);
     } catch (error: any) {
       toast({
         title: 'Error updating profile',
@@ -305,7 +304,7 @@ const Settings = () => {
                 {avatarUrl ? (
                   <img 
                     src={avatarUrl} 
-                    alt={profile.username} 
+                    alt={profile?.username} 
                     className="w-full h-full object-cover"
                   />
                 ) : (

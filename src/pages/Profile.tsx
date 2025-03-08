@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon } from 'lucide-react';
@@ -38,7 +37,7 @@ const Profile = () => {
           throw error;
         }
 
-        setProfile(data);
+        setProfile(data as Profile);
       } catch (error: any) {
         toast({
           title: 'Error fetching profile',
@@ -80,7 +79,7 @@ const Profile = () => {
         {/* Profile Header */}
         <div className="glass-card rounded-xl p-8 mb-8 relative overflow-hidden">
           <div className="h-40 absolute top-0 left-0 right-0">
-            {profile.cover_url ? (
+            {profile?.cover_url ? (
               <img 
                 src={profile.cover_url} 
                 alt="Profile cover" 
@@ -93,7 +92,7 @@ const Profile = () => {
           
           <div className="relative flex flex-col md:flex-row items-center gap-6 mt-20">
             <div className="w-24 h-24 bg-black/50 rounded-full border-4 border-neon-purple flex items-center justify-center overflow-hidden">
-              {profile.avatar_url ? (
+              {profile?.avatar_url ? (
                 <img 
                   src={profile.avatar_url} 
                   alt={profile.username} 
@@ -105,8 +104,8 @@ const Profile = () => {
             </div>
             
             <div className="text-center md:text-left">
-              <h1 className="text-2xl md:text-3xl font-bold neon-text">{profile.username}</h1>
-              <p className="text-neutral-300 mt-1">{profile.bio || 'No bio yet'}</p>
+              <h1 className="text-2xl md:text-3xl font-bold neon-text">{profile?.username}</h1>
+              <p className="text-neutral-300 mt-1">{profile?.bio || 'No bio yet'}</p>
             </div>
           </div>
           
