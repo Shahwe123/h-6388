@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Users, User, UserPlus, X, Search, Gamepad2, UserCircle, Check, UserMinus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Profile {
   id: string;
@@ -28,6 +28,7 @@ const Friends = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserAndFriends = async () => {
@@ -214,6 +215,10 @@ const Friends = () => {
     }
   };
 
+  const navigateToProfile = (friendId: string) => {
+    navigate(`/profile?id=${friendId}`);
+  };
+
   const renderUserList = () => {
     if (searchResults.length === 0 && hasSearched) {
       return (
@@ -244,7 +249,7 @@ const Friends = () => {
               </div>
             </div>
             <button
-              onClick={() => handleSendFriendRequest(user.id, user.username)}
+              onClick={() => sendFriendRequest(user.id, user.username)}
               className="p-2 bg-black/40 hover:bg-neon-purple/20 rounded transition-colors"
               disabled={pendingFriendRequests.includes(user.id)}
             >
@@ -280,21 +285,21 @@ const Friends = () => {
           >
             <div 
               className="flex items-center gap-3 flex-1 cursor-pointer"
-              onClick={() => navigateToProfile(friend.id)}
+              onClick={() => navigateToProfile(friend.friend.id)}
             >
               <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
-                {friend.avatar_url ? (
-                  <img src={friend.avatar_url} alt={friend.username} className="w-full h-full object-cover" />
+                {friend.friend.avatar_url ? (
+                  <img src={friend.friend.avatar_url} alt={friend.friend.username} className="w-full h-full object-cover" />
                 ) : (
                   <UserCircle className="w-8 h-8 text-neutral-400" />
                 )}
               </div>
               <div>
-                <div className="font-medium">{friend.username}</div>
+                <div className="font-medium">{friend.friend.username}</div>
               </div>
             </div>
             <button
-              onClick={() => handleRemoveFriend(friend.id)}
+              onClick={() => removeFriend(friend.friend.id, friend.friend.username)}
               className="p-2 hover:bg-red-500/20 hover:border hover:border-red-500/50 rounded transition-colors"
               title="Remove friend"
             >
