@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import LinkAccounts from "./pages/LinkAccounts";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthRequired from "./components/AuthRequired";
@@ -88,6 +89,7 @@ const App = () => {
             <Route element={<AuthRequired />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/link-accounts" element={<LinkAccounts />} />
             </Route>
           </Routes>
           <Footer />
