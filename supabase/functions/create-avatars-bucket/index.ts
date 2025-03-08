@@ -42,25 +42,26 @@ serve(async (req) => {
       if (error) throw error
 
       // Create storage policies that allow users to manage their own avatars
+      // Create more lenient policies to allow authenticated users to upload
       const policies = [
         {
-          name: 'Avatar Read Access Policy',
+          name: 'Avatar Public Read Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Read Access',
+            name: 'Avatar Public Read Access',
             operation: 'READ',
             statement: {
               effect: 'ALLOW',
-              principal: '*',
+              principal: '*', // Anyone can read
               conditions: {}
             }
           }
         },
         {
-          name: 'Avatar Insert Access Policy',
+          name: 'Avatar Authenticated Insert Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Insert Access',
+            name: 'Avatar Authenticated Insert Access',
             operation: 'INSERT',
             statement: {
               effect: 'ALLOW',
@@ -68,15 +69,15 @@ serve(async (req) => {
                 type: 'JWT',
                 value: 'authenticated'
               },
-              conditions: {}
+              conditions: {} // Any authenticated user can insert
             }
           }
         },
         {
-          name: 'Avatar Update Access Policy',
+          name: 'Avatar Authenticated Update Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Update Access',
+            name: 'Avatar Authenticated Update Access',
             operation: 'UPDATE',
             statement: {
               effect: 'ALLOW',
@@ -84,15 +85,15 @@ serve(async (req) => {
                 type: 'JWT',
                 value: 'authenticated'
               },
-              conditions: {}
+              conditions: {} // Any authenticated user can update
             }
           }
         },
         {
-          name: 'Avatar Delete Access Policy',
+          name: 'Avatar Authenticated Delete Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Delete Access',
+            name: 'Avatar Authenticated Delete Access',
             operation: 'DELETE',
             statement: {
               effect: 'ALLOW',
@@ -100,7 +101,7 @@ serve(async (req) => {
                 type: 'JWT',
                 value: 'authenticated'
               },
-              conditions: {}
+              conditions: {} // Any authenticated user can delete
             }
           }
         }
@@ -126,26 +127,26 @@ serve(async (req) => {
         }
       )
     } else {
-      // If the bucket exists, ensure it has the necessary policies
+      // If the bucket exists, ensure it has the necessary policies with more permissive settings
       const policies = [
         {
-          name: 'Avatar Read Access Policy',
+          name: 'Avatar Public Read Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Read Access',
+            name: 'Avatar Public Read Access',
             operation: 'READ',
             statement: {
               effect: 'ALLOW',
-              principal: '*',
+              principal: '*', // Anyone can read
               conditions: {}
             }
           }
         },
         {
-          name: 'Avatar Insert Access Policy',
+          name: 'Avatar Authenticated Insert Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Insert Access',
+            name: 'Avatar Authenticated Insert Access',
             operation: 'INSERT',
             statement: {
               effect: 'ALLOW',
@@ -153,15 +154,15 @@ serve(async (req) => {
                 type: 'JWT',
                 value: 'authenticated'
               },
-              conditions: {}
+              conditions: {} // Any authenticated user can insert
             }
           }
         },
         {
-          name: 'Avatar Update Access Policy',
+          name: 'Avatar Authenticated Update Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Update Access',
+            name: 'Avatar Authenticated Update Access',
             operation: 'UPDATE',
             statement: {
               effect: 'ALLOW',
@@ -169,15 +170,15 @@ serve(async (req) => {
                 type: 'JWT',
                 value: 'authenticated'
               },
-              conditions: {}
+              conditions: {} // Any authenticated user can update
             }
           }
         },
         {
-          name: 'Avatar Delete Access Policy',
+          name: 'Avatar Authenticated Delete Access Policy',
           definition: {
             bucket_id: 'avatars',
-            name: 'Avatar Delete Access',
+            name: 'Avatar Authenticated Delete Access',
             operation: 'DELETE',
             statement: {
               effect: 'ALLOW',
@@ -185,26 +186,36 @@ serve(async (req) => {
                 type: 'JWT',
                 value: 'authenticated'
               },
-              conditions: {}
+              conditions: {} // Any authenticated user can delete
             }
           }
         }
       ];
 
-      // Apply each policy
+      // Try to update all policies with more permissive settings
       for (const policy of policies) {
         try {
+          // Delete existing policy if it exists
+          try {
+            await supabaseAdmin
+              .storage
+              .deletePolicy(policy.definition.bucket_id, policy.definition.name)
+          } catch (error) {
+            // Ignore errors when deleting - policy might not exist yet
+          }
+
+          // Create the policy with updated settings
           await supabaseAdmin
             .storage
             .createPolicy(policy.definition)
         } catch (error) {
-          console.log(`Policy ${policy.name} might already exist:`, error);
+          console.log(`Issue with policy ${policy.name}:`, error);
           // Continue with other policies even if one fails
         }
       }
 
       return new Response(
-        JSON.stringify({ message: 'Avatars bucket already exists, policies checked' }),
+        JSON.stringify({ message: 'Avatars bucket already exists, policies updated' }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
@@ -212,7 +223,7 @@ serve(async (req) => {
       )
     }
   } catch (error) {
-    console.error('Error creating avatars bucket:', error)
+    console.error('Error creating/updating avatars bucket:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -51,7 +50,7 @@ const Settings = () => {
         setProfile(data);
         setUsername(data.username || '');
         setBio(data.bio || '');
-        setEmail(data.email || '');
+        setEmail(session.user.email || '');
         setAvatarUrl(data.avatar_url);
       } catch (error: any) {
         toast({
@@ -79,7 +78,6 @@ const Settings = () => {
       const updates: any = {};
       if (username !== profile.username) updates.username = username;
       if (bio !== profile.bio) updates.bio = bio;
-      if (email !== profile.email) updates.email = email;
       
       // Only update if there are changes
       if (Object.keys(updates).length > 0) {
@@ -160,10 +158,18 @@ const Settings = () => {
     try {
       setUploadingAvatar(true);
       
+      // Get current user session to ensure we're authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('You must be logged in to upload an avatar');
+      }
+      
       const file = e.target.files[0];
       const fileExt = file.name.split('.').pop();
-      const fileName = `${profile?.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const fileName = `${session.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+      
+      console.log('Uploading avatar:', filePath);
       
       // Upload avatar to storage
       const { error: uploadError } = await supabase.storage
@@ -177,11 +183,13 @@ const Settings = () => {
         .from('avatars')
         .getPublicUrl(filePath);
         
+      console.log('Avatar uploaded, public URL:', publicUrlData.publicUrl);
+      
       // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrlData.publicUrl })
-        .eq('id', profile?.id);
+        .eq('id', session.user.id);
         
       if (updateError) throw updateError;
       
@@ -193,6 +201,7 @@ const Settings = () => {
         description: 'Your profile picture has been updated',
       });
     } catch (error: any) {
+      console.error('Avatar upload error:', error);
       toast({
         title: 'Error uploading avatar',
         description: error.message,

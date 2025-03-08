@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +44,7 @@ const Auth = () => {
         }
 
         // Register with custom username via options.data
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -57,10 +56,14 @@ const Auth = () => {
 
         if (error) throw error;
 
-        toast({
-          title: "Registration successful!",
-          description: "Please check your email for confirmation",
-        });
+        // If user is created, navigate directly to profile page
+        if (data.user) {
+          toast({
+            title: "Registration successful!",
+            description: "Welcome to AchievR!",
+          });
+          navigate("/profile");
+        }
       } else if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({
           email,
