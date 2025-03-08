@@ -10,6 +10,7 @@ type AuthMode = "login" | "register" | "forgotPassword";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [mode, setMode] = useState<AuthMode>("login");
@@ -33,9 +34,25 @@ const Auth = () => {
           return;
         }
 
+        if (!username.trim()) {
+          toast({
+            title: "Username required",
+            description: "Please enter a username",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Register with custom username via options.data
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              username: username, // Store custom username in user metadata
+            },
+          },
         });
 
         if (error) throw error;
@@ -114,6 +131,22 @@ const Auth = () => {
                   required
                 />
               </div>
+              
+              {mode === "register" && (
+                <div>
+                  <label htmlFor="username" className="block text-sm font-medium text-neutral-300 mb-1">
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-black/70 border border-neutral-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-neon-purple"
+                    required={mode === "register"}
+                  />
+                </div>
+              )}
               
               {mode !== "forgotPassword" && (
                 <div>

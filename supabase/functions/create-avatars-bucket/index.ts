@@ -41,16 +41,170 @@ serve(async (req) => {
 
       if (error) throw error
 
+      // Create storage policies that allow users to manage their own avatars
+      const policies = [
+        {
+          name: 'Avatar Read Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Read Access',
+            operation: 'READ',
+            statement: {
+              effect: 'ALLOW',
+              principal: '*',
+              conditions: {}
+            }
+          }
+        },
+        {
+          name: 'Avatar Insert Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Insert Access',
+            operation: 'INSERT',
+            statement: {
+              effect: 'ALLOW',
+              principal: {
+                type: 'JWT',
+                value: 'authenticated'
+              },
+              conditions: {}
+            }
+          }
+        },
+        {
+          name: 'Avatar Update Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Update Access',
+            operation: 'UPDATE',
+            statement: {
+              effect: 'ALLOW',
+              principal: {
+                type: 'JWT',
+                value: 'authenticated'
+              },
+              conditions: {}
+            }
+          }
+        },
+        {
+          name: 'Avatar Delete Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Delete Access',
+            operation: 'DELETE',
+            statement: {
+              effect: 'ALLOW',
+              principal: {
+                type: 'JWT',
+                value: 'authenticated'
+              },
+              conditions: {}
+            }
+          }
+        }
+      ];
+
+      // Apply each policy
+      for (const policy of policies) {
+        const { error: policyError } = await supabaseAdmin
+          .storage
+          .createPolicy(policy.definition)
+
+        if (policyError) {
+          console.error(`Error creating policy ${policy.name}:`, policyError);
+          // Continue with other policies even if one fails
+        }
+      }
+
       return new Response(
-        JSON.stringify({ message: 'Avatars bucket created successfully', data }),
+        JSON.stringify({ message: 'Avatars bucket created successfully with policies', data }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
         }
       )
     } else {
+      // If the bucket exists, ensure it has the necessary policies
+      const policies = [
+        {
+          name: 'Avatar Read Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Read Access',
+            operation: 'READ',
+            statement: {
+              effect: 'ALLOW',
+              principal: '*',
+              conditions: {}
+            }
+          }
+        },
+        {
+          name: 'Avatar Insert Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Insert Access',
+            operation: 'INSERT',
+            statement: {
+              effect: 'ALLOW',
+              principal: {
+                type: 'JWT',
+                value: 'authenticated'
+              },
+              conditions: {}
+            }
+          }
+        },
+        {
+          name: 'Avatar Update Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Update Access',
+            operation: 'UPDATE',
+            statement: {
+              effect: 'ALLOW',
+              principal: {
+                type: 'JWT',
+                value: 'authenticated'
+              },
+              conditions: {}
+            }
+          }
+        },
+        {
+          name: 'Avatar Delete Access Policy',
+          definition: {
+            bucket_id: 'avatars',
+            name: 'Avatar Delete Access',
+            operation: 'DELETE',
+            statement: {
+              effect: 'ALLOW',
+              principal: {
+                type: 'JWT',
+                value: 'authenticated'
+              },
+              conditions: {}
+            }
+          }
+        }
+      ];
+
+      // Apply each policy
+      for (const policy of policies) {
+        try {
+          await supabaseAdmin
+            .storage
+            .createPolicy(policy.definition)
+        } catch (error) {
+          console.log(`Policy ${policy.name} might already exist:`, error);
+          // Continue with other policies even if one fails
+        }
+      }
+
       return new Response(
-        JSON.stringify({ message: 'Avatars bucket already exists' }),
+        JSON.stringify({ message: 'Avatars bucket already exists, policies checked' }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
