@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, UserCircle, ImageIcon } from 'lucide-react';
+import { Eye, EyeOff, UserCircle, ImageIcon, Lock, Unlock } from 'lucide-react';
 
 interface Profile {
   id: string;
@@ -10,6 +10,7 @@ interface Profile {
   avatar_url: string | null;
   cover_url: string | null;
   bio: string | null;
+  is_private: boolean | null;
 }
 
 const Settings = () => {
@@ -27,6 +28,7 @@ const Settings = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
   
   const { toast } = useToast();
 
@@ -56,6 +58,7 @@ const Settings = () => {
         setEmail(session.user.email || '');
         setAvatarUrl(data.avatar_url);
         setCoverUrl(data.cover_url);
+        setIsPrivate(data.is_private || false);
       } catch (error: any) {
         toast({
           title: 'Error fetching profile',
@@ -81,6 +84,7 @@ const Settings = () => {
       const updates: any = {};
       if (username !== profile.username) updates.username = username;
       if (bio !== profile.bio) updates.bio = bio;
+      if (isPrivate !== profile.is_private) updates.is_private = isPrivate;
       
       if (Object.keys(updates).length > 0) {
         const { error } = await supabase
@@ -374,6 +378,43 @@ const Settings = () => {
                   rows={3}
                   className="w-full bg-black/70 border border-neutral-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-neon-purple resize-none"
                 />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-neutral-300 mb-1">
+                  Profile Privacy
+                </label>
+                <div className="flex items-center gap-3 p-3 bg-black/40 rounded-md">
+                  <button
+                    type="button"
+                    onClick={() => setIsPrivate(false)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded ${
+                      !isPrivate 
+                        ? 'bg-neon-purple/20 text-white border border-neon-purple/50' 
+                        : 'bg-black/30 text-neutral-400 border border-transparent'
+                    }`}
+                  >
+                    <Unlock className="h-4 w-4" />
+                    <span>Public</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPrivate(true)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded ${
+                      isPrivate 
+                        ? 'bg-neon-purple/20 text-white border border-neon-purple/50' 
+                        : 'bg-black/30 text-neutral-400 border border-transparent'
+                    }`}
+                  >
+                    <Lock className="h-4 w-4" />
+                    <span>Private</span>
+                  </button>
+                </div>
+                <p className="text-xs text-neutral-400 mt-1">
+                  {isPrivate 
+                    ? 'Only friends can view your profile' 
+                    : 'Anyone can view your profile'}
+                </p>
               </div>
               
               <div className="pt-4 border-t border-neutral-700">

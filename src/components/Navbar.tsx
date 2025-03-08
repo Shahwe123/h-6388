@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -31,7 +30,6 @@ const Navbar = () => {
     });
   }, []);
 
-  // Close notifications when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
@@ -45,12 +43,10 @@ const Navbar = () => {
     };
   }, []);
 
-  // Fetch notifications when session changes
   useEffect(() => {
     if (session?.user?.id) {
       fetchNotifications();
       
-      // Subscribe to realtime notifications
       const channel = supabase
         .channel('public:notifications')
         .on('postgres_changes', { 
@@ -135,7 +131,6 @@ const Navbar = () => {
       
       setHasUnreadNotifications(false);
       
-      // Update local notifications state
       setNotifications(prev => 
         prev.map(notif => ({ ...notif, read: true }))
       );
@@ -149,7 +144,6 @@ const Navbar = () => {
     
     try {
       if (accept) {
-        // Add friend relationship
         const { error: friendError } = await supabase
           .from('friends')
           .insert([
@@ -159,7 +153,6 @@ const Navbar = () => {
           
         if (friendError) throw friendError;
         
-        // Send acceptance notification to requester
         const { error: notifError } = await supabase
           .from('notifications')
           .insert({
@@ -172,7 +165,6 @@ const Navbar = () => {
         if (notifError) throw notifError;
       }
       
-      // Delete the request notification
       const { error } = await supabase
         .from('notifications')
         .delete()
@@ -180,12 +172,10 @@ const Navbar = () => {
         
       if (error) throw error;
       
-      // Remove notification from state
       setNotifications(prev => 
         prev.filter(notif => notif.id !== notificationId)
       );
       
-      // Show toast message
       toast({
         title: accept ? 'Friend request accepted' : 'Friend request declined',
       });
@@ -207,11 +197,16 @@ const Navbar = () => {
     { path: '/auth', label: 'Sign In' }
   ];
 
-  // Render notifications dropdown
   const renderNotificationsDropdown = () => (
-    <div className="max-h-96 overflow-y-auto bg-primary border border-neutral-800 rounded-md shadow-lg">
-      <div className="px-4 py-2 border-b border-neutral-800">
+    <div className="max-h-96 overflow-y-auto bg-primary border border-neon-purple/30 rounded-md shadow-lg shadow-neon-purple/10 backdrop-blur-md">
+      <div className="px-4 py-2 border-b border-neutral-800 flex items-center justify-between">
         <h3 className="font-medium">Notifications</h3>
+        <button 
+          className="p-1 text-neutral-400 hover:text-white transition-colors"
+          onClick={() => setIsNotificationsOpen(false)}
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
       
       {notifications.length === 0 ? (
@@ -275,12 +270,10 @@ const Navbar = () => {
   return (
     <nav className="fixed w-full top-0 z-50 bg-primary/90 backdrop-blur-md border-b border-neon-purple/10">
       <div className="container-padding mx-auto flex items-center justify-between h-16">
-        {/* Logo */}
         <Link to={session ? "/profile" : "/"} className="flex items-center gap-2">
           <span className="font-bold text-xl">GameHub</span>
         </Link>
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map(link => (
             <Link
@@ -296,7 +289,6 @@ const Navbar = () => {
           
           {session && (
             <>
-              {/* Notifications Button */}
               <div className="relative" ref={notificationsRef}>
                 <button 
                   className={`p-2 rounded-full ${hasUnreadNotifications ? 'text-neon-pink' : 'text-neutral-400'} hover:text-white hover:bg-black/20`}
@@ -308,7 +300,6 @@ const Navbar = () => {
                   )}
                 </button>
                 
-                {/* Notifications Dropdown */}
                 {isNotificationsOpen && (
                   <div className="absolute right-0 mt-2 w-80 z-10">
                     {renderNotificationsDropdown()}
@@ -316,7 +307,6 @@ const Navbar = () => {
                 )}
               </div>
               
-              {/* Sign Out Button */}
               <button
                 onClick={handleSignOut}
                 className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
@@ -330,7 +320,6 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile menu button */}
         <button 
           className="md:hidden text-neutral-300 focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -343,7 +332,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-primary/95 backdrop-blur-md">
           <div className="container-padding pt-4 pb-6 space-y-4 border-b border-neon-purple/10">
@@ -362,7 +350,6 @@ const Navbar = () => {
 
             {session && (
               <>
-                {/* Mobile Notifications */}
                 <button
                   className={`flex items-center w-full py-2 text-lg ${hasUnreadNotifications ? 'text-neon-pink' : 'text-neutral-400'}`}
                   onClick={handleMobileNotificationClick}
@@ -374,7 +361,6 @@ const Navbar = () => {
                   )}
                 </button>
                 
-                {/* Mobile Sign Out */}
                 <div className="pt-4 border-t border-neutral-800">
                   <button
                     className="flex items-center text-neutral-400 hover:text-white w-full py-2"
@@ -390,7 +376,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Mobile Notifications Panel */}
       {mobileNotificationsOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 flex flex-col">
           <div className="bg-primary/95 border-b border-neutral-800 p-4 flex items-center justify-between">
@@ -409,7 +394,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* User Menu (Desktop) - No longer needed with sign out in nav */}
       {session && isUserMenuOpen && (
         <div className="hidden md:block absolute right-6 top-16">
           <div className="absolute right-0 mt-2 w-48 bg-primary border border-neutral-800 rounded-md shadow-lg py-1 z-10">

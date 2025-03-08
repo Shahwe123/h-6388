@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Users, User, UserPlus, X, Search, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface Profile {
   id: string;
@@ -96,7 +96,7 @@ const Friends = () => {
             avatar_url: profile?.avatar_url
           }
         };
-      }).filter(friend => friend.friend.id !== ''); // Filter out any friends without profiles
+      }).filter(friend => friend.friend.id !== '');
       
       setFriends(formattedFriends);
     } catch (error: any) {
@@ -262,7 +262,7 @@ const Friends = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {friends.map(({ id, friend }) => (
                   <div key={id} className="bg-black/30 rounded-lg p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                    <Link to={`/profile/${friend.id}`} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
                       <div className="w-12 h-12 rounded-full bg-neon-purple/20 flex items-center justify-center overflow-hidden">
                         {friend.avatar_url ? (
                           <img 
@@ -276,12 +276,11 @@ const Friends = () => {
                       </div>
                       <div>
                         <p className="font-medium">{friend.username}</p>
-                        <p className="text-sm text-neutral-400">Online</p>
                       </div>
-                    </div>
+                    </Link>
                     
                     <button 
-                      className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-black/40 transition-all duration-200"
+                      className="p-2 rounded text-neutral-400 hover:text-white hover:bg-red-500/80 hover:text-white transition-all duration-200"
                       onClick={() => removeFriend(friend.id, friend.username)}
                       title="Remove friend"
                     >
