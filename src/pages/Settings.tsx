@@ -55,7 +55,12 @@ const Settings = () => {
           throw error;
         }
 
-        setProfile(data as Profile);
+        const profileData: Profile = {
+          ...data,
+          is_private: data.is_private ?? false
+        };
+
+        setProfile(profileData);
         setUsername(data.username || '');
         setBio(data.bio || '');
         setEmail(session.user.email || '');
@@ -144,7 +149,12 @@ const Settings = () => {
         
       if (error) throw error;
       
-      setProfile(data as Profile);
+      const updatedProfileData: Profile = {
+        ...data,
+        is_private: data.is_private ?? false
+      };
+      
+      setProfile(updatedProfileData);
     } catch (error: any) {
       toast({
         title: 'Error updating profile',
