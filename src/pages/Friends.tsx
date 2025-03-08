@@ -65,6 +65,49 @@ const Friends = () => {
     fetchUserAndFriends();
   }, [toast]);
   
+  useEffect(() => {
+    if (!userId) return;
+    
+    const notificationsChannel = supabase
+      .channel('public:notifications')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'notifications',
+        filter: `recipient_id=eq.${userId}`
+      }, payload => {
+        if (payload.new.type === 'friend_accepted') {
+          fetchFriends(userId);
+        }
+      })
+      .subscribe();
+      
+    const friendsChannel = supabase
+      .channel('public:friends')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'friends',
+        filter: `user_id=eq.${userId}`
+      }, () => {
+        fetchFriends(userId);
+      })
+      .on('postgres_changes', { 
+        event: 'DELETE', 
+        schema: 'public', 
+        table: 'friends',
+        filter: `user_id=eq.${userId}`
+      }, () => {
+        fetchFriends(userId);
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(notificationsChannel);
+      supabase.removeChannel(friendsChannel);
+    };
+  }, [userId]);
+  
   const fetchFriends = async (userId: string) => {
     try {
       const { data, error } = await supabase

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon, Link } from 'lucide-react';
@@ -49,7 +48,6 @@ const Profile = () => {
         setLoading(true);
         const userId = await fetchUserSession();
         
-        // If profileId is provided in URL, fetch that profile, otherwise fetch current user's profile
         const targetProfileId = profileId || userId;
         
         if (!targetProfileId) {
@@ -67,10 +65,8 @@ const Profile = () => {
           throw error;
         }
 
-        // Use type assertion to ensure data is treated as Profile type
         setProfile(data as Profile);
         
-        // Fetch friend count for the profile
         const { count, error: friendError } = await supabase
           .from('friends')
           .select('*', { count: 'exact', head: true })
@@ -82,7 +78,6 @@ const Profile = () => {
         
         setFriendCount(count || 0);
         
-        // Check if viewing user is friends with this profile
         if (userId && profileId && userId !== profileId) {
           const { data: friendData, error: checkFriendError } = await supabase
             .from('friends')
@@ -108,7 +103,39 @@ const Profile = () => {
     };
     
     fetchProfileData();
+    
+    if (profileId) {
+      const friendsChannel = supabase
+        .channel(`profile-friends-${profileId}`)
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'friends',
+          filter: `user_id=eq.${profileId}`
+        }, () => {
+          fetchFriendCount(profileId);
+        })
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(friendsChannel);
+      };
+    }
   }, [toast, profileId]);
+  
+  const fetchFriendCount = async (userId: string) => {
+    try {
+      const { count, error } = await supabase
+        .from('friends')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+        
+      if (error) throw error;
+      setFriendCount(count || 0);
+    } catch (error) {
+      console.error('Error fetching friend count:', error);
+    }
+  };
 
   if (loading) {
     return <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">

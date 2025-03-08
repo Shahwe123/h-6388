@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -55,8 +56,28 @@ const Navbar = () => {
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
+          // Add the new notification to the list
           setNotifications(prev => [payload.new, ...prev]);
           setHasUnreadNotifications(true);
+        })
+        .on('postgres_changes', { 
+          event: 'DELETE', 
+          schema: 'public', 
+          table: 'notifications'
+        }, () => {
+          // Refresh notifications when one is deleted (like after accepting/declining)
+          fetchNotifications();
+        })
+        .on('postgres_changes', { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'notifications',
+          filter: `recipient_id=eq.${session.user.id}`
+        }, payload => {
+          // Update notification in the list when it changes (e.g. marked as read)
+          setNotifications(prev => 
+            prev.map(notif => notif.id === payload.new.id ? payload.new : notif)
+          );
         })
         .subscribe();
         
