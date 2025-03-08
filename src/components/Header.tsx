@@ -14,14 +14,14 @@ const Header = () => {
         </a>
         
         <div className="hidden md:flex items-center gap-8">
+          <a href="#problem" className="text-neutral-300 hover:text-neon-pink transition-colors">
+            The Problem
+          </a>
+          <a href="#solution" className="text-neutral-300 hover:text-neon-pink transition-colors">
+            The Solution
+          </a>
           <a href="#features" className="text-neutral-300 hover:text-neon-pink transition-colors">
             Features
-          </a>
-          <a href="#testimonials" className="text-neutral-300 hover:text-neon-pink transition-colors">
-            Testimonials
-          </a>
-          <a href="#pricing" className="text-neutral-300 hover:text-neon-pink transition-colors">
-            Pricing
           </a>
           <button className="cyber-button flex items-center gap-2">
             Get Started
@@ -39,14 +39,14 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-black/80 backdrop-blur-lg border-b border-neon-purple/30">
           <div className="container-padding py-4 flex flex-col gap-4">
+            <a href="#problem" className="text-neutral-300 hover:text-neon-pink transition-colors">
+              The Problem
+            </a>
+            <a href="#solution" className="text-neutral-300 hover:text-neon-pink transition-colors">
+              The Solution
+            </a>
             <a href="#features" className="text-neutral-300 hover:text-neon-pink transition-colors">
               Features
-            </a>
-            <a href="#testimonials" className="text-neutral-300 hover:text-neon-pink transition-colors">
-              Testimonials
-            </a>
-            <a href="#pricing" className="text-neutral-300 hover:text-neon-pink transition-colors">
-              Pricing
             </a>
             <button className="cyber-button flex items-center justify-center gap-2">
               Get Started

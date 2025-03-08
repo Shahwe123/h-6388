@@ -1,12 +1,14 @@
 
 import { XCircle, Check, AlertTriangle, Trophy, Target, Award, Users, Zap, Shield, Crosshair, Gamepad } from "lucide-react";
 import { useState } from "react";
+import NewsletterForm from "./NewsletterForm";
 
 const Problems = () => {
   const [activeTab, setActiveTab] = useState("problems");
+  const [isFormOpen, setIsFormOpen] = useState(false);
   
   return (
-    <section className="py-16 container-padding bg-gradient-to-b from-black to-primary">
+    <section id="problem" className="py-16 container-padding bg-gradient-to-b from-black via-primary/90 to-primary">
       <div className="max-w-4xl mx-auto">
         {/* Tab Navigation */}
         <div className="flex justify-center mb-12">
@@ -94,7 +96,7 @@ const Problems = () => {
 
         {/* Solution Section */}
         {activeTab === "solution" && (
-          <div className="animate-fade-in">
+          <div id="solution" className="animate-fade-in">
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
                 <span className="text-neon-purple mr-2">🎯</span> THE SOLUTION: AI-POWERED ACHIEVEMENT TRACKER <span className="text-neon-purple ml-2">🎯</span>
@@ -129,11 +131,17 @@ const Problems = () => {
                   </div>
                 ))}
               </div>
-              <p className="text-neon-purple font-semibold mb-6">💡 This is the power of AI-driven completion tracking.</p>
-              <p className="text-lg text-white mb-6">💾 Your Journey to 100% Just Became a Mission.</p>
-              <button className="cyber-button">
-                SIGN UP FOR BETA ACCESS →
-              </button>
+              
+              <div className="text-center">
+                <p className="text-neon-purple font-semibold mb-4">💡 This is the power of AI-driven completion tracking.</p>
+                <p className="text-lg text-white mb-6">💾 Your Journey to 100% Just Became a Mission.</p>
+                <button 
+                  className="cyber-button mx-auto"
+                  onClick={() => setIsFormOpen(true)}
+                >
+                  SIGN UP FOR BETA ACCESS →
+                </button>
+              </div>
             </div>
 
             {/* Competition Section */}
@@ -163,110 +171,119 @@ const Problems = () => {
                 </div>
               </div>
               
-              <p className="text-lg text-white text-center mb-6">👑 Your trophy collection is your legacy. Let the world see it.</p>
-              <div className="flex justify-center">
-                <button className="cyber-button">
+              <div className="text-center">
+                <p className="text-lg text-white mb-6">👑 Your trophy collection is your legacy. Let the world see it.</p>
+                <button 
+                  className="cyber-button mx-auto"
+                  onClick={() => setIsFormOpen(true)}
+                >
                   SIGN UP & UNLOCK YOUR GAMING STATUS →
                 </button>
               </div>
             </div>
-
-            {/* Early Access Section */}
-            <div className="glass-card p-8 rounded-xl mb-10 border border-neon-pink/30">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-neon-pink/20 p-3 rounded-lg">
-                  <Shield className="w-6 h-6 text-neon-pink" />
-                </div>
-                <h3 className="font-semibold text-2xl text-white">🎁 EARLY ACCESS = EXCLUSIVE REWARDS 🎁</h3>
-              </div>
-              <p className="text-lg text-white mb-6">🔥 First 1,000 Sign-Ups Get:</p>
-              
-              <div className="space-y-4 mb-8">
-                {[
-                  { title: "EARLY BETA ACCESS", desc: "Play before anyone else." },
-                  { title: "EXCLUSIVE FOUNDER'S BADGE", desc: "A permanent flex on your profile." },
-                  { title: "LAUNCH REWARDS", desc: "XP boosts, custom themes, and secret perks." }
-                ].map((reward, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="bg-neon-pink/20 p-1 rounded shrink-0 mt-1">
-                      <Check className="w-4 h-4 text-neon-pink" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-white">{reward.title}</h4>
-                      <p className="text-neutral-300">{reward.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* FAQs Section */}
-            <div className="glass-card p-8 rounded-xl mb-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-neon-purple/20 p-3 rounded-lg">
-                  <Gamepad className="w-6 h-6 text-neon-purple" />
-                </div>
-                <h3 className="font-semibold text-2xl text-white">💡 FAQs – BECAUSE YOU HAVE QUESTIONS, WE HAVE ANSWERS 💡</h3>
-              </div>
-              
-              <div className="space-y-6 mb-8">
-                {[
-                  {
-                    q: "What exactly does this do?",
-                    a: [
-                      "Tracks all achievements from PlayStation, Xbox, Steam, and more.",
-                      "Uses AI to suggest challenges to help you platinum games faster.",
-                      "Lets you compete globally with real leaderboards."
-                    ]
-                  },
-                  {
-                    q: "When does the beta launch?",
-                    a: ["Early adopters get first access!"]
-                  },
-                  {
-                    q: "Is this free?",
-                    a: ["YES! The core tracker is free forever. Optional premium perks for completionists."]
-                  },
-                  {
-                    q: "Will my data be safe?",
-                    a: ["100% secure. No selling data, no sketchy ads. Gamer-first, always."]
-                  }
-                ].map((faq, index) => (
-                  <div key={index} className="bg-black/30 p-6 rounded-lg border border-neon-purple/20">
-                    <h4 className="font-bold text-lg mb-3 text-white">❓ {faq.q}</h4>
-                    <div className="space-y-2">
-                      {faq.a.map((answer, i) => (
-                        <div key={i} className="flex items-start gap-3">
-                          <div className="bg-neon-purple/20 p-1 rounded shrink-0 mt-1">
-                            <Check className="w-4 h-4 text-neon-purple" />
-                          </div>
-                          <p className="text-neutral-300">{answer}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Final Call Section */}
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-4 text-white">
-                🚀 FINAL CALL: MASTER YOUR GAMING LEGACY 🚀
-              </h3>
-              <p className="text-lg text-neutral-300 mb-6">
-                🔥 Platinum More Games. Track Every Achievement. Compete with the Best.<br />
-                📩 Join the Beta & Unlock Exclusive Perks
-              </p>
-              <button className="cyber-button text-lg mx-auto">
-                SIGN UP NOW – BEFORE SPOTS ARE GONE →
-              </button>
-              <p className="text-xl font-bold text-white mt-8">
-                🎮 Your Legacy Starts Here. 🎮
-              </p>
-            </div>
           </div>
         )}
+
+        {/* Early Access Section - Moved outside the solution tab */}
+        <div className="glass-card p-8 rounded-xl mb-10 border border-neon-pink/30">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-neon-pink/20 p-3 rounded-lg">
+              <Shield className="w-6 h-6 text-neon-pink" />
+            </div>
+            <h3 className="font-semibold text-2xl text-white">🎁 EARLY ACCESS = EXCLUSIVE REWARDS 🎁</h3>
+          </div>
+          <p className="text-lg text-white mb-6">🔥 First 1,000 Sign-Ups Get:</p>
+          
+          <div className="space-y-4 mb-8">
+            {[
+              { title: "EARLY BETA ACCESS", desc: "Play before anyone else." },
+              { title: "EXCLUSIVE FOUNDER'S BADGE", desc: "A permanent flex on your profile." },
+              { title: "LAUNCH REWARDS", desc: "XP boosts, custom themes, and secret perks." }
+            ].map((reward, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <div className="bg-neon-pink/20 p-1 rounded shrink-0 mt-1">
+                  <Check className="w-4 h-4 text-neon-pink" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-white">{reward.title}</h4>
+                  <p className="text-neutral-300">{reward.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQs Section - Moved outside the solution tab */}
+        <div className="glass-card p-8 rounded-xl mb-10">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-neon-purple/20 p-3 rounded-lg">
+              <Gamepad className="w-6 h-6 text-neon-purple" />
+            </div>
+            <h3 className="font-semibold text-2xl text-white">💡 FAQs – BECAUSE YOU HAVE QUESTIONS, WE HAVE ANSWERS 💡</h3>
+          </div>
+          
+          <div className="space-y-6 mb-8">
+            {[
+              {
+                q: "What exactly does this do?",
+                a: [
+                  "Tracks all achievements from PlayStation, Xbox, Steam, and more.",
+                  "Uses AI to suggest challenges to help you platinum games faster.",
+                  "Lets you compete globally with real leaderboards."
+                ]
+              },
+              {
+                q: "When does the beta launch?",
+                a: ["Early adopters get first access!"]
+              },
+              {
+                q: "Is this free?",
+                a: ["YES! The core tracker is free forever. Optional premium perks for completionists."]
+              },
+              {
+                q: "Will my data be safe?",
+                a: ["100% secure. No selling data, no sketchy ads. Gamer-first, always."]
+              }
+            ].map((faq, index) => (
+              <div key={index} className="bg-black/30 p-6 rounded-lg border border-neon-purple/20">
+                <h4 className="font-bold text-lg mb-3 text-white">❓ {faq.q}</h4>
+                <div className="space-y-2">
+                  {faq.a.map((answer, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="bg-neon-purple/20 p-1 rounded shrink-0 mt-1">
+                        <Check className="w-4 h-4 text-neon-purple" />
+                      </div>
+                      <p className="text-neutral-300">{answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Final Call Section */}
+        <div className="text-center">
+          <h3 className="text-2xl font-bold mb-4 text-white">
+            🚀 FINAL CALL: MASTER YOUR GAMING LEGACY 🚀
+          </h3>
+          <p className="text-lg text-neutral-300 mb-6">
+            🔥 Platinum More Games. Track Every Achievement. Compete with the Best.<br />
+            📩 Join the Beta & Unlock Exclusive Perks
+          </p>
+          <button 
+            className="cyber-button text-lg mx-auto"
+            onClick={() => setIsFormOpen(true)}
+          >
+            SIGN UP NOW – BEFORE SPOTS ARE GONE →
+          </button>
+          <p className="text-xl font-bold text-white mt-8">
+            🎮 Your Legacy Starts Here. 🎮
+          </p>
+        </div>
+
+        {/* Newsletter Form Modal */}
+        <NewsletterForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
       </div>
     </section>
   );
