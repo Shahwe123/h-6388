@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +29,6 @@ const Friends = () => {
   useEffect(() => {
     const fetchUserAndFriends = async () => {
       try {
-        // Get current user
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           setLoading(false);
@@ -39,7 +37,6 @@ const Friends = () => {
         
         setUserId(session.user.id);
         
-        // Get user profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('username')
@@ -49,7 +46,6 @@ const Friends = () => {
         if (profileError) throw profileError;
         setUsername(profileData.username);
         
-        // Get friends
         await fetchFriends(session.user.id);
       } catch (error: any) {
         toast({
@@ -67,31 +63,38 @@ const Friends = () => {
   
   const fetchFriends = async (userId: string) => {
     try {
-      // Fixed query to properly join with profiles table
       const { data, error } = await supabase
         .from('friends')
-        .select(`
-          id,
-          friend_id,
-          profiles!friends_friend_id_fkey (
-            id,
-            username,
-            avatar_url
-          )
-        `)
+        .select('id, friend_id')
         .eq('user_id', userId);
         
       if (error) throw error;
       
-      // Transform the response to match our Friend interface
-      const formattedFriends: Friend[] = data?.map(item => ({
-        id: item.id,
-        friend: {
-          id: item.profiles.id,
-          username: item.profiles.username,
-          avatar_url: item.profiles.avatar_url
-        }
-      })) || [];
+      if (!data || data.length === 0) {
+        setFriends([]);
+        return;
+      }
+      
+      const friendIds = data.map(item => item.friend_id);
+      
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', friendIds);
+        
+      if (profilesError) throw profilesError;
+      
+      const formattedFriends: Friend[] = data.map(item => {
+        const profile = profilesData?.find(p => p.id === item.friend_id);
+        return {
+          id: item.id,
+          friend: {
+            id: profile?.id || '',
+            username: profile?.username || 'Unknown User',
+            avatar_url: profile?.avatar_url
+          }
+        };
+      });
       
       setFriends(formattedFriends);
     } catch (error: any) {
@@ -109,17 +112,15 @@ const Friends = () => {
     setSearching(true);
     
     try {
-      // Search by username
       const { data, error } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
         .ilike('username', `%${searchQuery}%`)
-        .neq('id', userId) // Don't include current user
+        .neq('id', userId)
         .limit(10);
         
       if (error) throw error;
       
-      // Filter out users that are already friends
       const friendIds = friends.map(f => f.friend.id);
       const filteredResults = data?.filter(user => !friendIds.includes(user.id)) || [];
       
@@ -139,7 +140,6 @@ const Friends = () => {
     if (!userId || !username) return;
     
     try {
-      // Check if a request already exists
       const { data: existingRequests, error: checkError } = await supabase
         .from('notifications')
         .select()
@@ -157,7 +157,6 @@ const Friends = () => {
         return;
       }
       
-      // Send friend request notification
       const { error } = await supabase
         .from('notifications')
         .insert({
@@ -175,7 +174,6 @@ const Friends = () => {
         description: `A friend request has been sent to ${recipientUsername}`,
       });
       
-      // Remove user from search results
       setSearchResults(prev => prev.filter(user => user.id !== recipientId));
     } catch (error: any) {
       toast({
@@ -190,7 +188,6 @@ const Friends = () => {
     if (!userId) return;
     
     try {
-      // Delete both friendship records
       const { error } = await supabase
         .from('friends')
         .delete()
@@ -203,7 +200,6 @@ const Friends = () => {
         description: `${friendUsername} has been removed from your friends list`,
       });
       
-      // Update friends list
       setFriends(prev => prev.filter(f => f.friend.id !== friendId));
     } catch (error: any) {
       toast({
@@ -228,7 +224,6 @@ const Friends = () => {
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
       <div className="container-padding mx-auto max-w-6xl">
-        {/* Friends Header */}
         <div className="glass-card rounded-xl p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
@@ -296,7 +291,6 @@ const Friends = () => {
           </div>
         </div>
         
-        {/* Game Activity (Placeholder) */}
         <div className="glass-card rounded-xl p-8">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
             <Gamepad2 className="h-5 w-5 text-neon-pink" />
@@ -313,7 +307,6 @@ const Friends = () => {
         </div>
       </div>
       
-      {/* Search Modal */}
       {showSearchModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div className="bg-primary border border-neon-purple/30 rounded-xl w-full max-w-md">
