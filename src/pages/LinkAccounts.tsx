@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -17,8 +18,9 @@ interface PlatformAccount {
   id: string;
   platform: string;
   platform_username: string;
-  platform_id: string;
-  connected_at: string;
+  platform_id: string | null;
+  linked_at: string;
+  user_id: string;
 }
 
 const LinkAccounts = () => {
@@ -32,6 +34,10 @@ const LinkAccounts = () => {
   const [accountToUnlink, setAccountToUnlink] = useState<PlatformAccount | null>(null);
   const { toast } = useToast();
 
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
+
   const fetchAccounts = async () => {
     try {
       setLoading(true);
@@ -42,7 +48,7 @@ const LinkAccounts = () => {
       }
 
       const { data, error } = await supabase
-        .from('platform_accounts')
+        .from('linked_accounts')
         .select('*')
         .eq('user_id', session.user.id);
 
@@ -86,7 +92,7 @@ const LinkAccounts = () => {
 
       // Check if account already exists
       const { data: existingAccounts } = await supabase
-        .from('platform_accounts')
+        .from('linked_accounts')
         .select('*')
         .eq('user_id', session.user.id)
         .eq('platform', selectedPlatform);
@@ -101,7 +107,7 @@ const LinkAccounts = () => {
       }
 
       const { error } = await supabase
-        .from('platform_accounts')
+        .from('linked_accounts')
         .insert({
           user_id: session.user.id,
           platform: selectedPlatform,
@@ -140,7 +146,7 @@ const LinkAccounts = () => {
 
     try {
       const { error } = await supabase
-        .from('platform_accounts')
+        .from('linked_accounts')
         .delete()
         .eq('id', accountToUnlink.id);
 

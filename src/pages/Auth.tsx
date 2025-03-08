@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Github, 
-  Google, 
+  LogIn, 
   Mail, 
   Lock, 
   Eye, 
@@ -52,7 +52,6 @@ const Auth = () => {
         throw error;
       }
       
-      // Redirect the user to the authorization URL
       window.location.href = data.url;
     } catch (error: any) {
       toast({
@@ -78,7 +77,6 @@ const Auth = () => {
         throw error;
       }
 
-      // Redirect user to the intended page after successful login
       const redirectTo = localStorage.getItem('redirectTo');
       if (redirectTo) {
         localStorage.removeItem('redirectTo');
@@ -131,7 +129,7 @@ const Auth = () => {
         title: 'Signup successful',
         description: 'A confirmation email has been sent to your email address.',
       });
-      setAuthMode('login'); // Switch back to login mode after successful signup
+      setAuthMode('login');
     } catch (error: any) {
       toast({
         title: 'Error signing up',
@@ -159,7 +157,7 @@ const Auth = () => {
         title: 'Password reset email sent',
         description: 'Please check your email for further instructions.',
       });
-      setAuthMode('login'); // Switch back to login mode after successful signup
+      setAuthMode('login');
     } catch (error: any) {
       toast({
         title: 'Error requesting password reset',
@@ -219,7 +217,7 @@ const Auth = () => {
                 </>
               ) : (
                 <>
-                  <Google className="mr-2 h-4 w-4" />
+                  <LogIn className="mr-2 h-4 w-4" />
                   Sign in with Google
                 </>
               )}
