@@ -117,7 +117,11 @@ const Auth = () => {
         <div className="w-full max-w-md">
           <div className="glass-card rounded-xl p-8">
             <h2 className="text-2xl font-bold text-center mb-6">
-              {mode === "login" ? "Sign In" : mode === "register" ? "Create an Account" : "Reset Password"}
+              {mode === "login" 
+                ? "Sign In" 
+                : mode === "register" 
+                  ? "Create an Account" 
+                  : "Reset Password"}
             </h2>
             
             <form onSubmit={handleAuth} className="space-y-4">

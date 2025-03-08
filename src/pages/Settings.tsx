@@ -78,12 +78,10 @@ const Settings = () => {
     try {
       setUpdating(true);
       
-      // Only update fields that have changed
       const updates: any = {};
       if (username !== profile.username) updates.username = username;
       if (bio !== profile.bio) updates.bio = bio;
       
-      // Only update if there are changes
       if (Object.keys(updates).length > 0) {
         const { error } = await supabase
           .from('profiles')
@@ -92,7 +90,6 @@ const Settings = () => {
           
         if (error) throw error;
         
-        // Also update email in auth if it changed
         if (email !== profile.email) {
           const { error: authError } = await supabase.auth.updateUser({
             email,
@@ -107,7 +104,6 @@ const Settings = () => {
         });
       }
       
-      // Handle password change if provided
       if (password && confirmPassword) {
         if (password !== confirmPassword) {
           toast({
@@ -133,7 +129,6 @@ const Settings = () => {
         setConfirmPassword('');
       }
       
-      // Refresh profile data
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -162,7 +157,6 @@ const Settings = () => {
     try {
       setUploadingAvatar(true);
       
-      // Get current user session to ensure we're authenticated
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('You must be logged in to upload an avatar');
@@ -173,19 +167,16 @@ const Settings = () => {
       const fileName = `avatar-${session.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = fileName;
       
-      // Upload avatar to storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
         
       if (uploadError) throw uploadError;
       
-      // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
         
-      // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrlData.publicUrl })
@@ -193,7 +184,6 @@ const Settings = () => {
         
       if (updateError) throw updateError;
       
-      // Update local state
       setAvatarUrl(publicUrlData.publicUrl);
       
       toast({
@@ -220,7 +210,6 @@ const Settings = () => {
     try {
       setUploadingCover(true);
       
-      // Get current user session to ensure we're authenticated
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('You must be logged in to upload a cover image');
@@ -231,19 +220,16 @@ const Settings = () => {
       const fileName = `cover-${session.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = fileName;
       
-      // Upload cover to storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
         
       if (uploadError) throw uploadError;
       
-      // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
         
-      // Update profile with new cover URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ cover_url: publicUrlData.publicUrl })
@@ -251,7 +237,6 @@ const Settings = () => {
         
       if (updateError) throw updateError;
       
-      // Update local state
       setCoverUrl(publicUrlData.publicUrl);
       
       toast({
@@ -298,7 +283,6 @@ const Settings = () => {
           <h1 className="text-2xl font-bold mb-8">Account Settings</h1>
           
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Avatar & Cover Upload */}
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 bg-black/50 rounded-full border-2 border-neon-purple flex items-center justify-center overflow-hidden mb-4">
                 {avatarUrl ? (
@@ -352,7 +336,6 @@ const Settings = () => {
               </label>
             </div>
             
-            {/* Settings Form */}
             <form onSubmit={handleUpdateProfile} className="flex-1 space-y-4">
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-neutral-300 mb-1">

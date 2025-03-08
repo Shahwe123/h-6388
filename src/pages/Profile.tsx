@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon } from 'lucide-react';
@@ -37,6 +38,7 @@ const Profile = () => {
           throw error;
         }
 
+        // Use type assertion to ensure data is treated as Profile type
         setProfile(data as Profile);
       } catch (error: any) {
         toast({
