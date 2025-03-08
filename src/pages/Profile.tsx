@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad } from 'lucide-react';
+import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Profile {
@@ -9,6 +9,7 @@ interface Profile {
   username: string;
   email: string;
   avatar_url: string | null;
+  cover_url: string | null;
   bio: string | null;
 }
 
@@ -78,7 +79,17 @@ const Profile = () => {
       <div className="container-padding mx-auto max-w-6xl">
         {/* Profile Header */}
         <div className="glass-card rounded-xl p-8 mb-8 relative overflow-hidden">
-          <div className="h-40 bg-gradient-game absolute top-0 left-0 right-0"></div>
+          <div className="h-40 absolute top-0 left-0 right-0">
+            {profile.cover_url ? (
+              <img 
+                src={profile.cover_url} 
+                alt="Profile cover" 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="h-40 bg-gradient-game"></div>
+            )}
+          </div>
           
           <div className="relative flex flex-col md:flex-row items-center gap-6 mt-20">
             <div className="w-24 h-24 bg-black/50 rounded-full border-4 border-neon-purple flex items-center justify-center overflow-hidden">

@@ -1,13 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, UserCircle } from 'lucide-react';
+import { Eye, EyeOff, UserCircle, ImageIcon } from 'lucide-react';
 
 interface Profile {
   id: string;
   username: string;
   email: string;
   avatar_url: string | null;
+  cover_url: string | null;
   bio: string | null;
 }
 
@@ -16,7 +18,9 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
@@ -52,6 +56,7 @@ const Settings = () => {
         setBio(data.bio || '');
         setEmail(session.user.email || '');
         setAvatarUrl(data.avatar_url);
+        setCoverUrl(data.cover_url);
       } catch (error: any) {
         toast({
           title: 'Error fetching profile',
@@ -166,10 +171,8 @@ const Settings = () => {
       
       const file = e.target.files[0];
       const fileExt = file.name.split('.').pop();
-      const fileName = `${session.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
-      
-      console.log('Uploading avatar:', filePath);
+      const fileName = `avatar-${session.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = fileName;
       
       // Upload avatar to storage
       const { error: uploadError } = await supabase.storage
@@ -183,8 +186,6 @@ const Settings = () => {
         .from('avatars')
         .getPublicUrl(filePath);
         
-      console.log('Avatar uploaded, public URL:', publicUrlData.publicUrl);
-      
       // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
@@ -209,6 +210,64 @@ const Settings = () => {
       });
     } finally {
       setUploadingAvatar(false);
+    }
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+    
+    try {
+      setUploadingCover(true);
+      
+      // Get current user session to ensure we're authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('You must be logged in to upload a cover image');
+      }
+      
+      const file = e.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cover-${session.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = fileName;
+      
+      // Upload cover to storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+        
+      if (uploadError) throw uploadError;
+      
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+        
+      // Update profile with new cover URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ cover_url: publicUrlData.publicUrl })
+        .eq('id', session.user.id);
+        
+      if (updateError) throw updateError;
+      
+      // Update local state
+      setCoverUrl(publicUrlData.publicUrl);
+      
+      toast({
+        title: 'Cover image updated',
+        description: 'Your profile cover image has been updated',
+      });
+    } catch (error: any) {
+      console.error('Cover upload error:', error);
+      toast({
+        title: 'Error uploading cover image',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingCover(false);
     }
   };
 
@@ -240,7 +299,7 @@ const Settings = () => {
           <h1 className="text-2xl font-bold mb-8">Account Settings</h1>
           
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Avatar Upload */}
+            {/* Avatar & Cover Upload */}
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 bg-black/50 rounded-full border-2 border-neon-purple flex items-center justify-center overflow-hidden mb-4">
                 {avatarUrl ? (
@@ -254,7 +313,7 @@ const Settings = () => {
                 )}
               </div>
               
-              <label className="cyber-button cursor-pointer text-sm px-4 py-2 text-center">
+              <label className="cyber-button cursor-pointer text-sm px-4 py-2 text-center mb-6">
                 <input
                   type="file"
                   accept="image/*"
@@ -263,6 +322,34 @@ const Settings = () => {
                   className="hidden"
                 />
                 {uploadingAvatar ? 'Uploading...' : 'Change Avatar'}
+              </label>
+              
+              <div className="w-full bg-black/50 rounded-md border border-neon-purple/30 p-2 mb-2">
+                <div className="h-24 rounded flex items-center justify-center overflow-hidden">
+                  {coverUrl ? (
+                    <img 
+                      src={coverUrl} 
+                      alt="Profile cover" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full w-full bg-black/50">
+                      <ImageIcon className="w-8 h-8 text-neutral-400 mb-2" />
+                      <span className="text-xs text-neutral-400">No cover image</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <label className="cyber-button cursor-pointer text-sm px-4 py-2 text-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverChange}
+                  disabled={uploadingCover}
+                  className="hidden"
+                />
+                {uploadingCover ? 'Uploading...' : 'Change Cover Image'}
               </label>
             </div>
             

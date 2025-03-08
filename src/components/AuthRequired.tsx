@@ -44,6 +44,7 @@ const AuthRequired = () => {
   }
 
   if (!session) {
+    // Save the location they were trying to go to for a future redirect
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
