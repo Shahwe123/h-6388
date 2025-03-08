@@ -37,40 +37,69 @@ export const fetchFriends = createAsyncThunk(
   async (userId: string, { rejectWithValue }) => {
     try {
       // Get confirmed friends where user is the requester
-      const { data: outgoingFriends, error: outgoingError } = await supabase
+      const { data: outgoingData, error: outgoingError } = await supabase
         .from('friendships')
-        .select(`
-          *,
-          friend:friend_id(id, username, display_name, avatar_url)
-        `)
+        .select('*')
         .eq('user_id', userId)
         .eq('status', 'accepted');
       
       if (outgoingError) throw outgoingError;
 
       // Get confirmed friends where user is the recipient
-      const { data: incomingFriends, error: incomingError } = await supabase
+      const { data: incomingData, error: incomingError } = await supabase
         .from('friendships')
-        .select(`
-          *,
-          friend:user_id(id, username, display_name, avatar_url)
-        `)
+        .select('*')
         .eq('friend_id', userId)
         .eq('status', 'accepted');
       
       if (incomingError) throw incomingError;
 
+      // Transform the data to include friend profiles
+      const outgoingFriends: Friendship[] = [];
+      const incomingFriends: Friendship[] = [];
+
+      // Process outgoing friendships and fetch friend profiles
+      if (outgoingData && outgoingData.length > 0) {
+        for (const friendship of outgoingData) {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', friendship.friend_id)
+            .single();
+          
+          if (profileError) continue;
+          
+          outgoingFriends.push({
+            ...friendship,
+            friend: profileData as Profile
+          });
+        }
+      }
+
+      // Process incoming friendships and fetch friend profiles
+      if (incomingData && incomingData.length > 0) {
+        for (const friendship of incomingData) {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', friendship.user_id)
+            .single();
+          
+          if (profileError) continue;
+          
+          // Swap user_id and friend_id for consistency
+          incomingFriends.push({
+            ...friendship,
+            user_id: friendship.friend_id,
+            friend_id: friendship.user_id,
+            friend: profileData as Profile
+          });
+        }
+      }
+
       // Combine both sets
-      const allFriends = [
-        ...(outgoingFriends || []),
-        ...((incomingFriends || []).map(f => ({
-          ...f,
-          user_id: f.friend_id,
-          friend_id: f.user_id
-        })))
-      ];
-      
-      return allFriends as Friendship[];
+      const allFriends = [...outgoingFriends, ...incomingFriends];
+      return allFriends;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -84,16 +113,33 @@ export const fetchPendingRequests = createAsyncThunk(
       // Get pending requests sent to the user
       const { data, error } = await supabase
         .from('friendships')
-        .select(`
-          *,
-          friend:user_id(id, username, display_name, avatar_url)
-        `)
+        .select('*')
         .eq('friend_id', userId)
         .eq('status', 'pending');
       
       if (error) throw error;
       
-      return data as Friendship[];
+      // Transform the data to include sender profiles
+      const pendingRequests: Friendship[] = [];
+      
+      if (data && data.length > 0) {
+        for (const request of data) {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', request.user_id)
+            .single();
+          
+          if (profileError) continue;
+          
+          pendingRequests.push({
+            ...request,
+            friend: profileData as Profile
+          });
+        }
+      }
+      
+      return pendingRequests;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -109,14 +155,24 @@ export const sendFriendRequest = createAsyncThunk(
         .insert([
           { user_id: userId, friend_id: friendId }
         ])
-        .select(`
-          *,
-          friend:friend_id(id, username, display_name, avatar_url)
-        `)
+        .select('*')
         .single();
       
       if (error) throw error;
-      return data as Friendship;
+      
+      // Fetch the friend's profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', friendId)
+        .single();
+      
+      if (profileError) throw profileError;
+      
+      return {
+        ...data,
+        friend: profileData as Profile
+      } as Friendship;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -131,14 +187,24 @@ export const acceptFriendRequest = createAsyncThunk(
         .from('friendships')
         .update({ status: 'accepted' })
         .eq('id', requestId)
-        .select(`
-          *,
-          friend:user_id(id, username, display_name, avatar_url)
-        `)
+        .select('*')
         .single();
       
       if (error) throw error;
-      return data as Friendship;
+      
+      // Fetch the user's profile who sent the request
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user_id)
+        .single();
+      
+      if (profileError) throw profileError;
+      
+      return {
+        ...data,
+        friend: profileData as Profile
+      } as Friendship;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
