@@ -25,7 +25,6 @@ const config = {
           pink: "#FF0080",
           green: "#13FF00",
           blue: "#00FFFF",
-          // Add green color for Xbox
           yellow: "#FFFF00",
         },
         border: "hsl(var(--border))",
@@ -80,6 +79,9 @@ const config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      backgroundImage: {
+        'gradient-game': 'linear-gradient(to right, rgba(132,0,255,1) 0%, rgba(230,0,115,1) 100%)',
       },
     },
   },

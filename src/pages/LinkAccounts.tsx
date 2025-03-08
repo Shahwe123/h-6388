@@ -1,316 +1,354 @@
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  Gamepad2, 
+  Monitor, 
+  User, 
+  X, 
+  Link2, 
+  Unlink 
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Steam, GamepadIcon, Gamepad2Icon } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Tables } from "@/integrations/supabase/types";
-
-type LinkedAccount = Tables<"linked_accounts">;
-
-interface PlatformInfo {
-  name: string;
-  icon: React.ReactNode;
-  color: string;
-  linkInstructions: string;
+interface PlatformAccount {
+  id: string;
+  platform: string;
+  platform_username: string;
+  platform_id: string;
+  connected_at: string;
 }
 
-const PLATFORMS: Record<string, PlatformInfo> = {
-  steam: {
-    name: "Steam",
-    icon: <Steam className="h-8 w-8" />,
-    color: "bg-[#1b2838] hover:bg-[#2a3f5a]",
-    linkInstructions: "Enter your Steam username or ID. You can find this in your Steam profile URL."
-  },
-  xbox: {
-    name: "Xbox",
-    icon: <GamepadIcon className="h-8 w-8" />,
-    color: "bg-neon-green hover:bg-green-600",
-    linkInstructions: "Enter your Xbox Gamertag. This is the username you use to sign in to Xbox Live."
-  },
-  playstation: {
-    name: "PlayStation",
-    icon: <Gamepad2Icon className="h-8 w-8" />,
-    color: "bg-blue-600 hover:bg-blue-700",
-    linkInstructions: "Enter your PlayStation Network ID. This is the username you use to sign in to PSN."
-  }
-};
-
 const LinkAccounts = () => {
-  const [linkedAccounts, setLinkedAccounts] = useState<LinkedAccount[]>([]);
+  const [accounts, setAccounts] = useState<PlatformAccount[]>([]);
   const [loading, setLoading] = useState(true);
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-  const [platformUsername, setPlatformUsername] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLinking, setIsLinking] = useState(false);
+  const [platformUsername, setPlatformUsername] = useState('');
+  const [platformId, setPlatformId] = useState('');
+  const [unlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
+  const [accountToUnlink, setAccountToUnlink] = useState<PlatformAccount | null>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchLinkedAccounts();
-  }, []);
-
-  const fetchLinkedAccounts = async () => {
+  const fetchAccounts = async () => {
     try {
-      const { data: session } = await supabase.auth.getSession();
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session.session) {
-        navigate("/auth");
+      if (!session) {
         return;
       }
-      
+
       const { data, error } = await supabase
-        .from("linked_accounts")
-        .select("*")
-        .order("linked_at", { ascending: false });
-        
-      if (error) throw error;
-      
-      setLinkedAccounts(data || []);
-    } catch (error) {
-      console.error("Error fetching linked accounts:", error);
+        .from('platform_accounts')
+        .select('*')
+        .eq('user_id', session.user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      setAccounts(data || []);
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Failed to load linked accounts",
-        variant: "destructive",
+        title: 'Error fetching accounts',
+        description: error.message,
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const openLinkDialog = (platform: string) => {
-    setSelectedPlatform(platform);
-    setPlatformUsername("");
-    setIsDialogOpen(true);
-  };
-
   const handleLinkAccount = async () => {
-    if (!selectedPlatform || !platformUsername.trim()) {
+    if (!selectedPlatform || !platformUsername) {
       toast({
-        title: "Invalid input",
-        description: "Please enter a valid username",
-        variant: "destructive",
+        title: 'Missing information',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
       });
       return;
     }
 
-    setIsLinking(true);
-
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
-        navigate("/auth");
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: 'Authentication error',
+          description: 'Please log in again',
+          variant: 'destructive',
+        });
         return;
       }
 
-      // Check if this platform is already linked
-      const existingAccount = linkedAccounts.find(
-        account => account.platform === selectedPlatform
-      );
+      // Check if account already exists
+      const { data: existingAccounts } = await supabase
+        .from('platform_accounts')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .eq('platform', selectedPlatform);
 
-      if (existingAccount) {
-        // Update the existing link
-        const { error } = await supabase
-          .from("linked_accounts")
-          .update({
-            platform_username: platformUsername,
-            linked_at: new Date().toISOString(),
-          })
-          .eq("id", existingAccount.id);
-
-        if (error) throw error;
-      } else {
-        // Create a new link
-        const { error } = await supabase.from("linked_accounts").insert({
-          user_id: session.session.user.id,
-          platform: selectedPlatform,
-          platform_username: platformUsername,
+      if (existingAccounts && existingAccounts.length > 0) {
+        toast({
+          title: 'Account already linked',
+          description: `You already have a ${selectedPlatform} account linked`,
+          variant: 'destructive',
         });
-
-        if (error) throw error;
+        return;
       }
 
-      // Refresh the list of linked accounts
-      await fetchLinkedAccounts();
-      
-      setIsDialogOpen(false);
-      toast({
-        title: "Success",
-        description: `Your ${PLATFORMS[selectedPlatform].name} account has been linked!`,
-      });
-    } catch (error) {
-      console.error("Error linking account:", error);
-      toast({
-        title: "Error",
-        description: "Failed to link account. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLinking(false);
-    }
-  };
-
-  const handleUnlinkAccount = async (platform: string) => {
-    try {
-      const accountToUnlink = linkedAccounts.find(
-        account => account.platform === platform
-      );
-
-      if (!accountToUnlink) return;
-
       const { error } = await supabase
-        .from("linked_accounts")
-        .delete()
-        .eq("id", accountToUnlink.id);
+        .from('platform_accounts')
+        .insert({
+          user_id: session.user.id,
+          platform: selectedPlatform,
+          platform_username: platformUsername,
+          platform_id: platformId || null,
+        });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
-      // Refresh the list of linked accounts
-      await fetchLinkedAccounts();
-      
       toast({
-        title: "Account unlinked",
-        description: `Your ${PLATFORMS[platform].name} account has been unlinked`,
+        title: 'Account linked',
+        description: `Your ${selectedPlatform} account has been linked successfully`,
       });
-    } catch (error) {
-      console.error("Error unlinking account:", error);
+
+      // Reset form and close dialog
+      setPlatformUsername('');
+      setPlatformId('');
+      setSelectedPlatform(null);
+      setLinkDialogOpen(false);
+      
+      // Refresh accounts list
+      fetchAccounts();
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Failed to unlink account. Please try again.",
-        variant: "destructive",
+        title: 'Error linking account',
+        description: error.message,
+        variant: 'destructive',
       });
     }
   };
 
-  const isPlatformLinked = (platform: string) => {
-    return linkedAccounts.some(account => account.platform === platform);
+  const handleUnlinkAccount = async () => {
+    if (!accountToUnlink) return;
+
+    try {
+      const { error } = await supabase
+        .from('platform_accounts')
+        .delete()
+        .eq('id', accountToUnlink.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: 'Account unlinked',
+        description: `Your ${accountToUnlink.platform} account has been unlinked`,
+      });
+
+      setUnlinkDialogOpen(false);
+      setAccountToUnlink(null);
+      
+      // Refresh accounts list
+      fetchAccounts();
+    } catch (error: any) {
+      toast({
+        title: 'Error unlinking account',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
-  const getLinkedUsername = (platform: string) => {
-    const account = linkedAccounts.find(acc => acc.platform === platform);
-    return account ? account.platform_username : null;
+  const getPlatformIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'xbox':
+        return <Gamepad2 className="w-6 h-6 text-green-500" />;
+      case 'playstation':
+        return <Gamepad2 className="w-6 h-6 text-blue-500" />;
+      case 'steam':
+        return <Monitor className="w-6 h-6 text-gray-300" />;
+      case 'epic':
+        return <Monitor className="w-6 h-6 text-yellow-500" />;
+      default:
+        return <User className="w-6 h-6 text-gray-400" />;
+    }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-20 pb-10 container-padding flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-neon-purple border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-neutral-300">Loading your linked accounts...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen pt-20 pb-10 container-padding">
-      <div className="max-w-4xl mx-auto">
-        <div className="glass-card p-6 rounded-xl mb-8">
-          <h1 className="text-2xl font-bold neon-text mb-2">Link Your Gaming Accounts</h1>
-          <p className="text-neutral-300 mb-4">
-            Connect your gaming platform accounts to AchievR to sync achievements and track your progress across all your platforms.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Object.entries(PLATFORMS).map(([platformId, platform]) => (
-            <div 
-              key={platformId}
-              className="glass-card p-6 rounded-xl hover:border-neon-purple/50 transition-all"
+    <div className="min-h-screen pt-20 pb-12 bg-primary">
+      <div className="container-padding mx-auto max-w-4xl">
+        <div className="glass-card rounded-xl p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold neon-text">Linked Accounts</h1>
+            <Button 
+              onClick={() => setLinkDialogOpen(true)}
+              className="bg-gradient-game"
             >
-              <div className="flex items-center mb-4">
-                <div className={`p-3 rounded-lg mr-3 ${platform.color}`}>
-                  {platform.icon}
-                </div>
-                <h2 className="text-xl font-bold text-white">{platform.name}</h2>
+              <Link2 className="w-4 h-4 mr-2" />
+              Link New Account
+            </Button>
+          </div>
+          
+          <div className="space-y-4">
+            {accounts.length === 0 ? (
+              <div className="text-center py-12 text-neutral-400">
+                <User className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No accounts linked yet</p>
+                <p className="text-sm mt-1">Link your gaming accounts to track achievements across platforms</p>
               </div>
-              
-              {isPlatformLinked(platformId) ? (
-                <>
-                  <div className="mb-4">
-                    <p className="text-neutral-400 text-sm">Linked Account</p>
-                    <p className="text-neon-purple font-medium">{getLinkedUsername(platformId)}</p>
+            ) : (
+              accounts.map((account) => (
+                <div 
+                  key={account.id} 
+                  className="flex items-center justify-between p-4 bg-black/30 rounded-lg border border-neon-purple/20"
+                >
+                  <div className="flex items-center gap-3">
+                    {getPlatformIcon(account.platform)}
+                    <div>
+                      <div className="font-medium">{account.platform}</div>
+                      <div className="text-sm text-neutral-400">{account.platform_username}</div>
+                    </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-neon-purple/30 text-neon-purple hover:bg-neon-purple/10"
-                      onClick={() => openLinkDialog(platformId)}
-                    >
-                      Update
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      className="w-full"
-                      onClick={() => handleUnlinkAccount(platformId)}
-                    >
-                      Unlink
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-neutral-300 mb-4">
-                    Link your {platform.name} account to track achievements
-                  </p>
                   <Button 
-                    className={`w-full ${platform.color} text-white`}
-                    onClick={() => openLinkDialog(platformId)}
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setAccountToUnlink(account);
+                      setUnlinkDialogOpen(true);
+                    }}
+                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
                   >
-                    Link Account
+                    <Unlink className="w-4 h-4 mr-1" />
+                    Unlink
                   </Button>
-                </>
-              )}
-            </div>
-          ))}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Platform linking dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/90 border border-neon-purple/30 text-white">
+      {/* Link Account Dialog */}
+      <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
+        <DialogContent className="glass-card border-neon-purple/50 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl neon-text">
-              {selectedPlatform && `Link Your ${PLATFORMS[selectedPlatform].name} Account`}
-            </DialogTitle>
-            <DialogDescription className="text-neutral-300">
-              {selectedPlatform && PLATFORMS[selectedPlatform].linkInstructions}
+            <DialogTitle className="neon-text">Link Gaming Account</DialogTitle>
+            <DialogDescription>
+              Connect your gaming accounts to track achievements and stats across platforms.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
-            <div>
-              <label htmlFor="platform-username" className="block text-sm font-medium text-neutral-300 mb-1">
-                {selectedPlatform && `${PLATFORMS[selectedPlatform].name} Username`}
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant={selectedPlatform === 'Xbox' ? 'default' : 'outline'}
+                className={selectedPlatform === 'Xbox' ? 'bg-green-600 hover:bg-green-700' : ''}
+                onClick={() => setSelectedPlatform('Xbox')}
+              >
+                <Gamepad2 className="w-4 h-4 mr-2" />
+                Xbox
+              </Button>
+              
+              <Button
+                type="button"
+                variant={selectedPlatform === 'PlayStation' ? 'default' : 'outline'}
+                className={selectedPlatform === 'PlayStation' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                onClick={() => setSelectedPlatform('PlayStation')}
+              >
+                <Gamepad2 className="w-4 h-4 mr-2" />
+                PlayStation
+              </Button>
+              
+              <Button
+                type="button"
+                variant={selectedPlatform === 'Steam' ? 'default' : 'outline'}
+                className={selectedPlatform === 'Steam' ? 'bg-gray-600 hover:bg-gray-700' : ''}
+                onClick={() => setSelectedPlatform('Steam')}
+              >
+                <Monitor className="w-4 h-4 mr-2" />
+                Steam
+              </Button>
+              
+              <Button
+                type="button"
+                variant={selectedPlatform === 'Epic' ? 'default' : 'outline'}
+                className={selectedPlatform === 'Epic' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}
+                onClick={() => setSelectedPlatform('Epic')}
+              >
+                <Monitor className="w-4 h-4 mr-2" />
+                Epic
+              </Button>
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="username" className="text-sm font-medium">
+                Username
               </label>
-              <input
-                id="platform-username"
-                type="text"
+              <Input
+                id="username"
                 value={platformUsername}
                 onChange={(e) => setPlatformUsername(e.target.value)}
-                placeholder={selectedPlatform ? `Enter your ${PLATFORMS[selectedPlatform].name} username` : ""}
-                className="w-full bg-black/50 border border-neon-purple/30 rounded-md p-3 text-white focus:outline-none focus:ring-2 focus:ring-neon-purple"
+                placeholder="Enter your platform username"
+                className="bg-black/50 border-neon-purple/30"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="platformId" className="text-sm font-medium flex items-center">
+                Platform ID <span className="text-xs text-neutral-400 ml-2">(Optional)</span>
+              </label>
+              <Input
+                id="platformId"
+                value={platformId}
+                onChange={(e) => setPlatformId(e.target.value)}
+                placeholder="Enter your platform ID if available"
+                className="bg-black/50 border-neon-purple/30"
               />
             </div>
           </div>
           
           <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsDialogOpen(false)}
-              className="border-neon-purple/30 text-white"
-            >
+            <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+            <Button onClick={handleLinkAccount} className="bg-gradient-game">
+              <Link2 className="w-4 h-4 mr-2" />
+              Link Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unlink Account Dialog */}
+      <Dialog open={unlinkDialogOpen} onOpenChange={setUnlinkDialogOpen}>
+        <DialogContent className="glass-card border-neon-purple/50 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-500">Unlink Account</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to unlink your {accountToUnlink?.platform} account? This will remove all associated data.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUnlinkDialogOpen(false)}>
               Cancel
             </Button>
             <Button 
-              onClick={handleLinkAccount}
-              className={selectedPlatform ? PLATFORMS[selectedPlatform].color : ""}
-              disabled={isLinking || !platformUsername.trim()}
+              variant="destructive" 
+              onClick={handleUnlinkAccount}
             >
-              {isLinking ? "Linking..." : "Link Account"}
+              <Unlink className="w-4 h-4 mr-2" />
+              Unlink Account
             </Button>
           </DialogFooter>
         </DialogContent>
