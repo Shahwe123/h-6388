@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,10 +13,12 @@ const Navbar = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [mobileNotificationsOpen, setMobileNotificationsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { pathname } = location;
   const { toast } = useToast();
+  const notificationsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession()
@@ -27,6 +29,20 @@ const Navbar = () => {
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
+  }, []);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   // Fetch notifications when session changes
@@ -92,6 +108,14 @@ const Navbar = () => {
 
   const handleNotificationClick = () => {
     setIsNotificationsOpen(!isNotificationsOpen);
+    if (hasUnreadNotifications) {
+      markNotificationsAsRead();
+    }
+  };
+
+  const handleMobileNotificationClick = () => {
+    setMobileNotificationsOpen(!mobileNotificationsOpen);
+    setIsMobileMenuOpen(false);
     if (hasUnreadNotifications) {
       markNotificationsAsRead();
     }
@@ -183,6 +207,71 @@ const Navbar = () => {
     { path: '/auth', label: 'Sign In' }
   ];
 
+  // Render notifications dropdown
+  const renderNotificationsDropdown = () => (
+    <div className="max-h-96 overflow-y-auto bg-primary border border-neutral-800 rounded-md shadow-lg">
+      <div className="px-4 py-2 border-b border-neutral-800">
+        <h3 className="font-medium">Notifications</h3>
+      </div>
+      
+      {notifications.length === 0 ? (
+        <div className="px-4 py-6 text-center text-neutral-400">
+          <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
+          <p>No notifications yet</p>
+        </div>
+      ) : (
+        notifications.map(notification => (
+          <div 
+            key={notification.id} 
+            className={`px-4 py-3 border-b border-neutral-800 last:border-0 ${!notification.read ? 'bg-black/30' : ''}`}
+          >
+            {notification.type === 'friend_request' && (
+              <div>
+                <p className="mb-2 text-sm">
+                  <span className="font-medium text-neon-blue">Friend request</span> from {notification.sender_username || 'a user'}
+                </p>
+                <div className="flex gap-2">
+                  <button 
+                    className="bg-neon-purple/20 hover:bg-neon-purple/30 text-white px-3 py-1 rounded text-xs"
+                    onClick={() => handleFriendAction(notification.id, true, notification.sender_id)}
+                  >
+                    Accept
+                  </button>
+                  <button 
+                    className="bg-black/30 hover:bg-black/50 text-neutral-300 px-3 py-1 rounded text-xs"
+                    onClick={() => handleFriendAction(notification.id, false, notification.sender_id)}
+                  >
+                    Decline
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {notification.type === 'friend_accepted' && (
+              <div>
+                <p className="text-sm">
+                  <span className="font-medium text-green-500">Friend request accepted</span> by {notification.sender_username || 'a user'}
+                </p>
+              </div>
+            )}
+            
+            {notification.type === 'friend_rejected' && (
+              <div>
+                <p className="text-sm">
+                  <span className="font-medium text-neutral-400">Friend request declined</span> by {notification.sender_username || 'a user'}
+                </p>
+              </div>
+            )}
+            
+            <p className="text-xs text-neutral-500 mt-1">
+              {new Date(notification.created_at).toLocaleString()}
+            </p>
+          </div>
+        ))
+      )}
+    </div>
+  );
+
   return (
     <nav className="fixed w-full top-0 z-50 bg-primary/90 backdrop-blur-md border-b border-neon-purple/10">
       <div className="container-padding mx-auto flex items-center justify-between h-16">
@@ -208,7 +297,7 @@ const Navbar = () => {
           {session && (
             <>
               {/* Notifications Button */}
-              <div className="relative">
+              <div className="relative" ref={notificationsRef}>
                 <button 
                   className={`p-2 rounded-full ${hasUnreadNotifications ? 'text-neon-pink' : 'text-neutral-400'} hover:text-white hover:bg-black/20`}
                   onClick={handleNotificationClick}
@@ -221,67 +310,8 @@ const Navbar = () => {
                 
                 {/* Notifications Dropdown */}
                 {isNotificationsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-primary border border-neutral-800 rounded-md shadow-lg py-1 z-10">
-                    <div className="px-4 py-2 border-b border-neutral-800">
-                      <h3 className="font-medium">Notifications</h3>
-                    </div>
-                    <div className="max-h-96 overflow-y-auto">
-                      {notifications.length === 0 ? (
-                        <div className="px-4 py-6 text-center text-neutral-400">
-                          <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                          <p>No notifications yet</p>
-                        </div>
-                      ) : (
-                        notifications.map(notification => (
-                          <div 
-                            key={notification.id} 
-                            className={`px-4 py-3 border-b border-neutral-800 last:border-0 ${!notification.read ? 'bg-black/30' : ''}`}
-                          >
-                            {notification.type === 'friend_request' && (
-                              <div>
-                                <p className="mb-2 text-sm">
-                                  <span className="font-medium text-neon-blue">Friend request</span> from {notification.sender_username || 'a user'}
-                                </p>
-                                <div className="flex gap-2">
-                                  <button 
-                                    className="bg-neon-purple/20 hover:bg-neon-purple/30 text-white px-3 py-1 rounded text-xs"
-                                    onClick={() => handleFriendAction(notification.id, true, notification.sender_id)}
-                                  >
-                                    Accept
-                                  </button>
-                                  <button 
-                                    className="bg-black/30 hover:bg-black/50 text-neutral-300 px-3 py-1 rounded text-xs"
-                                    onClick={() => handleFriendAction(notification.id, false, notification.sender_id)}
-                                  >
-                                    Decline
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                            
-                            {notification.type === 'friend_accepted' && (
-                              <div>
-                                <p className="text-sm">
-                                  <span className="font-medium text-green-500">Friend request accepted</span> by {notification.sender_username || 'a user'}
-                                </p>
-                              </div>
-                            )}
-                            
-                            {notification.type === 'friend_rejected' && (
-                              <div>
-                                <p className="text-sm">
-                                  <span className="font-medium text-neutral-400">Friend request declined</span> by {notification.sender_username || 'a user'}
-                                </p>
-                              </div>
-                            )}
-                            
-                            <p className="text-xs text-neutral-500 mt-1">
-                              {new Date(notification.created_at).toLocaleString()}
-                            </p>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                  <div className="absolute right-0 mt-2 w-80 z-10">
+                    {renderNotificationsDropdown()}
                   </div>
                 )}
               </div>
@@ -335,11 +365,7 @@ const Navbar = () => {
                 {/* Mobile Notifications */}
                 <button
                   className={`flex items-center w-full py-2 text-lg ${hasUnreadNotifications ? 'text-neon-pink' : 'text-neutral-400'}`}
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    setIsNotificationsOpen(true);
-                    markNotificationsAsRead();
-                  }}
+                  onClick={handleMobileNotificationClick}
                 >
                   <Bell className="h-5 w-5 mr-2" />
                   <span>Notifications</span>
@@ -360,6 +386,25 @@ const Navbar = () => {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Notifications Panel */}
+      {mobileNotificationsOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex flex-col">
+          <div className="bg-primary/95 border-b border-neutral-800 p-4 flex items-center justify-between">
+            <h3 className="font-medium text-lg">Notifications</h3>
+            <button 
+              className="p-2 text-neutral-400 hover:text-white"
+              onClick={() => setMobileNotificationsOpen(false)}
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto">
+            {renderNotificationsDropdown()}
           </div>
         </div>
       )}
