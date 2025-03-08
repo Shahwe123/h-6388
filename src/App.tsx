@@ -12,6 +12,7 @@ import { setSession } from "@/store/slices/authSlice";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import AuthRequired from "./components/AuthRequired";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/profile" element={<Profile />} />
           {/* Add protected routes as needed */}
         </Routes>
       </BrowserRouter>

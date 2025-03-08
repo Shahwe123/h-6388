@@ -20,7 +20,7 @@ const Auth = () => {
 
   // Redirect if already logged in
   if (user) {
-    return <Navigate to="/" />;
+    return <Navigate to="/profile" />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -28,7 +28,7 @@ const Auth = () => {
     
     try {
       await dispatch(signIn({ email, password })).unwrap();
-      navigate('/');
+      navigate('/profile');
     } catch (error) {
       toast({
         title: 'Login failed',
@@ -98,7 +98,7 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="glass-card p-8 rounded-xl w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold neon-text mb-2">AchievR</h1>
+          <h1 className="text-3xl font-bold neon-text mb-6">AchievR</h1>
           
           {view === 'login' && <h2 className="text-xl font-bold">Sign In</h2>}
           {view === 'register' && <h2 className="text-xl font-bold">Create Account</h2>}
