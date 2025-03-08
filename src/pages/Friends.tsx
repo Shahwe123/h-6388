@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +25,7 @@ const Friends = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -94,7 +96,7 @@ const Friends = () => {
             avatar_url: profile?.avatar_url
           }
         };
-      });
+      }).filter(friend => friend.friend.id !== ''); // Filter out any friends without profiles
       
       setFriends(formattedFriends);
     } catch (error: any) {
@@ -110,6 +112,7 @@ const Friends = () => {
     if (!searchQuery.trim() || !userId) return;
     
     setSearching(true);
+    setHasSearched(true);
     
     try {
       const { data, error } = await supabase
@@ -278,7 +281,7 @@ const Friends = () => {
                     </div>
                     
                     <button 
-                      className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-black/40"
+                      className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-black/40 transition-all duration-200"
                       onClick={() => removeFriend(friend.id, friend.username)}
                       title="Remove friend"
                     >
@@ -313,11 +316,12 @@ const Friends = () => {
             <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
               <h3 className="font-medium">Find Friends</h3>
               <button 
-                className="p-1 text-neutral-400 hover:text-white"
+                className="p-1 text-neutral-400 hover:text-white transition-colors"
                 onClick={() => {
                   setShowSearchModal(false);
                   setSearchQuery('');
                   setSearchResults([]);
+                  setHasSearched(false);
                 }}
               >
                 <X className="h-5 w-5" />
@@ -351,11 +355,13 @@ const Friends = () => {
               </div>
               
               <div className="max-h-80 overflow-y-auto">
-                {searchResults.length === 0 ? (
+                {!hasSearched ? (
                   <div className="text-center py-6 text-neutral-400">
-                    {searchQuery ? 
-                      'No users found matching your search. Try a different name.' : 
-                      'Search for users by username to add them as friends.'}
+                    Search for users by username to add them as friends.
+                  </div>
+                ) : searchResults.length === 0 ? (
+                  <div className="text-center py-6 text-neutral-400">
+                    No users found matching your search. Try a different name.
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -377,7 +383,7 @@ const Friends = () => {
                         </div>
                         
                         <Button 
-                          className="cyber-button-sm p-2"
+                          className="cyber-button-sm p-2 transition-all duration-200 hover:bg-neon-purple hover:text-white"
                           onClick={() => sendFriendRequest(user.id, user.username)}
                         >
                           <UserPlus className="h-4 w-4" />
