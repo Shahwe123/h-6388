@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Gamepad, User, Settings, LogOut, ChevronDown, Link2 } from 'lucide-react';
+import { Menu, X, Gamepad, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 
@@ -60,16 +60,7 @@ const Navbar = () => {
                       className="block px-4 py-2 text-sm text-neutral-300 hover:bg-neon-purple/10 hover:text-neon-pink transition-colors"
                       onClick={() => setIsDropdownOpen(false)}
                     >
-                      <User className="w-4 h-4 inline mr-2" />
                       View Profile
-                    </Link>
-                    <Link 
-                      to="/link-accounts" 
-                      className="block px-4 py-2 text-sm text-neutral-300 hover:bg-neon-purple/10 hover:text-neon-pink transition-colors"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <Link2 className="w-4 h-4 inline mr-2" />
-                      Link Accounts
                     </Link>
                     <Link 
                       to="/settings" 
@@ -120,14 +111,6 @@ const Navbar = () => {
                 >
                   <User className="w-4 h-4" />
                   Profile
-                </Link>
-                <Link 
-                  to="/link-accounts" 
-                  className="text-neutral-300 hover:text-neon-pink transition-colors flex items-center gap-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Link2 className="w-4 h-4" />
-                  Link Accounts
                 </Link>
                 <Link 
                   to="/settings" 

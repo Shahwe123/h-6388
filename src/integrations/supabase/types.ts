@@ -9,33 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      linked_accounts: {
-        Row: {
-          id: string
-          linked_at: string | null
-          platform: string
-          platform_id: string | null
-          platform_username: string
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          linked_at?: string | null
-          platform: string
-          platform_id?: string | null
-          platform_username: string
-          user_id: string
-        }
-        Update: {
-          id?: string
-          linked_at?: string | null
-          platform?: string
-          platform_id?: string | null
-          platform_username?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
