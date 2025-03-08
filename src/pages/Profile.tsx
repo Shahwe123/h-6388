@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, UserCircle, BarChart3, Clock, Users } from 'lucide-react';
+import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Profile {
