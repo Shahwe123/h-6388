@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Users, User, UserPlus, X, Search, UserCheck, Gamepad2 } from 'lucide-react';
+import { Users, User, UserPlus, X, Search, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Profile {
@@ -67,11 +67,13 @@ const Friends = () => {
   
   const fetchFriends = async (userId: string) => {
     try {
+      // Fixed query to properly join with profiles table
       const { data, error } = await supabase
         .from('friends')
         .select(`
           id,
-          friend:friend_id (
+          friend_id,
+          profiles!friends_friend_id_fkey (
             id,
             username,
             avatar_url
@@ -80,7 +82,18 @@ const Friends = () => {
         .eq('user_id', userId);
         
       if (error) throw error;
-      setFriends(data || []);
+      
+      // Transform the response to match our Friend interface
+      const formattedFriends: Friend[] = data?.map(item => ({
+        id: item.id,
+        friend: {
+          id: item.profiles.id,
+          username: item.profiles.username,
+          avatar_url: item.profiles.avatar_url
+        }
+      })) || [];
+      
+      setFriends(formattedFriends);
     } catch (error: any) {
       toast({
         title: 'Error fetching friends',
