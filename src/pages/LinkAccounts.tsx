@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -177,8 +176,7 @@ const LinkAccounts = () => {
   const [currentPlatform, setCurrentPlatform] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch user profile on component mount
-  useState(() => {
+  useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
@@ -247,7 +245,6 @@ const LinkAccounts = () => {
         
       if (error) throw error;
       
-      // Update local state
       setProfile({ ...profile, ...updates });
       
       toast({
@@ -290,7 +287,6 @@ const LinkAccounts = () => {
         
       if (error) throw error;
       
-      // Update local state
       setProfile({ ...profile, ...updates });
       
       toast({
@@ -364,7 +360,6 @@ const LinkAccounts = () => {
         </div>
       </div>
       
-      {/* Platform Linking Modals */}
       <PlatformModal
         isOpen={currentPlatform === 'Steam'}
         onClose={handleCloseModal}
