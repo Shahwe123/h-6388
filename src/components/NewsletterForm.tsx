@@ -31,6 +31,8 @@ const NewsletterForm = ({ isOpen, onClose }: NewsletterFormProps) => {
     setIsSubmitting(true);
 
     try {
+      // Insert the email into the waitlist table
+      // We're using the raw Supabase client without relying on specific types
       const { error } = await supabase
         .from("waitlist")
         .insert([{ email }]);
