@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon, Link } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 interface Profile {
@@ -23,13 +23,36 @@ const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [friendCount, setFriendCount] = useState(0);
+  const [searchParams] = useSearchParams();
+  const profileId = searchParams.get('id');
   const { toast } = useToast();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isFriend, setIsFriend] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchUserSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
+        if (session) {
+          setCurrentUserId(session.user.id);
+          return session.user.id;
+        }
+        return null;
+      } catch (error) {
+        console.error('Error fetching session:', error);
+        return null;
+      }
+    };
+
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        const userId = await fetchUserSession();
+        
+        // If profileId is provided in URL, fetch that profile, otherwise fetch current user's profile
+        const targetProfileId = profileId || userId;
+        
+        if (!targetProfileId) {
           setLoading(false);
           return;
         }
@@ -37,7 +60,7 @@ const Profile = () => {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', session.user.id)
+          .eq('id', targetProfileId)
           .single();
 
         if (error) {
@@ -47,17 +70,32 @@ const Profile = () => {
         // Use type assertion to ensure data is treated as Profile type
         setProfile(data as Profile);
         
-        // Fetch friend count
+        // Fetch friend count for the profile
         const { count, error: friendError } = await supabase
           .from('friends')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', session.user.id);
+          .eq('user_id', targetProfileId);
           
         if (friendError) {
           throw friendError;
         }
         
         setFriendCount(count || 0);
+        
+        // Check if viewing user is friends with this profile
+        if (userId && profileId && userId !== profileId) {
+          const { data: friendData, error: checkFriendError } = await supabase
+            .from('friends')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('friend_id', profileId);
+            
+          if (checkFriendError) {
+            console.error('Error checking friend status:', checkFriendError);
+          } else {
+            setIsFriend(friendData && friendData.length > 0);
+          }
+        }
       } catch (error: any) {
         toast({
           title: 'Error fetching profile',
@@ -68,8 +106,9 @@ const Profile = () => {
         setLoading(false);
       }
     };
-    fetchProfile();
-  }, [toast]);
+    
+    fetchProfileData();
+  }, [toast, profileId]);
 
   if (loading) {
     return <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">
@@ -89,6 +128,7 @@ const Profile = () => {
   }
 
   const hasLinkedAccounts = profile.steam_id || profile.xbox_gamertag || profile.playstation_username;
+  const isOwnProfile = currentUserId === profile.id;
 
   return <div className="min-h-screen pt-20 pb-12 bg-primary">
       <div className="container-padding mx-auto max-w-6xl">
@@ -138,12 +178,14 @@ const Profile = () => {
         <div className="glass-card rounded-xl p-6 mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">Linked Accounts</h2>
-            <RouterLink to="/link-accounts">
-              <Button className="bg-gradient-game" size="sm">
-                <Link className="h-4 w-4 mr-1" /> 
-                {hasLinkedAccounts ? 'Manage Accounts' : 'Link Accounts'}
-              </Button>
-            </RouterLink>
+            {isOwnProfile && (
+              <RouterLink to="/link-accounts">
+                <Button className="bg-gradient-game" size="sm">
+                  <Link className="h-4 w-4 mr-1" /> 
+                  {hasLinkedAccounts ? 'Manage Accounts' : 'Link Accounts'}
+                </Button>
+              </RouterLink>
+            )}
           </div>
           
           {hasLinkedAccounts ? <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -186,9 +228,13 @@ const Profile = () => {
               <Link className="w-12 h-12 mx-auto mb-3 opacity-30" />
               <p>No gaming accounts linked</p>
               <p className="text-sm mt-1">Connect your gaming accounts to track achievements and stats</p>
-              <RouterLink to="/link-accounts" className="block mt-4">
-                
-              </RouterLink>
+              {isOwnProfile && (
+                <RouterLink to="/link-accounts" className="block mt-4">
+                  <Button className="bg-gradient-game mt-2" size="sm">
+                    Link Accounts
+                  </Button>
+                </RouterLink>
+              )}
             </div>}
         </div>
         
