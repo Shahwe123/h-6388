@@ -1,10 +1,9 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Menu, X, User, Settings, LogOut, Gamepad, Users, Bell } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Gamepad, Users, Bell, Trash2 } from 'lucide-react';
 
 const Navbar = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -56,7 +55,6 @@ const Navbar = () => {
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
-          // Add the new notification to the list
           setNotifications(prev => [payload.new, ...prev]);
           setHasUnreadNotifications(true);
         })
@@ -65,7 +63,6 @@ const Navbar = () => {
           schema: 'public', 
           table: 'notifications'
         }, () => {
-          // Refresh notifications when one is deleted (like after accepting/declining)
           fetchNotifications();
         })
         .on('postgres_changes', { 
@@ -74,7 +71,6 @@ const Navbar = () => {
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
-          // Update notification in the list when it changes (e.g. marked as read)
           setNotifications(prev => 
             prev.map(notif => notif.id === payload.new.id ? payload.new : notif)
           );
@@ -209,6 +205,33 @@ const Navbar = () => {
     }
   };
 
+  const handleDeleteNotification = async (notificationId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
+        
+      if (error) throw error;
+      
+      setNotifications(prev => 
+        prev.filter(notif => notif.id !== notificationId)
+      );
+      
+      toast({
+        title: 'Notification deleted',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error deleting notification',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const navLinks = session ? [
     { path: '/profile', label: 'Profile' },
     { path: '/friends', label: 'Friends' },
@@ -239,11 +262,19 @@ const Navbar = () => {
         notifications.map(notification => (
           <div 
             key={notification.id} 
-            className={`px-4 py-3 border-b border-neutral-800 last:border-0 ${!notification.read ? 'bg-black/30' : ''}`}
+            className={`px-4 py-3 border-b border-neutral-800 last:border-0 ${!notification.read ? 'bg-black/30' : ''} relative`}
           >
+            <button
+              className="absolute top-3 right-3 p-1 text-neutral-400 hover:text-red-500 transition-colors"
+              onClick={(e) => handleDeleteNotification(notification.id, e)}
+              aria-label="Delete notification"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+            
             {notification.type === 'friend_request' && (
               <div>
-                <p className="mb-2 text-sm">
+                <p className="mb-2 text-sm pr-6">
                   <span className="font-medium text-neon-blue">Friend request</span> from {notification.sender_username || 'a user'}
                 </p>
                 <div className="flex gap-2">
@@ -265,7 +296,7 @@ const Navbar = () => {
             
             {notification.type === 'friend_accepted' && (
               <div>
-                <p className="text-sm">
+                <p className="text-sm pr-6">
                   <span className="font-medium text-green-500">Friend request accepted</span> by {notification.sender_username || 'a user'}
                 </p>
               </div>
@@ -273,7 +304,7 @@ const Navbar = () => {
             
             {notification.type === 'friend_rejected' && (
               <div>
-                <p className="text-sm">
+                <p className="text-sm pr-6">
                   <span className="font-medium text-neutral-400">Friend request declined</span> by {notification.sender_username || 'a user'}
                 </p>
               </div>
