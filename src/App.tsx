@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import LinkAccounts from "./pages/LinkAccounts";
+import Friends from "./pages/Friends";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthRequired from "./components/AuthRequired";
@@ -88,6 +89,7 @@ const App = () => {
             {/* Protected routes */}
             <Route element={<AuthRequired />}>
               <Route path="/profile" element={<Profile />} />
+              <Route path="/friends" element={<Friends />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/link-accounts" element={<LinkAccounts />} />
             </Route>
