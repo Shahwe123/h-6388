@@ -71,6 +71,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          is_private: boolean | null
           playstation_username: string | null
           steam_id: string | null
           username: string
@@ -83,6 +84,7 @@ export type Database = {
           created_at?: string
           email: string
           id: string
+          is_private?: boolean | null
           playstation_username?: string | null
           steam_id?: string | null
           username: string
@@ -95,6 +97,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          is_private?: boolean | null
           playstation_username?: string | null
           steam_id?: string | null
           username?: string

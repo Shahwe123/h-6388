@@ -11,6 +11,9 @@ interface Profile {
   cover_url: string | null;
   bio: string | null;
   is_private: boolean | null;
+  steam_id: string | null;
+  xbox_gamertag: string | null;
+  playstation_username: string | null;
 }
 
 const Settings = () => {

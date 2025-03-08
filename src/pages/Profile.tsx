@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon, Link } from 'lucide-react';
@@ -15,6 +16,7 @@ interface Profile {
   steam_id: string | null;
   xbox_gamertag: string | null;
   playstation_username: string | null;
+  is_private: boolean | null;
 }
 
 const Profile = () => {

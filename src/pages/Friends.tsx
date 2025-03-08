@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Users, User, UserPlus, X, Search, Gamepad2 } from 'lucide-react';
+import { Users, User, UserPlus, X, Search, Gamepad2, UserCircle, Check, UserMinus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -26,6 +26,7 @@ const Friends = () => {
   const [username, setUsername] = useState<string | null>(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -213,6 +214,98 @@ const Friends = () => {
     }
   };
 
+  const renderUserList = () => {
+    if (searchResults.length === 0 && hasSearched) {
+      return (
+        <div className="text-center py-8 text-neutral-400">
+          <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p>No users found</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {searchResults.map((user) => (
+          <div
+            key={user.id}
+            className="p-3 bg-black/30 rounded-lg flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+                ) : (
+                  <UserCircle className="w-8 h-8 text-neutral-400" />
+                )}
+              </div>
+              <div>
+                <div className="font-medium">{user.username}</div>
+              </div>
+            </div>
+            <button
+              onClick={() => handleSendFriendRequest(user.id, user.username)}
+              className="p-2 bg-black/40 hover:bg-neon-purple/20 rounded transition-colors"
+              disabled={pendingFriendRequests.includes(user.id)}
+            >
+              {pendingFriendRequests.includes(user.id) ? (
+                <Check className="w-5 h-5 text-green-500" />
+              ) : (
+                <UserPlus className="w-5 h-5 text-neutral-300" />
+              )}
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderFriendsList = () => {
+    if (friends.length === 0) {
+      return (
+        <div className="text-center py-8 text-neutral-400">
+          <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p>No friends yet</p>
+          <p className="text-sm mt-1">Search for users to add them as friends</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {friends.map((friend) => (
+          <div
+            key={friend.id}
+            className="p-3 bg-black/30 rounded-lg flex items-center justify-between"
+          >
+            <div 
+              className="flex items-center gap-3 flex-1 cursor-pointer"
+              onClick={() => navigateToProfile(friend.id)}
+            >
+              <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
+                {friend.avatar_url ? (
+                  <img src={friend.avatar_url} alt={friend.username} className="w-full h-full object-cover" />
+                ) : (
+                  <UserCircle className="w-8 h-8 text-neutral-400" />
+                )}
+              </div>
+              <div>
+                <div className="font-medium">{friend.username}</div>
+              </div>
+            </div>
+            <button
+              onClick={() => handleRemoveFriend(friend.id)}
+              className="p-2 hover:bg-red-500/20 hover:border hover:border-red-500/50 rounded transition-colors"
+              title="Remove friend"
+            >
+              <UserMinus className="w-5 h-5 text-neutral-300 hover:text-red-400" />
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">
@@ -260,34 +353,7 @@ const Friends = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {friends.map(({ id, friend }) => (
-                  <div key={id} className="bg-black/30 rounded-lg p-4 flex items-center justify-between">
-                    <Link to={`/profile/${friend.id}`} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-                      <div className="w-12 h-12 rounded-full bg-neon-purple/20 flex items-center justify-center overflow-hidden">
-                        {friend.avatar_url ? (
-                          <img 
-                            src={friend.avatar_url} 
-                            alt={friend.username} 
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-6 w-6 text-neon-purple" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium">{friend.username}</p>
-                      </div>
-                    </Link>
-                    
-                    <button 
-                      className="p-2 rounded text-neutral-400 hover:text-white hover:bg-red-500/80 hover:text-white transition-all duration-200"
-                      onClick={() => removeFriend(friend.id, friend.username)}
-                      title="Remove friend"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+                {renderFriendsList()}
               </div>
             )}
           </div>
@@ -364,31 +430,7 @@ const Friends = () => {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {searchResults.map(user => (
-                      <div key={user.id} className="bg-black/30 rounded-lg p-3 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-neon-purple/20 flex items-center justify-center overflow-hidden">
-                            {user.avatar_url ? (
-                              <img 
-                                src={user.avatar_url} 
-                                alt={user.username} 
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <User className="h-5 w-5 text-neon-purple" />
-                            )}
-                          </div>
-                          <p className="font-medium">{user.username}</p>
-                        </div>
-                        
-                        <Button 
-                          className="cyber-button-sm p-2 transition-all duration-200 hover:bg-neon-purple hover:text-white"
-                          onClick={() => sendFriendRequest(user.id, user.username)}
-                        >
-                          <UserPlus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                    {renderUserList()}
                   </div>
                 )}
               </div>

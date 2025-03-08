@@ -198,7 +198,7 @@ const Navbar = () => {
   ];
 
   const renderNotificationsDropdown = () => (
-    <div className="max-h-96 overflow-y-auto bg-primary border border-neon-purple/30 rounded-md shadow-lg shadow-neon-purple/10 backdrop-blur-md">
+    <div className="max-h-96 overflow-y-auto bg-primary border border-neon-purple/30 rounded-md shadow-lg shadow-neon-purple/20 backdrop-blur-md">
       <div className="px-4 py-2 border-b border-neutral-800 flex items-center justify-between">
         <h3 className="font-medium">Notifications</h3>
         <button 
