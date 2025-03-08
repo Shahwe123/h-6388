@@ -17,7 +17,10 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          playstation_username: string | null
+          steam_id: string | null
           username: string
+          xbox_gamertag: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -26,7 +29,10 @@ export type Database = {
           created_at?: string
           email: string
           id: string
+          playstation_username?: string | null
+          steam_id?: string | null
           username: string
+          xbox_gamertag?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -35,7 +41,10 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          playstation_username?: string | null
+          steam_id?: string | null
           username?: string
+          xbox_gamertag?: string | null
         }
         Relationships: []
       }

@@ -1,149 +1,167 @@
-
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Gamepad, User, Settings, LogOut, ChevronDown } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Menu, X, User, Settings, LogOut, Gamepad } from 'lucide-react';
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { pathname } = location;
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Get current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setSession(session);
+      });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: 'Error signing out',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } else {
+      navigate('/auth');
+      toast({
+        title: 'Signed out successfully',
+      });
+    }
   };
 
+  const navLinks = [
+    { path: '/', label: 'Home' },
+    ...(!session ? [
+      { path: '/auth', label: 'Sign In' }
+    ] : [
+      { path: '/profile', label: 'Profile' },
+      { path: '/link-accounts', label: 'Link Accounts' },
+      { path: '/settings', label: 'Settings' }
+    ])
+  ];
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-lg border-b border-neon-purple/30">
-      <nav className="container-padding mx-auto flex h-16 items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-white flex items-center gap-2">
-          <Gamepad className="w-6 h-6 text-neon-purple" />
-          <span className="neon-text">AchievR</span>
+    <nav className="fixed w-full top-0 z-50 bg-primary/90 backdrop-blur-md border-b border-neon-purple/10">
+      <div className="container-padding mx-auto flex items-center justify-between h-16">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <span className="font-bold text-xl">GameHub</span>
         </Link>
-        
-        <div className="hidden md:flex items-center gap-8">
-          {session ? (
-            <>
-              <div className="relative">
-                <button 
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="text-neutral-300 hover:text-neon-pink transition-colors flex items-center gap-1"
-                >
-                  <User className="w-4 h-4" />
-                  Profile
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-lg border border-neon-purple/30 rounded-md shadow-lg py-1 z-10">
-                    <Link 
-                      to="/profile" 
-                      className="block px-4 py-2 text-sm text-neutral-300 hover:bg-neon-purple/10 hover:text-neon-pink transition-colors"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      View Profile
-                    </Link>
-                    <Link 
-                      to="/settings" 
-                      className="block px-4 py-2 text-sm text-neutral-300 hover:bg-neon-purple/10 hover:text-neon-pink transition-colors"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <Settings className="w-4 h-4 inline mr-2" />
-                      Settings
-                    </Link>
-                    <button 
-                      onClick={() => {
-                        handleSignOut();
-                        setIsDropdownOpen(false);
-                      }}
-                      className="block w-full text-left px-4 py-2 text-sm text-neutral-300 hover:bg-neon-purple/10 hover:text-neon-pink transition-colors"
-                    >
-                      <LogOut className="w-4 h-4 inline mr-2" />
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <Link to="/auth" className="cyber-button flex items-center gap-2">
-              Sign In
+
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-6">
+          {navLinks.map(link => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`text-sm font-medium transition-colors hover:text-white ${
+                pathname === link.path ? 'text-white' : 'text-neutral-400'
+              }`}
+            >
+              {link.label}
             </Link>
-          )}
+          ))}
         </div>
 
+        {/* Mobile menu button */}
         <button 
-          className="md:hidden text-white"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden text-neutral-300 focus:outline-none"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          {isMenuOpen ? <X className="text-neon-purple" /> : <Menu className="text-neon-purple" />}
+          {isMobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
         </button>
-      </nav>
+      </div>
 
-      {isMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-black/80 backdrop-blur-lg border-b border-neon-purple/30">
-          <div className="container-padding py-4 flex flex-col gap-4">
-            {session ? (
-              <>
-                <Link 
-                  to="/profile" 
-                  className="text-neutral-300 hover:text-neon-pink transition-colors flex items-center gap-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <User className="w-4 h-4" />
-                  Profile
-                </Link>
-                <Link 
-                  to="/settings" 
-                  className="text-neutral-300 hover:text-neon-pink transition-colors flex items-center gap-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Settings className="w-4 h-4" />
-                  Settings
-                </Link>
-                <button 
-                  onClick={() => {
-                    handleSignOut();
-                    setIsMenuOpen(false);
-                  }}
-                  className="text-neutral-300 hover:text-neon-pink transition-colors flex items-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <Link 
-                to="/auth" 
-                className="cyber-button flex items-center justify-center"
-                onClick={() => setIsMenuOpen(false)}
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-primary/95 backdrop-blur-md">
+          <div className="container-padding pt-4 pb-6 space-y-4 border-b border-neon-purple/10">
+            {navLinks.map(link => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`block py-2 text-lg ${
+                  pathname === link.path ? 'text-white font-medium' : 'text-neutral-400'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                Sign In
+                {link.label}
               </Link>
+            ))}
+
+            {session && (
+              <div className="pt-4 border-t border-neutral-800">
+                <button
+                  className="flex items-center text-neutral-400 hover:text-white w-full py-2"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
       )}
-    </header>
+
+      {/* User Menu (Desktop) */}
+      {session && (
+        <div className="hidden md:block absolute right-6 top-16">
+          {isUserMenuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-primary border border-neutral-800 rounded-md shadow-lg py-1 z-10">
+              <Link 
+                to="/profile" 
+                className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:bg-black/30"
+                onClick={() => setIsUserMenuOpen(false)}
+              >
+                <User className="h-4 w-4 mr-2" />
+                Profile
+              </Link>
+              <Link 
+                to="/link-accounts" 
+                className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:bg-black/30"
+                onClick={() => setIsUserMenuOpen(false)}
+              >
+                <Gamepad className="h-4 w-4 mr-2" />
+                Link Accounts
+              </Link>
+              <Link 
+                to="/settings" 
+                className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:bg-black/30"
+                onClick={() => setIsUserMenuOpen(false)}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Link>
+              <div className="border-t border-neutral-800 my-1"></div>
+              <button
+                className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:bg-black/30 w-full text-left"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </nav>
   );
 };
 
