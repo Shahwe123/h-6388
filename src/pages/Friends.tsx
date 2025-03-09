@@ -1,37 +1,26 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Users, User, UserPlus, X, Search, Gamepad2, UserCircle, Check, UserMinus } from 'lucide-react';
+import { Users, UserPlus, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
-
-interface Profile {
-  id: string;
-  username: string;
-  avatar_url: string | null;
-}
-
-interface Friend {
-  id: string;
-  friend: Profile;
-}
+import FriendsList from '@/components/friends/FriendsList';
+import UserSearch from '@/components/friends/UserSearch';
+import FriendActivity from '@/components/friends/FriendActivity';
+import { useFriends } from '@/hooks/useFriends';
 
 const Friends = () => {
   const [loading, setLoading] = useState(true);
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Profile[]>([]);
-  const [searching, setSearching] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
   const { toast } = useToast();
-  const navigate = useNavigate();
+  
+  // Use the custom hook for friends data
+  const { friends, setFriends, loading: friendsLoading } = useFriends(userId);
 
   useEffect(() => {
-    const fetchUserAndFriends = async () => {
+    const fetchUserData = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -49,11 +38,9 @@ const Friends = () => {
           
         if (profileError) throw profileError;
         setUsername(profileData.username);
-        
-        await fetchFriends(session.user.id);
       } catch (error: any) {
         toast({
-          title: 'Error fetching data',
+          title: 'Error fetching user data',
           description: error.message,
           variant: 'destructive',
         });
@@ -62,7 +49,7 @@ const Friends = () => {
       }
     };
     
-    fetchUserAndFriends();
+    fetchUserData();
   }, [toast]);
   
   useEffect(() => {
@@ -77,284 +64,17 @@ const Friends = () => {
         filter: `recipient_id=eq.${userId}`
       }, payload => {
         if (payload.new.type === 'friend_accepted') {
-          fetchFriends(userId);
+          // Friend acceptance handling is now in the useFriends hook
         }
-      })
-      .subscribe();
-      
-    const friendsChannel = supabase
-      .channel('public:friends')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'friends',
-        filter: `user_id=eq.${userId}`
-      }, () => {
-        fetchFriends(userId);
-      })
-      .on('postgres_changes', { 
-        event: 'DELETE', 
-        schema: 'public', 
-        table: 'friends',
-        filter: `user_id=eq.${userId}`
-      }, () => {
-        fetchFriends(userId);
       })
       .subscribe();
       
     return () => {
       supabase.removeChannel(notificationsChannel);
-      supabase.removeChannel(friendsChannel);
     };
   }, [userId]);
-  
-  const fetchFriends = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('friends')
-        .select('id, friend_id')
-        .eq('user_id', userId);
-        
-      if (error) throw error;
-      
-      if (!data || data.length === 0) {
-        setFriends([]);
-        return;
-      }
-      
-      const friendIds = data.map(item => item.friend_id);
-      
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', friendIds);
-        
-      if (profilesError) throw profilesError;
-      
-      const formattedFriends: Friend[] = data.map(item => {
-        const profile = profilesData?.find(p => p.id === item.friend_id);
-        return {
-          id: item.id,
-          friend: {
-            id: profile?.id || '',
-            username: profile?.username || 'Unknown User',
-            avatar_url: profile?.avatar_url
-          }
-        };
-      }).filter(friend => friend.friend.id !== '');
-      
-      setFriends(formattedFriends);
-    } catch (error: any) {
-      toast({
-        title: 'Error fetching friends',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
-  };
-  
-  const handleSearch = async () => {
-    if (!searchQuery.trim() || !userId) return;
-    
-    setSearching(true);
-    setHasSearched(true);
-    
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .ilike('username', `%${searchQuery}%`)
-        .neq('id', userId)
-        .limit(10);
-        
-      if (error) throw error;
-      
-      const friendIds = friends.map(f => f.friend.id);
-      const filteredResults = data?.filter(user => !friendIds.includes(user.id)) || [];
-      
-      setSearchResults(filteredResults);
-    } catch (error: any) {
-      toast({
-        title: 'Error searching users',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setSearching(false);
-    }
-  };
-  
-  const sendFriendRequest = async (recipientId: string, recipientUsername: string) => {
-    if (!userId || !username) return;
-    
-    try {
-      const { data: existingRequests, error: checkError } = await supabase
-        .from('notifications')
-        .select()
-        .eq('sender_id', userId)
-        .eq('recipient_id', recipientId)
-        .eq('type', 'friend_request');
-        
-      if (checkError) throw checkError;
-      
-      if (existingRequests && existingRequests.length > 0) {
-        toast({
-          title: 'Friend request already sent',
-          description: `You've already sent a request to ${recipientUsername}`,
-        });
-        return;
-      }
-      
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          recipient_id: recipientId,
-          sender_id: userId,
-          sender_username: username,
-          type: 'friend_request',
-          read: false
-        });
-        
-      if (error) throw error;
-      
-      toast({
-        title: 'Friend request sent',
-        description: `A friend request has been sent to ${recipientUsername}`,
-      });
-      
-      setSearchResults(prev => prev.filter(user => user.id !== recipientId));
-    } catch (error: any) {
-      toast({
-        title: 'Error sending friend request',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
-  };
-  
-  const removeFriend = async (friendId: string, friendUsername: string) => {
-    if (!userId) return;
-    
-    try {
-      const { error } = await supabase
-        .from('friends')
-        .delete()
-        .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`);
-        
-      if (error) throw error;
-      
-      toast({
-        title: 'Friend removed',
-        description: `${friendUsername} has been removed from your friends list`,
-      });
-      
-      setFriends(prev => prev.filter(f => f.friend.id !== friendId));
-    } catch (error: any) {
-      toast({
-        title: 'Error removing friend',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
-  };
 
-  const navigateToProfile = (friendId: string) => {
-    navigate(`/profile?id=${friendId}`);
-  };
-
-  const renderUserList = () => {
-    if (searchResults.length === 0 && hasSearched) {
-      return (
-        <div className="text-center py-8 text-neutral-400">
-          <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>No users found</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        {searchResults.map((user) => (
-          <div
-            key={user.id}
-            className="p-3 bg-black/30 rounded-lg flex items-center justify-between"
-          >
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
-                {user.avatar_url ? (
-                  <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
-                ) : (
-                  <UserCircle className="w-8 h-8 text-neutral-400" />
-                )}
-              </div>
-              <div>
-                <div className="font-medium">{user.username}</div>
-              </div>
-            </div>
-            <button
-              onClick={() => sendFriendRequest(user.id, user.username)}
-              className="p-2 bg-black/40 hover:bg-neon-purple/20 rounded transition-colors"
-              disabled={pendingFriendRequests.includes(user.id)}
-            >
-              {pendingFriendRequests.includes(user.id) ? (
-                <Check className="w-5 h-5 text-green-500" />
-              ) : (
-                <UserPlus className="w-5 h-5 text-neutral-300" />
-              )}
-            </button>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const renderFriendsList = () => {
-    if (friends.length === 0) {
-      return (
-        <div className="text-center py-8 text-neutral-400">
-          <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>No friends yet</p>
-          <p className="text-sm mt-1">Search for users to add them as friends</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        {friends.map((friend) => (
-          <div
-            key={friend.id}
-            className="p-3 bg-black/30 rounded-lg flex items-center justify-between"
-          >
-            <div 
-              className="flex items-center gap-3 flex-1 cursor-pointer"
-              onClick={() => navigateToProfile(friend.friend.id)}
-            >
-              <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
-                {friend.friend.avatar_url ? (
-                  <img src={friend.friend.avatar_url} alt={friend.friend.username} className="w-full h-full object-cover" />
-                ) : (
-                  <UserCircle className="w-8 h-8 text-neutral-400" />
-                )}
-              </div>
-              <div>
-                <div className="font-medium">{friend.friend.username}</div>
-              </div>
-            </div>
-            <button
-              onClick={() => removeFriend(friend.friend.id, friend.friend.username)}
-              className="p-2 hover:bg-red-500/20 hover:border hover:border-red-500/50 rounded transition-colors"
-              title="Remove friend"
-            >
-              <UserMinus className="w-5 h-5 text-neutral-300 hover:text-red-400" />
-            </button>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  if (loading) {
+  if (loading || friendsLoading) {
     return (
       <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">
         <div className="flex flex-col items-center">
@@ -385,105 +105,20 @@ const Friends = () => {
           </div>
           
           <div className="bg-black/20 rounded-lg p-4">
-            {friends.length === 0 ? (
-              <div className="text-center py-8">
-                <Users className="h-16 w-16 mx-auto opacity-30 mb-4" />
-                <h3 className="text-xl font-medium mb-2">No friends yet</h3>
-                <p className="text-neutral-400 mb-6">
-                  Start adding friends to connect and see what games they're playing
-                </p>
-                <Button 
-                  className="cyber-button-sm"
-                  onClick={() => setShowSearchModal(true)}
-                >
-                  Find Friends
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {renderFriendsList()}
-              </div>
-            )}
+            <FriendsList friends={friends} setFriends={setFriends} />
           </div>
         </div>
         
-        <div className="glass-card rounded-xl p-8">
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <Gamepad2 className="h-5 w-5 text-neon-pink" />
-            Friend Activity
-          </h2>
-          
-          <div className="bg-black/20 rounded-lg p-4 text-center py-8">
-            <Gamepad2 className="h-16 w-16 mx-auto opacity-30 mb-4" />
-            <h3 className="text-xl font-medium mb-2">No recent activity</h3>
-            <p className="text-neutral-400">
-              Connect your gaming accounts to track your friends' achievements and stats
-            </p>
-          </div>
-        </div>
+        <FriendActivity />
       </div>
       
       {showSearchModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-          <div className="bg-primary border border-neon-purple/30 rounded-xl w-full max-w-md">
-            <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
-              <h3 className="font-medium">Find Friends</h3>
-              <button 
-                className="p-1 text-neutral-400 hover:text-white transition-colors"
-                onClick={() => {
-                  setShowSearchModal(false);
-                  setSearchQuery('');
-                  setSearchResults([]);
-                  setHasSearched(false);
-                }}
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    placeholder="Search by username..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-black/70 border border-neutral-700 rounded-md pl-10 pr-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-neon-purple"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSearch();
-                      }
-                    }}
-                  />
-                  <Search className="h-4 w-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                </div>
-                <Button 
-                  className="cyber-button-sm"
-                  onClick={handleSearch}
-                  disabled={searching || !searchQuery.trim()}
-                >
-                  {searching ? 'Searching...' : 'Search'}
-                </Button>
-              </div>
-              
-              <div className="max-h-80 overflow-y-auto">
-                {!hasSearched ? (
-                  <div className="text-center py-6 text-neutral-400">
-                    Search for users by username to add them as friends.
-                  </div>
-                ) : searchResults.length === 0 ? (
-                  <div className="text-center py-6 text-neutral-400">
-                    No users found matching your search. Try a different name.
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {renderUserList()}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <UserSearch 
+            userId={userId} 
+            username={username} 
+            onClose={() => setShowSearchModal(false)} 
+          />
         </div>
       )}
     </div>
