@@ -51,11 +51,23 @@ const SteamGamesCollection: React.FC<SteamGamesCollectionProps> = ({ userId, isO
           return;
         }
         
-        // Check if steam_games is an array and has entries
-        const steamGames = profile.steam_games as SteamGame[];
-        if (Array.isArray(steamGames) && steamGames.length > 0) {
-          setGames(steamGames);
-          setFilteredGames(steamGames);
+        // Safely check and convert the steam_games data to SteamGame[]
+        if (Array.isArray(profile.steam_games)) {
+          // Validate each game object to ensure it has the required SteamGame properties
+          const validGames = profile.steam_games.filter((game: any) => 
+            typeof game === 'object' && 
+            game !== null &&
+            typeof game.appid === 'number' &&
+            typeof game.name === 'string' &&
+            typeof game.playtime_forever === 'number' &&
+            // img_icon_url can be empty string but should be a string
+            typeof game.img_icon_url === 'string'
+          ) as SteamGame[];
+          
+          if (validGames.length > 0) {
+            setGames(validGames);
+            setFilteredGames(validGames);
+          }
         }
         
       } catch (error) {
