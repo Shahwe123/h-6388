@@ -1,9 +1,18 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon, Link } from 'lucide-react';
+import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon, Link, Medal, BarChart, ChartPie } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import LevelProgress from '@/components/profile/LevelProgress';
+import RankBadge from '@/components/profile/RankBadge';
+import TrophyCase from '@/components/profile/TrophyCase';
+import AchievementBadge from '@/components/profile/AchievementBadge';
+import RarityCard from '@/components/profile/RarityCard';
+import StatCharts from '@/components/profile/StatCharts';
+import SocialShare from '@/components/profile/SocialShare';
 
 interface Profile {
   id: string;
@@ -18,6 +27,16 @@ interface Profile {
   is_private: boolean | null;
 }
 
+// Mock data for demonstration
+const mockTrophies = [
+  { id: '1', name: 'Platinum Master', type: 'platinum' as const, game: 'God of War', rarity: '0.1%' },
+  { id: '2', name: 'Gold Champion', type: 'gold' as const, game: 'Elden Ring', rarity: '1.2%' },
+  { id: '3', name: 'Silver Star', type: 'silver' as const, game: 'Cyberpunk 2077', rarity: '5.7%' },
+  { id: '4', name: 'Bronze Medal', type: 'bronze' as const, game: 'Call of Duty', rarity: '15.3%' },
+  { id: '5', name: 'Ultra Rare', type: 'ultra-rare' as const, game: 'Red Dead Redemption 2', rarity: '0.01%' },
+  { id: '6', name: 'Legendary', type: 'platinum' as const, game: 'The Last of Us', rarity: '0.5%' },
+];
+
 const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,6 +46,18 @@ const Profile = () => {
   const { toast } = useToast();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isFriend, setIsFriend] = useState(false);
+  
+  // For the demo UI - these would come from the database in a real implementation
+  const [playerStats] = useState({
+    level: 12,
+    xp: 2450,
+    nextLevelXp: 3000,
+    rank: 'Trophy Hunter',
+    trophiesCount: 45,
+    platinumCount: 3,
+    gamesCompleted: 5,
+    totalGames: 15
+  });
 
   useEffect(() => {
     const fetchUserSession = async () => {
@@ -156,42 +187,74 @@ const Profile = () => {
 
   const hasLinkedAccounts = profile.steam_id || profile.xbox_gamertag || profile.playstation_username;
   const isOwnProfile = currentUserId === profile.id;
+  const completionPercentage = Math.round((playerStats.gamesCompleted / playerStats.totalGames) * 100);
 
-  return <div className="min-h-screen pt-20 pb-12 bg-primary">
+  return (
+    <div className="min-h-screen pt-20 pb-12 bg-primary">
       <div className="container-padding mx-auto max-w-6xl">
+        {/* Profile Header with Level */}
         <div className="glass-card rounded-xl p-8 mb-8 relative overflow-hidden">
           <div className="h-40 absolute top-0 left-0 right-0">
-            {profile?.cover_url ? <img src={profile.cover_url} alt="Profile cover" className="w-full h-full object-cover" /> : <div className="h-40 bg-gradient-game"></div>}
+            {profile?.cover_url ? (
+              <img src={profile.cover_url} alt="Profile cover" className="w-full h-full object-cover" />
+            ) : (
+              <div className="h-40 bg-gradient-game"></div>
+            )}
           </div>
           
-          <div className="relative flex flex-col md:flex-row items-center gap-6 mt-20">
-            <div className="w-24 h-24 bg-black/50 rounded-full border-4 border-neon-purple flex items-center justify-center overflow-hidden">
-              {profile?.avatar_url ? <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" /> : <UserCircle className="w-20 h-20 text-neutral-400" />}
+          <div className="relative mt-20">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <motion.div 
+                className="w-24 h-24 bg-black/50 rounded-full border-4 border-neon-purple flex items-center justify-center overflow-hidden"
+                whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(139, 92, 246, 0.5)' }}
+              >
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
+                ) : (
+                  <UserCircle className="w-20 h-20 text-neutral-400" />
+                )}
+              </motion.div>
+              
+              <div className="text-center md:text-left flex-1">
+                <div className="flex items-center flex-wrap justify-center md:justify-start gap-2 mb-1">
+                  <h1 className="text-2xl md:text-3xl font-bold neon-text">{profile?.username}</h1>
+                  <RankBadge rank={playerStats.rank} />
+                </div>
+                <p className="text-neutral-300">{profile?.bio || 'No bio yet'}</p>
+              </div>
+              
+              <SocialShare username={profile.username} />
             </div>
             
-            <div className="text-center md:text-left">
-              <h1 className="text-2xl md:text-3xl font-bold neon-text">{profile?.username}</h1>
-              <p className="text-neutral-300 mt-1">{profile?.bio || 'No bio yet'}</p>
+            {/* Level Progress Bar */}
+            <div className="mt-6">
+              <LevelProgress 
+                level={playerStats.level} 
+                xp={playerStats.xp} 
+                nextLevelXp={playerStats.nextLevelXp}
+                rank={playerStats.rank}
+              />
             </div>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+          {/* Stats Cards Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
             <div className="bg-black/30 p-4 rounded-lg text-center">
-              <Trophy className="w-6 h-6 text-neon-pink mx-auto mb-2" />
-              <div className="text-xl font-bold">0</div>
-              <div className="text-sm text-neutral-400">Achievements</div>
+              <Trophy className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+              <div className="text-xl font-bold">{playerStats.trophiesCount}</div>
+              <div className="text-sm text-neutral-400">Trophies</div>
             </div>
             
             <div className="bg-black/30 p-4 rounded-lg text-center">
-              <BarChart3 className="w-6 h-6 text-neon-blue mx-auto mb-2" />
-              <div className="text-xl font-bold">0</div>
-              <div className="text-sm text-neutral-400">Games</div>
+              <Medal className="w-6 h-6 text-neon-blue mx-auto mb-2" />
+              <div className="text-xl font-bold">{playerStats.platinumCount}</div>
+              <div className="text-sm text-neutral-400">Platinums</div>
             </div>
             
             <div className="bg-black/30 p-4 rounded-lg text-center">
-              <Clock className="w-6 h-6 text-neon-purple mx-auto mb-2" />
-              <div className="text-xl font-bold">0h</div>
-              <div className="text-sm text-neutral-400">Hours Played</div>
+              <BarChart3 className="w-6 h-6 text-neon-purple mx-auto mb-2" />
+              <div className="text-xl font-bold">{completionPercentage}%</div>
+              <div className="text-sm text-neutral-400">Completion Rate</div>
             </div>
             
             <div className="bg-black/30 p-4 rounded-lg text-center">
@@ -202,9 +265,62 @@ const Profile = () => {
           </div>
         </div>
         
+        {/* Trophy Showcase */}
+        <TrophyCase trophies={mockTrophies} />
+        
+        {/* Achievement Highlights */}
+        <div className="glass-card rounded-xl p-6 mb-8">
+          <h2 className="text-xl font-bold mb-4">Achievement Highlights</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <RarityCard 
+              title="🏆 Ultra-Rare Achievement" 
+              description="Only 0.03% of players unlocked this" 
+              icon="trophy"
+              percentage="Top 0.1% worldwide"
+            />
+            
+            <RarityCard 
+              title="🕐 Fastest Completion" 
+              description="Finished Elden Ring 100% in 72 hours" 
+              icon="time"
+              percentage="38% faster than average"
+            />
+            
+            <RarityCard 
+              title="🔥 Longest Grind" 
+              description="250 hours spent in Red Dead Redemption 2" 
+              icon="grind"
+              percentage="Dedication Level: Legend"
+            />
+          </div>
+        </div>
+        
+        {/* Gaming Stats Charts */}
+        <div className="glass-card rounded-xl p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Gaming Stats</h2>
+            
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-neutral-400">View:</span>
+              <div className="flex space-x-1 bg-black/30 p-1 rounded-md">
+                <button className="p-1 rounded bg-neon-purple/30">
+                  <BarChart className="h-4 w-4" />
+                </button>
+                <button className="p-1 rounded">
+                  <ChartPie className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <StatCharts />
+        </div>
+        
+        {/* Linked Accounts Section */}
         <div className="glass-card rounded-xl p-6 mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Linked Accounts</h2>
+            <h2 className="text-xl font-bold">Linked Gaming Accounts</h2>
             {isOwnProfile && (
               <RouterLink to="/link-accounts">
                 <Button className="bg-gradient-game" size="sm">
@@ -265,15 +381,61 @@ const Profile = () => {
             </div>}
         </div>
         
+        {/* Friends Comparison Section */}
         <div className="glass-card rounded-xl p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">Recent Achievements</h2>
-          <div className="text-neutral-400 text-center py-8">
-            <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p>No achievements yet</p>
-            <p className="text-sm mt-1">Connect your gaming accounts to start tracking</p>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Compare with Friends</h2>
+            <Button 
+              variant="outline"
+              size="sm"
+              className="bg-black/40 border-neon-purple/30 hover:bg-black/60"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              View All
+            </Button>
           </div>
+          
+          {friendCount > 0 ? (
+            <div className="space-y-4">
+              <p className="text-sm text-neutral-400">
+                You have 13 more Platinum trophies than your friends on average!
+              </p>
+              
+              <div className="bg-black/30 p-4 rounded-lg">
+                <div className="mb-3 flex justify-between items-center">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-gray-700 rounded-full overflow-hidden"></div>
+                    <span className="ml-2 font-medium">JohnDoe</span>
+                  </div>
+                  <RankBadge rank="Trophy Hunter" />
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                  <div>
+                    <div className="font-bold">30</div>
+                    <div className="text-xs text-neutral-500">Trophies</div>
+                  </div>
+                  <div>
+                    <div className="font-bold">1</div>
+                    <div className="text-xs text-neutral-500">Platinums</div>
+                  </div>
+                  <div>
+                    <div className="font-bold text-green-500">+15</div>
+                    <div className="text-xs text-neutral-500">Your Lead</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-neutral-400 text-center py-8">
+              <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p>No friends to compare with</p>
+              <p className="text-sm mt-1">Add friends to compare your achievements</p>
+            </div>
+          )}
         </div>
         
+        {/* Games Collection Section */}
         <div className="glass-card rounded-xl p-6">
           <h2 className="text-xl font-bold mb-4">Games Collection</h2>
           <div className="text-neutral-400 text-center py-8">
@@ -283,7 +445,8 @@ const Profile = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default Profile;
