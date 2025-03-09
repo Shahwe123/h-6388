@@ -294,6 +294,11 @@ const LinkAccounts = () => {
       
       if (steamData.games && Array.isArray(steamData.games)) {
         for (const game of steamData.games) {
+          if (!game.appid || typeof game.appid !== 'number') {
+            console.warn('Invalid game appid:', game.appid, 'for game:', game.name);
+            continue; // Skip this game
+          }
+
           const { data: existingGame, error: gameCheckError } = await supabase
             .from('games')
             .select('id')
@@ -309,7 +314,7 @@ const LinkAccounts = () => {
               .from('games')
               .insert({
                 steam_app_id: game.appid,
-                name: game.name,
+                name: game.name || 'Unknown Game',
                 icon_url: game.img_icon_url ? `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg` : null
               })
               .select('id')
@@ -320,15 +325,21 @@ const LinkAccounts = () => {
             gameId = newGame.id;
             
             if (game.achievements && Array.isArray(game.achievements)) {
-              const achievementsToInsert = game.achievements.map(achievement => ({
-                game_id: gameId,
-                platform: 'steam',
-                platform_api_name: achievement.apiname,
-                name: achievement.name,
-                description: achievement.description,
-                icon_url: achievement.icon,
-                locked_icon_url: achievement.icongray
-              }));
+              const achievementsToInsert = game.achievements
+                .filter(achievement => 
+                  achievement && 
+                  typeof achievement === 'object' && 
+                  achievement.apiname
+                )
+                .map(achievement => ({
+                  game_id: gameId,
+                  platform: 'steam',
+                  platform_api_name: achievement.apiname,
+                  name: achievement.name || 'Unknown Achievement',
+                  description: achievement.description || null,
+                  icon_url: achievement.icon || null,
+                  locked_icon_url: achievement.icongray || null
+                }));
               
               if (achievementsToInsert.length > 0) {
                 const { error: achievementsInsertError } = await supabase
@@ -344,7 +355,7 @@ const LinkAccounts = () => {
           
           if (game.achievements && Array.isArray(game.achievements)) {
             for (const achievement of game.achievements) {
-              if (achievement.achieved) {
+              if (achievement && achievement.achieved && achievement.apiname) {
                 const { data: achievementData, error: achievementError } = await supabase
                   .from('achievements')
                   .select('id')
@@ -356,7 +367,9 @@ const LinkAccounts = () => {
                 if (achievementError) throw achievementError;
                 
                 if (achievementData) {
-                  const unlockTime = achievement.unlocktime ? new Date(achievement.unlocktime * 1000).toISOString() : null;
+                  const unlockTime = achievement.unlocktime && achievement.unlocktime > 0
+                    ? new Date(achievement.unlocktime * 1000).toISOString()
+                    : null;
                   
                   const { error: userAchievementError } = await supabase
                     .from('user_achievements')
