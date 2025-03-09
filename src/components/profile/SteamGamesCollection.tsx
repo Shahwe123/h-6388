@@ -46,14 +46,17 @@ const SteamGamesCollection: React.FC<SteamGamesCollectionProps> = ({ userId, isO
         
         setSteamId(profile.steam_id);
         
-        if (!profile.steam_id || !profile.steam_games || profile.steam_games.length === 0) {
+        if (!profile.steam_id || !profile.steam_games) {
           setLoading(false);
           return;
         }
         
-        // The games are already stored in the profile
-        setGames(profile.steam_games || []);
-        setFilteredGames(profile.steam_games || []);
+        // Check if steam_games is an array and has entries
+        const steamGames = profile.steam_games as SteamGame[];
+        if (Array.isArray(steamGames) && steamGames.length > 0) {
+          setGames(steamGames);
+          setFilteredGames(steamGames);
+        }
         
       } catch (error) {
         console.error('Error fetching games:', error);

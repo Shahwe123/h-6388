@@ -356,16 +356,16 @@ const LinkAccounts = () => {
                 if (achievementError) throw achievementError;
                 
                 if (achievementData) {
+                  const unlockTime = achievement.unlocktime ? new Date(achievement.unlocktime * 1000).toISOString() : null;
+                  
                   const { error: userAchievementError } = await supabase
                     .from('user_achievements')
-                    .insert({
+                    .upsert({
                       user_id: userId,
                       achievement_id: achievementData.id,
                       unlocked: true,
-                      unlock_time: achievement.unlocktime ? new Date(achievement.unlocktime * 1000) : null
-                    })
-                    .onConflict(['user_id', 'achievement_id'])
-                    .ignore();
+                      unlock_time: unlockTime
+                    });
                     
                   if (userAchievementError) throw userAchievementError;
                 }
