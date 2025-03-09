@@ -6,6 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Gamepad, User, X } from 'lucide-react';
+// import psnApi from 'psn-api';
+// const { exchangeNpssoForCode } = psnApi;
+// const { exchangeCodeForAccessToken } = psnApi;
+// const { getUserTitles } = psnApi;
+import { exchangeNpssoForCode } from "psn-api";
+import { exchangeCodeForAccessToken } from "psn-api";
+import  { getUserTitles }from "psn-api";
+import  { exchangeRefreshTokenForAuthTokens } from "psn-api";
 
 // Platform-specific icons
 const SteamIcon = () => (
@@ -37,15 +45,15 @@ interface PlatformModalProps {
   guideText: string;
 }
 
-const PlatformModal = ({ 
-  isOpen, 
-  onClose, 
-  platformName, 
-  platformIcon, 
-  inputLabel, 
-  inputPlaceholder, 
+const PlatformModal = ({
+  isOpen,
+  onClose,
+  platformName,
+  platformIcon,
+  inputLabel,
+  inputPlaceholder,
   onSubmit,
-  guideText 
+  guideText
 }: PlatformModalProps) => {
   const [inputValue, setInputValue] = useState('');
 
@@ -67,11 +75,11 @@ const PlatformModal = ({
             Enter your {platformName} information to link your account
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="platform-input">{inputLabel}</Label>
-            <Input 
+            <Input
               id="platform-input"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
@@ -79,23 +87,23 @@ const PlatformModal = ({
               className="bg-black/70 border-neutral-700 text-white"
             />
           </div>
-          
+
           <div className="bg-black/30 p-3 rounded-md border border-neon-purple/10">
             <h4 className="text-sm font-medium mb-2 text-neon-blue">How to find your {platformName} information:</h4>
             <p className="text-xs text-neutral-300">{guideText}</p>
           </div>
-          
+
           <div className="flex justify-end gap-2">
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               variant="outline"
               onClick={onClose}
               className="border-neutral-700 hover:bg-black/50 hover:text-white"
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="bg-gradient-game"
               disabled={!inputValue.trim()}
             >
@@ -108,21 +116,21 @@ const PlatformModal = ({
   );
 };
 
-const PlatformCard = ({ 
-  platformName, 
-  icon, 
-  description, 
-  isLinked, 
-  username, 
-  onLink, 
-  onUnlink 
-}: { 
-  platformName: string; 
-  icon: React.ReactNode; 
-  description: string; 
-  isLinked: boolean; 
-  username?: string | null; 
-  onLink: () => void; 
+const PlatformCard = ({
+  platformName,
+  icon,
+  description,
+  isLinked,
+  username,
+  onLink,
+  onUnlink
+}: {
+  platformName: string;
+  icon: React.ReactNode;
+  description: string;
+  isLinked: boolean;
+  username?: string | null;
+  onLink: () => void;
   onUnlink: () => void;
 }) => {
   return (
@@ -137,18 +145,18 @@ const PlatformCard = ({
             <p className="text-sm text-neutral-300">{description}</p>
           </div>
         </div>
-        
+
         {isLinked ? (
-          <Button 
-            onClick={onUnlink} 
+          <Button
+            onClick={onUnlink}
             size="sm"
             className="bg-black/50 hover:bg-red-950 text-white border border-red-900/30"
           >
             <X className="h-4 w-4 mr-1" /> Unlink
           </Button>
         ) : (
-          <Button 
-            onClick={onLink} 
+          <Button
+            onClick={onLink}
             size="sm"
             className="bg-gradient-game"
           >
@@ -156,7 +164,7 @@ const PlatformCard = ({
           </Button>
         )}
       </div>
-      
+
       {isLinked && username && (
         <div className="mt-4 bg-black/40 rounded-md p-3 border border-neon-purple/10">
           <div className="flex items-center text-sm">
@@ -181,7 +189,7 @@ const LinkAccounts = () => {
       try {
         setLoading(true);
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (!session) {
           setLoading(false);
           return;
@@ -220,38 +228,89 @@ const LinkAccounts = () => {
     setCurrentPlatform(null);
   };
 
+  const fetchSteamData = async (steamId) => {
+    if (steamId) {
+
+      const { data : {session}} = await supabase.auth.getSession()
+      const token = session.access_token
+
+      fetch("https://nvjjragekchczuxgdvvo.supabase.co/functions/v1/fetch-steam-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json, Authorization",
+          "Authorization":`Bearer ${token}`
+        },
+        mode: "cors",
+        body:JSON.stringify({
+          "steamId":steamId
+        })
+
+      }).then((res) => res.json())
+      .then((data) => console.log(data)) //TODO: add data to redux store
+      .catch((err) => console.error(err));
+    } else {
+      console.error("Steam ID not found");
+    }
+  };
+
+  const fetchXboxData = async (gamerTag) => {
+    if (gamerTag) {
+      const { data : {session}} = await supabase.auth.getSession()
+      const token = session.access_token
+      fetch("https://nvjjragekchczuxgdvvo.supabase.co/functions/v1/fetch-xbox-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json, Authorization",
+          "Authorization":`Bearer ${token}`
+        },
+        mode: "cors",
+        body:JSON.stringify({
+          gamerTag
+        })
+
+      }).then((res) => res.json())
+      .then((data) => console.log(data)) //TODO: add data to redux store
+      .catch((err) => console.error(err));
+    } else {
+      console.error("GamerTag not found");
+    }
+  }
+
   const handleLinkAccount = async (value: string) => {
     if (!profile) return;
-    
+
     try {
       const updates: any = {};
-      
+
       switch (currentPlatform) {
         case 'Steam':
           updates.steam_id = value;
+          fetchSteamData(updates.steam_id)
+          //TODO: add steam name and change in to that on link accounts
           break;
         case 'Xbox':
           updates.xbox_gamertag = value;
+          fetchXboxData(updates.xbox_gamertag)
           break;
         case 'PlayStation':
           updates.playstation_username = value;
           break;
       }
-      
+
       const { error } = await supabase
         .from('profiles')
         .update(updates)
         .eq('id', profile.id);
-        
+
       if (error) throw error;
-      
+
       setProfile({ ...profile, ...updates });
-      
+
       toast({
         title: 'Account linked',
         description: `Your ${currentPlatform} account has been successfully linked.`,
       });
-      
+
       handleCloseModal();
     } catch (error: any) {
       toast({
@@ -264,10 +323,10 @@ const LinkAccounts = () => {
 
   const handleUnlinkAccount = async (platform: string) => {
     if (!profile) return;
-    
+
     try {
       const updates: any = {};
-      
+
       switch (platform) {
         case 'Steam':
           updates.steam_id = null;
@@ -279,16 +338,16 @@ const LinkAccounts = () => {
           updates.playstation_username = null;
           break;
       }
-      
+
       const { error } = await supabase
         .from('profiles')
         .update(updates)
         .eq('id', profile.id);
-        
+
       if (error) throw error;
-      
+
       setProfile({ ...profile, ...updates });
-      
+
       toast({
         title: 'Account unlinked',
         description: `Your ${platform} account has been unlinked.`,
@@ -321,11 +380,11 @@ const LinkAccounts = () => {
             <Gamepad className="h-6 w-6 text-neon-pink" />
             <h1 className="text-2xl font-bold">Link Gaming Accounts</h1>
           </div>
-          
+
           <p className="text-neutral-300 mb-8">
             Connect your gaming platform accounts to track achievements, stats, and more in one place.
           </p>
-          
+
           <div className="space-y-4">
             <PlatformCard
               platformName="Steam"
@@ -336,7 +395,7 @@ const LinkAccounts = () => {
               onLink={() => handleOpenModal('Steam')}
               onUnlink={() => handleUnlinkAccount('Steam')}
             />
-            
+
             <PlatformCard
               platformName="Xbox"
               icon={<XboxIcon />}
@@ -346,7 +405,7 @@ const LinkAccounts = () => {
               onLink={() => handleOpenModal('Xbox')}
               onUnlink={() => handleUnlinkAccount('Xbox')}
             />
-            
+
             <PlatformCard
               platformName="PlayStation"
               icon={<PlayStationIcon />}
@@ -359,7 +418,7 @@ const LinkAccounts = () => {
           </div>
         </div>
       </div>
-      
+
       <PlatformModal
         isOpen={currentPlatform === 'Steam'}
         onClose={handleCloseModal}
@@ -370,7 +429,7 @@ const LinkAccounts = () => {
         onSubmit={handleLinkAccount}
         guideText="To find your Steam ID, open the Steam client, click on your profile name, then view profile. Your Steam ID is the number shown in the URL. You can also use third-party sites to convert your Steam vanity URL to a Steam ID."
       />
-      
+
       <PlatformModal
         isOpen={currentPlatform === 'Xbox'}
         onClose={handleCloseModal}
@@ -381,7 +440,7 @@ const LinkAccounts = () => {
         onSubmit={handleLinkAccount}
         guideText="Your Xbox Gamertag is your username on Xbox Live. You can find it by signing into your Xbox console or the Xbox app on Windows and looking at your profile."
       />
-      
+
       <PlatformModal
         isOpen={currentPlatform === 'PlayStation'}
         onClose={handleCloseModal}
@@ -396,4 +455,4 @@ const LinkAccounts = () => {
   );
 };
 
-export default LinkAccounts;
+export default LinkAccounts
