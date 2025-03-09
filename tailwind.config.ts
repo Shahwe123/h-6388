@@ -32,6 +32,7 @@ export default {
           pink: "#F97316",
           blue: "#0EA5E9",
           purple: "#8B5CF6",
+          green: "#10B981",
         },
         neutral: {
           50: "#FAFAF8",

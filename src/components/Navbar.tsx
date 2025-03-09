@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Menu, X, User, Settings, LogOut, Gamepad, Users, Bell, Trash2 } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Gamepad, Users, Bell, Trash2, Trophy } from 'lucide-react';
 
 const Navbar = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -235,10 +235,12 @@ const Navbar = () => {
   const navLinks = session ? [
     { path: '/profile', label: 'Profile' },
     { path: '/friends', label: 'Friends' },
+    { path: '/leaderboard', label: 'Leaderboard' },
     { path: '/link-accounts', label: 'Link Accounts' },
     { path: '/settings', label: 'Settings' }
   ] : [
-    { path: '/auth', label: 'Sign In' }
+    { path: '/auth', label: 'Sign In' },
+    { path: '/leaderboard', label: 'Leaderboard' }
   ];
 
   const renderNotificationsDropdown = () => (
@@ -320,7 +322,7 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="fixed w-full top-0 z-50 bg-primary/90 backdrop-blur-md border-b border-neon-purple/10">
+    <nav className="fixed w-full top-0 z-50 bg-primary backdrop-blur-md border-b border-neon-purple/10">
       <div className="container-padding mx-auto flex items-center justify-between h-16">
         <Link to={session ? "/profile" : "/"} className="flex items-center gap-2">
           <span className="font-bold text-xl">GameHub</span>
