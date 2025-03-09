@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          game_id: number
+          icon_url: string | null
+          id: number
+          locked_icon_url: string | null
+          name: string
+          platform: string
+          platform_api_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          game_id: number
+          icon_url?: string | null
+          id?: number
+          locked_icon_url?: string | null
+          name: string
+          platform: string
+          platform_api_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          game_id?: number
+          icon_url?: string | null
+          id?: number
+          locked_icon_url?: string | null
+          name?: string
+          platform?: string
+          platform_api_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       friends: {
         Row: {
           created_at: string
@@ -27,6 +74,39 @@ export type Database = {
           friend_id?: string
           id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      games: {
+        Row: {
+          created_at: string | null
+          icon_url: string | null
+          id: number
+          name: string
+          playstation_id: string | null
+          steam_app_id: number | null
+          updated_at: string | null
+          xbox_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          icon_url?: string | null
+          id?: number
+          name: string
+          playstation_id?: string | null
+          steam_app_id?: number | null
+          updated_at?: string | null
+          xbox_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          icon_url?: string | null
+          id?: number
+          name?: string
+          playstation_id?: string | null
+          steam_app_id?: number | null
+          updated_at?: string | null
+          xbox_id?: string | null
         }
         Relationships: []
       }
@@ -73,6 +153,7 @@ export type Database = {
           id: string
           is_private: boolean | null
           playstation_username: string | null
+          steam_games: Json | null
           steam_id: string | null
           username: string
           xbox_gamertag: string | null
@@ -86,6 +167,7 @@ export type Database = {
           id: string
           is_private?: boolean | null
           playstation_username?: string | null
+          steam_games?: Json | null
           steam_id?: string | null
           username: string
           xbox_gamertag?: string | null
@@ -99,11 +181,50 @@ export type Database = {
           id?: string
           is_private?: boolean | null
           playstation_username?: string | null
+          steam_games?: Json | null
           steam_id?: string | null
           username?: string
           xbox_gamertag?: string | null
         }
         Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: number
+          created_at: string | null
+          id: number
+          unlock_time: string | null
+          unlocked: boolean
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: number
+          created_at?: string | null
+          id?: number
+          unlock_time?: string | null
+          unlocked?: boolean
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: number
+          created_at?: string | null
+          id?: number
+          unlock_time?: string | null
+          unlocked?: boolean
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waitlist: {
         Row: {
