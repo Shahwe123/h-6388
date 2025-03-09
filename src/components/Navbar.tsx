@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -322,10 +323,11 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="fixed w-full top-0 z-50 bg-primary backdrop-blur-md border-b border-neon-purple/10">
+    <nav className="fixed w-full top-0 z-50 bg-black border-b border-neon-purple/10">
       <div className="container-padding mx-auto flex items-center justify-between h-16">
         <Link to={session ? "/profile" : "/"} className="flex items-center gap-2">
-          <span className="font-bold text-xl">GameHub</span>
+          <Gamepad className="w-6 h-6 text-neon-purple" />
+          <span className="font-bold text-xl text-white neon-text">AchievR</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
@@ -363,12 +365,10 @@ const Navbar = () => {
               
               <button
                 onClick={handleSignOut}
-                className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
+                className="text-sm font-medium text-neutral-400 hover:text-white transition-colors flex items-center"
               >
-                <span className="flex items-center">
-                  <LogOut className="h-4 w-4 mr-1" />
-                  Sign Out
-                </span>
+                <LogOut className="h-4 w-4 mr-1" />
+                Sign Out
               </button>
             </>
           )}
@@ -387,7 +387,7 @@ const Navbar = () => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-primary/95 backdrop-blur-md">
+        <div className="md:hidden bg-black backdrop-blur-md">
           <div className="container-padding pt-4 pb-6 space-y-4 border-b border-neon-purple/10">
             {navLinks.map(link => (
               <Link

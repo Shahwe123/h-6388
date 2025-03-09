@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -62,6 +62,13 @@ const AuthRedirect = () => {
   return <Auth />;
 };
 
+// Wrapper to conditionally render the Navbar
+const NavbarWrapper = () => {
+  const location = useLocation();
+  // Don't show navbar on home page as it has its own Header
+  return location.pathname !== '/' ? <Navbar /> : null;
+};
+
 const App = () => {
   // Create avatars bucket when the app starts
   useEffect(() => {
@@ -82,7 +89,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Navbar />
+          <NavbarWrapper />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthRedirect />} />
