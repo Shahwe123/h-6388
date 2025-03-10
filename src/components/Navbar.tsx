@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -139,7 +138,7 @@ const Navbar = () => {
       <div className="container-padding mx-auto flex items-center justify-between h-16">
         <Link to={session ? "/profile" : "/"} className="flex items-center gap-2">
           <Gamepad className="w-6 h-6 text-neon-purple" />
-          <span className="font-bold text-xl text-white neon-text">AchievR</span>
+          <span className="font-bold text-xl text-white neon-text">PlatinumPath</span>
         </Link>
 
         {/* Desktop Navigation */}

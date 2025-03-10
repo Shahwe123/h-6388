@@ -22,7 +22,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({
   const { toast } = useToast();
 
   const generateMessage = () => {
-    return `Check out my gaming profile on GameGlory! I've unlocked ${stats.trophies} trophies including ${stats.platinums} platinums. Try to beat my record! #GameGlory #GamingAchievements`;
+    return `Check out my gaming profile on PlatinumPath! I've unlocked ${stats.trophies} trophies including ${stats.platinums} platinums. Try to beat my record! #PlatinumPath #GamingAchievements`;
   };
 
   const handleShare = (platform: string) => {

@@ -43,11 +43,11 @@ const Footer = () => {
         <div className="max-w-4xl mx-auto mt-12 pt-8 border-t border-neutral-800 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Gamepad className="w-5 h-5 text-neon-purple" />
-            <p className="text-white font-bold">AchievR</p>
+            <p className="text-white font-bold">PlatinumPath</p>
           </div>
           
           <p className="text-neutral-400 text-center text-sm">
-            © 2024 AchievR. All rights reserved.
+            © 2024 PlatinumPath. All rights reserved.
           </p>
           
           <div className="flex items-center gap-4">

@@ -11,7 +11,7 @@ const Header = () => {
       <nav className="container-padding mx-auto flex h-16 items-center justify-between">
         <Link to="/" className="text-xl font-bold text-white flex items-center gap-2">
           <Gamepad className="w-6 h-6 text-neon-purple" />
-          <span className="neon-text">AchievR</span>
+          <span className="neon-text">PlatinumPath</span>
         </Link>
         
         <div className="hidden md:flex items-center gap-8">
