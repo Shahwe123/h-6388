@@ -1,3 +1,4 @@
+
 import { Trophy, BarChart, Gamepad, Zap, Target, Rocket, Shield, Crosshair } from "lucide-react";
 const features = [{
   title: "Unified Gaming Profile",
@@ -28,7 +29,7 @@ const Features = () => {
   return <section id="features" className="py-16 container-padding bg-primary">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
-          Everything You Need to <span className="text-neon-purple">Master Your Games</span>
+          Why Use <span className="text-neon-purple">PlatinumPath</span>?
         </h2>
         <p className="text-neutral-300 text-center mb-12 max-w-2xl mx-auto">Are you a completionist who loves unlocking trophies and achievements? PlatinumPath lets you track all your gaming milestones across PlayStation, Xbox, and Steam – all in one place!</p>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
