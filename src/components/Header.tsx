@@ -24,6 +24,9 @@ const Header = () => {
           <a href="#features" className="text-neutral-300 hover:text-neon-pink transition-colors">
             Features
           </a>
+          <Link to="/beta" className="text-neutral-300 hover:text-neon-pink transition-colors">
+            Beta
+          </Link>
           <Link to="/auth" className="cyber-button flex items-center gap-2">
             Get Started
           </Link>
@@ -49,6 +52,9 @@ const Header = () => {
             <a href="#features" className="text-neutral-300 hover:text-neon-pink transition-colors">
               Features
             </a>
+            <Link to="/beta" className="text-neutral-300 hover:text-neon-pink transition-colors">
+              Beta
+            </Link>
             <Link to="/auth" className="cyber-button flex items-center justify-center gap-2">
               Get Started
             </Link>

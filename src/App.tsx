@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import Index from "./pages/Index";
+import BetaLanding from "./pages/BetaLanding";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -92,6 +93,7 @@ const App = () => {
           <NavbarWrapper />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/beta" element={<BetaLanding />} />
             <Route path="/auth" element={<AuthRedirect />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             
