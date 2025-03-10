@@ -4,12 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Gamepad } from 'lucide-react';
+import { Json } from '@/integrations/supabase/types';
 
 interface SteamGame {
   appid: number;
   name: string;
   playtime_forever: number; 
-  img_icon_url: string;
+  img_icon_url?: string;
 }
 
 export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
@@ -45,19 +46,33 @@ export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
         }
 
         if (data && data.steam_games) {
-          // Parse the steam_games JSON data
-          const steamGames = Array.isArray(data.steam_games) ? data.steam_games : [];
+          // Parse the steam_games JSON data as an array
+          const steamGamesArray = Array.isArray(data.steam_games) ? data.steam_games : [];
           
           // Filter and validate the games data
-          const validGames = steamGames.filter((game): game is SteamGame => {
-            return (
-              typeof game === 'object' &&
-              game !== null &&
-              typeof game.appid === 'number' &&
-              typeof game.name === 'string' &&
-              typeof game.playtime_forever === 'number'
-            );
-          });
+          const validGames: SteamGame[] = [];
+          
+          for (const game of steamGamesArray) {
+            // Skip null or non-object items
+            if (!game || typeof game !== 'object') continue;
+            
+            // Type assertion with safety checks
+            const gameObj = game as Record<string, unknown>;
+            
+            if (
+              typeof gameObj.appid === 'number' && 
+              typeof gameObj.name === 'string' && 
+              typeof gameObj.playtime_forever === 'number'
+            ) {
+              // Add only games with valid required properties
+              validGames.push({
+                appid: gameObj.appid,
+                name: gameObj.name,
+                playtime_forever: gameObj.playtime_forever,
+                img_icon_url: typeof gameObj.img_icon_url === 'string' ? gameObj.img_icon_url : undefined
+              });
+            }
+          }
           
           setGames(validGames);
         } else {
