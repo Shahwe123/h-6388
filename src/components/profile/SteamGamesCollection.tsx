@@ -3,16 +3,16 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Json } from '@/integrations/supabase/types';
+import { Gamepad } from 'lucide-react';
 
 interface SteamGame {
   appid: number;
   name: string;
-  playtime_forever: number;
+  playtime_forever: number; 
   img_icon_url: string;
 }
 
-export const SteamGamesCollection = () => {
+export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
   const [games, setGames] = useState<SteamGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,54 +20,60 @@ export const SteamGamesCollection = () => {
   useEffect(() => {
     const fetchSteamGames = async () => {
       try {
-        const { data: user } = await supabase.auth.getUser();
+        // First, get the current user ID if not provided
+        let targetUserId = userId;
         
-        if (!user.user) {
-          setError('User not authenticated');
-          setLoading(false);
-          return;
+        if (!targetUserId) {
+          const { data: user } = await supabase.auth.getUser();
+          if (!user?.user) {
+            setError('User not authenticated');
+            setLoading(false);
+            return;
+          }
+          targetUserId = user.user.id;
         }
 
+        // Query the profiles table to get the steam_games JSON data
         const { data, error } = await supabase
-          .from('steam_games')
-          .select('*')
-          .eq('user_id', user.user.id);
+          .from('profiles')
+          .select('steam_games')
+          .eq('id', targetUserId)
+          .single();
 
         if (error) {
           throw error;
         }
 
-        if (data && data.length > 0) {
-          // Type safety: Convert Json[] to SteamGame[] with validation
-          const validGames = data
-            .filter((game): game is SteamGame => {
-              // Validate that each game has the required properties and correct types
-              return (
-                typeof game === 'object' &&
-                game !== null &&
-                'appid' in game &&
-                typeof game.appid === 'number' &&
-                'name' in game &&
-                typeof game.name === 'string' &&
-                'playtime_forever' in game &&
-                typeof game.playtime_forever === 'number' &&
-                'img_icon_url' in game &&
-                typeof game.img_icon_url === 'string'
-              );
-            });
+        if (data && data.steam_games) {
+          // Parse the steam_games JSON data
+          const steamGames = Array.isArray(data.steam_games) ? data.steam_games : [];
+          
+          // Filter and validate the games data
+          const validGames = steamGames.filter((game): game is SteamGame => {
+            return (
+              typeof game === 'object' &&
+              game !== null &&
+              typeof game.appid === 'number' &&
+              typeof game.name === 'string' &&
+              typeof game.playtime_forever === 'number'
+            );
+          });
           
           setGames(validGames);
+        } else {
+          // No games found, but not an error
+          setGames([]);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching Steam games:', err);
-        setError('Failed to load Steam games');
+        setError(err.message || 'Failed to load Steam games');
       } finally {
         setLoading(false);
       }
     };
 
     fetchSteamGames();
-  }, []);
+  }, [userId]);
 
   if (loading) {
     return (
@@ -88,7 +94,11 @@ export const SteamGamesCollection = () => {
   if (games.length === 0) {
     return (
       <div className="text-center p-4">
-        <p className="text-neutral-400">No Steam games linked yet. Connect your Steam account to see your games.</p>
+        <div className="flex flex-col items-center text-neutral-400">
+          <Gamepad className="w-12 h-12 opacity-30 mb-2" />
+          <p>No Steam games linked yet.</p>
+          <p className="text-sm">Connect your Steam account to see your games.</p>
+        </div>
       </div>
     );
   }
@@ -104,7 +114,8 @@ export const SteamGamesCollection = () => {
                 alt={game.name}
                 className="w-16 h-16 mb-2 rounded"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://placehold.co/64x64?text=Game';
+                  const imgElement = e.target as HTMLImageElement;
+                  imgElement.src = 'https://placehold.co/64x64?text=Game';
                 }}
               />
             ) : (
