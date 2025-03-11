@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
+
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -17,6 +18,7 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -57,6 +59,7 @@ const BetaLanding = () => {
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
+
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -90,11 +93,15 @@ const BetaLanding = () => {
             </div>
             
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
-              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap relative">
-                🔥 Join the Waitlist – Limited Early Access!
-                <ArrowRight className="w-4 h-4" />
-                
-              </button>
+              <Button 
+                onClick={openNewsletterForm} 
+                variant="cta" 
+                size="xl" 
+                className="animate-pulse shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide"
+              >
+                🔥 GET EARLY ACCESS – LIMITED SPOTS!
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
             </div>
             
             <div className="mt-8 relative">
