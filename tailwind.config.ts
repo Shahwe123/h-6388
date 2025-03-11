@@ -89,6 +89,9 @@ export default {
       backgroundImage: {
         'hero-pattern': "url('/lovable-uploads/f85054f1-73fb-4801-ad6a-b98da6f62038.png')",
         'gradient-game': 'linear-gradient(90deg, #D946EF 0%, #8B5CF6 100%)',
+        'gradient-primary-black': 'linear-gradient(180deg, #1A1F2C 0%, #191919 100%)',
+        'gradient-black-primary': 'linear-gradient(180deg, #191919 0%, #1A1F2C 100%)',
+        'gradient-cta': 'linear-gradient(90deg, #F97316 0%, #D946EF 100%)',
       },
     },
   },

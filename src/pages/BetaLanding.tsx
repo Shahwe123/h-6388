@@ -62,7 +62,7 @@ const BetaLanding = () => {
   return <div className="min-h-screen">
       <Header />
       <main>
-        <section className="pt-32 pb-16 container-padding bg-black text-white relative overflow-hidden">
+        <section className="pt-32 pb-16 container-padding bg-gradient-to-b from-black to-primary text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-40 bg-hero-pattern bg-cover bg-center"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-primary"></div>
           
@@ -110,7 +110,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="problem-solution" className="py-16 container-padding bg-primary">
+        <section id="problem-solution" className="py-16 container-padding bg-gradient-to-b from-primary to-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
               The <span className="text-neon-purple">Problem</span> & Our <span className="text-neon-purple">Solution</span>
@@ -167,7 +167,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="beta-perks" className="py-16 container-padding bg-black">
+        <section id="beta-perks" className="py-16 container-padding bg-gradient-to-b from-black to-primary">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
               Why Join the <span className="text-neon-purple">PlatinumPath Beta</span>?
@@ -221,7 +221,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="how-it-works" className="py-16 container-padding bg-primary">
+        <section id="how-it-works" className="py-16 container-padding bg-gradient-to-b from-primary to-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
               ⚡How It Works – Get Started in <span className="text-neon-purple">3 Simple Steps!</span>
@@ -278,7 +278,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="testimonials" className="py-16 container-padding bg-black">
+        <section id="testimonials" className="py-16 container-padding bg-gradient-to-b from-black to-primary">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
               <span className="text-neon-purple">Gamers</span> Are Hyped for PlatinumPath!
@@ -338,7 +338,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="urgency" className="py-16 container-padding bg-primary">
+        <section id="urgency" className="py-16 container-padding bg-gradient-to-b from-primary to-black">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
               <span className="text-neon-pink">Limited Beta Spots – Join Now Before It's Too Late!</span>
@@ -384,7 +384,7 @@ and Free Premium for 2 months! 🔥</p>
           </div>
         </section>
 
-        <section className="py-16 container-padding bg-gradient-to-b from-primary to-black">
+        <section className="py-16 container-padding bg-gradient-to-b from-black via-primary to-black">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-white">
               Join the <span className="text-neon-purple">PlatinumPath Beta</span> Today!
