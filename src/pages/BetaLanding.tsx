@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole } from "lucide-react";
@@ -56,16 +57,14 @@ const BetaLanding = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Now all forms open the newsletter popup directly
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes('@')) {
-      toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address.",
-        variant: "destructive"
-      });
-      return;
-    }
+    setIsNewsletterOpen(true);
+  };
+  
+  // Common function for all CTA buttons
+  const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
 
@@ -173,7 +172,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Solve This Problem Now – Join the Beta!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -227,7 +226,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Get Exclusive Perks – Join the Beta!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -261,7 +260,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">2</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Get Your Invite</h3>
-                <p className="text-neutral-300">We’ll notify you before launch and send you instructions.</p>
+                <p className="text-neutral-300">We'll notify you before launch and send you instructions.</p>
                 <div className="mt-4 text-center">
                   <Mail className="w-12 h-12 text-neon-blue mx-auto" />
                 </div>
@@ -282,7 +281,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Easy to Join – Get Started Now!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -342,7 +341,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Join Other Gamers – Get Beta Access!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -388,7 +387,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="relative inline-block">
-              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto text-lg px-8 py-4">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto text-lg px-8 py-4">
                 Join the Beta – Limited Spots!
                 <ArrowRight className="w-5 h-5" />
               </button>
