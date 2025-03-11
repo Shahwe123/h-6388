@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
+
 const BetaLanding = () => {
   const [email, setEmail] = useState("");
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
@@ -18,6 +19,7 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -53,6 +55,7 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
@@ -65,6 +68,7 @@ const BetaLanding = () => {
     }
     setIsNewsletterOpen(true);
   };
+
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -349,7 +353,7 @@ const BetaLanding = () => {
         <section id="urgency" className="py-16 container-padding bg-primary">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-              <span className="text-neon-pink">Limited</span> Beta Spots Available!
+              <span className="text-neon-pink">Limited Beta Spots – Join Now Before It's Too Late!</span>
             </h2>
             <p className="text-xl text-neutral-300 mb-8">
               Only 100 Beta Spots – Once They're Gone, They're Gone!
@@ -443,4 +447,5 @@ const BetaLanding = () => {
       {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
     </div>;
 };
+
 export default BetaLanding;
