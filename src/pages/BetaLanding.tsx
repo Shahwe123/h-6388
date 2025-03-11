@@ -103,10 +103,15 @@ const BetaLanding = () => {
             
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-8 max-w-lg mx-auto">
               <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
-              <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
-                🔥 Join the Waitlist – Limited Early Access!
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="relative">
+                <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
+                  🔥 Join the Waitlist – Limited Early Access!
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <div className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                  Limited Spots Available!
+                </div>
+              </div>
             </form>
             
             <div className="mt-8 relative">
@@ -384,10 +389,15 @@ const BetaLanding = () => {
               </div>
             </div>
             
-            <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto text-lg px-8 py-4">
-              Join the Beta – Limited Spots!
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            <div className="relative inline-block">
+              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto text-lg px-8 py-4">
+                Join the Beta – Limited Spots!
+                <ArrowRight className="w-5 h-5" />
+              </button>
+              <div className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                Limited Spots Available!
+              </div>
+            </div>
           </div>
         </section>
 
@@ -414,10 +424,15 @@ const BetaLanding = () => {
             
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-12 max-w-lg mx-auto">
               <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
-              <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
-                🔥 Join the Waitlist – Limited Early Access!
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="relative">
+                <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
+                  🔥 Join the Waitlist – Limited Early Access!
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <div className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                  Limited Spots Available!
+                </div>
+              </div>
             </form>
             
             <div className="flex justify-center space-x-6 mb-8">
