@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
-
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -18,7 +17,6 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -54,11 +52,9 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
-
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -343,7 +339,7 @@ const BetaLanding = () => {
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
               <span className="text-neon-pink">Limited Beta Spots – Join Now Before It's Too Late!</span>
             </h2>
-            <p className="text-xl text-neutral-300 mb-8">Only 200 Beta Spots – Once They're Gone, They're Gone!</p>
+            <p className="text-xl text-neutral-300 mb-8">Only 500 Beta Spots – Once They're Gone, They're Gone!</p>
             
             <div className="glass-card p-8 rounded-xl mb-12">
               <h3 className="font-bold text-xl mb-6">Beta Signup Closes In:</h3>
