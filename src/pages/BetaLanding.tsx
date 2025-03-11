@@ -340,9 +340,7 @@ const BetaLanding = () => {
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
               <span className="text-neon-pink">Limited Beta Spots – Join Now Before It's Too Late!</span>
             </h2>
-            <p className="text-xl text-neutral-300 mb-8">
-              Only 100 Beta Spots – Once They're Gone, They're Gone!
-            </p>
+            <p className="text-xl text-neutral-300 mb-8">Only 200 Beta Spots – Once They're Gone, They're Gone!</p>
             
             <div className="glass-card p-8 rounded-xl mb-12">
               <h3 className="font-bold text-xl mb-6">Beta Signup Closes In:</h3>
@@ -368,7 +366,8 @@ const BetaLanding = () => {
             
             <div className="mb-8">
               <div className="px-4 py-2 rounded-lg bg-neon-pink/10 inline-block mb-4">
-                <p className="text-neon-pink font-bold">🔥 First 50 Signups Get an Exclusive Profile Badge! 🔥</p>
+                <p className="text-neon-pink font-bold">🔥 First 50 Signups Get an Exclusive Profile Badge 
+and Free Premium for 2 months! 🔥</p>
               </div>
             </div>
             
@@ -377,9 +376,7 @@ const BetaLanding = () => {
                 Join the Beta – Limited Spots!
                 <ArrowRight className="w-5 h-5" />
               </button>
-              <div className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
-                Limited Spots Available!
-              </div>
+              
             </div>
           </div>
         </section>
@@ -409,9 +406,7 @@ const BetaLanding = () => {
               <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap relative">
                 🔥 Join the Waitlist – Limited Early Access!
                 <ArrowRight className="w-4 h-4" />
-                <span className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
-                  Limited Spots Available!
-                </span>
+                
               </button>
             </div>
             
