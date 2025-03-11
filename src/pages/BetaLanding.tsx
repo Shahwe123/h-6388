@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
+
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -17,6 +18,7 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -52,9 +54,11 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
+
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -277,7 +281,7 @@ const BetaLanding = () => {
         <section id="testimonials" className="py-16 container-padding bg-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
-              What <span className="text-neon-purple">Gamers</span> Are Saying
+              <span className="text-neon-purple">Gamers</span> Are Hyped for PlatinumPath!
             </h2>
             
             <div className="grid md:grid-cols-2 gap-8 mb-12">
