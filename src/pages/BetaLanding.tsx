@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
-
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -18,7 +17,6 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -54,11 +52,9 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
-
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -234,7 +230,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">1</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Sign Up Today</h3>
-                <p className="text-neutral-300">It takes just 10 seconds to enter your email and join the waitlist.</p>
+                <p className="text-neutral-300">It takes just 10 seconds to enter your email and secure your spot.</p>
                 <div className="mt-4 text-center">
                   <Mail className="w-12 h-12 text-neon-pink mx-auto" />
                 </div>
@@ -247,7 +243,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">2</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Get Your Invite</h3>
-                <p className="text-neutral-300">We'll notify you before launch and send you instructions.</p>
+                <p className="text-neutral-300">We'll emailyou before launch when it's time to join.</p>
                 <div className="mt-4 text-center">
                   <Mail className="w-12 h-12 text-neon-blue mx-auto" />
                 </div>
@@ -260,7 +256,9 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">3</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Start Tracking</h3>
-                <p className="text-neutral-300">Connect  and be among the first to flex your achievements.</p>
+                <p className="text-neutral-300">Sync your trophies &amp; start flexing your achievements!
+
+              </p>
                 <div className="mt-4 text-center">
                   <Trophy className="w-12 h-12 text-neon-green mx-auto" />
                 </div>
