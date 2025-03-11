@@ -93,7 +93,7 @@ const BetaLanding = () => {
             
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
               <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide ">
-                🔥 Claim Your Beta Spot – Only 500 Available!
+                🔥 Claim Your Beta Spot – Only 500 Spots Available!
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
@@ -426,3 +426,4 @@ and Free Premium for 2 months! 🔥</p>
     </div>;
 };
 export default BetaLanding;
+
