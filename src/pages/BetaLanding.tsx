@@ -313,7 +313,7 @@ const BetaLanding = () => {
                 <p className="text-xs text-neutral-400">Xbox Logo</p>
               </div>
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                
+                <p className="text-xs text-neutral-400">Steam Logo</p>
               </div>
             </div>
             
