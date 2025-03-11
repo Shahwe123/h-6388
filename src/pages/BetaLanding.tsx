@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
-
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -18,7 +17,6 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -54,11 +52,9 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
-
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -180,7 +176,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl">
                 <Trophy className="w-10 h-10 text-neon-pink mb-4" />
                 <h3 className="font-bold text-lg mb-2">Early Access – Try it BEFORE the public release!</h3>
-                <p className="text-neutral-300">Be the first to try it before public release. Explore features months ahead of everyone else.</p>
+                <p className="text-neutral-300">Be the FIRST to try it before public release. Explore features months ahead of everyone else.</p>
               </div>
               
               <div className="glass-card p-8 rounded-xl">
@@ -426,4 +422,3 @@ and Free Premium for 2 months! 🔥</p>
     </div>;
 };
 export default BetaLanding;
-
