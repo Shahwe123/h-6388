@@ -69,7 +69,7 @@ const BetaLanding = () => {
               <p className="text-sm font-medium text-neon-purple animate-pulse">🔥 LIMITED BETA ACCESS NOW AVAILABLE! 🔥</p>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">Track All Your Gaming Achievements in One Place – Join the Beta Waitlist!</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">Track All Your Gaming Achievements in One Place – Join the Beta Waitlist Now!</h1>
             <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">Be among the first to access AI-powered trophy tracking for PlayStation, Xbox, &amp; Steam.</h2>
             
             <div className="flex justify-center mb-6">
