@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
-
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -18,7 +17,6 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -54,12 +52,11 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-  
+
   // Common function for all CTA buttons
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
-
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -96,9 +93,7 @@ const BetaLanding = () => {
               <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap relative">
                 🔥 Join the Waitlist – Limited Early Access!
                 <ArrowRight className="w-4 h-4" />
-                <span className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
-                  Limited Spots Available!
-                </span>
+                
               </button>
             </div>
             
@@ -434,5 +429,4 @@ const BetaLanding = () => {
       {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
     </div>;
 };
-
 export default BetaLanding;
