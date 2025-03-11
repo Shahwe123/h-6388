@@ -72,7 +72,7 @@ const BetaLanding = () => {
               <p className="text-sm font-medium text-neon-purple animate-pulse">🔥 LIMITED BETA ACCESS NOW AVAILABLE! 🔥</p>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">The Ultimate Achievement Tracker – Join the Beta Before It’s Too Late!</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">The Ultimate Achievement Tracker – Join the Beta Before It's Too Late!</h1>
             <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">Tired of tracking achievements across multiple platforms? PlatinumPath syncs your trophies from PlayStation, Xbox, & Steam – all in one place. 🚀</h2>
             
             <div className="flex justify-center mb-6">
@@ -93,9 +93,9 @@ const BetaLanding = () => {
             </div>
             
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
-              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse-slow shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide ">
-                🔥 Claim Your Beta Spot – Only 500 Spots Available!
-                <ArrowRight className="w-5 h-5 ml-2" />
+              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse-slow shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide max-w-[90%] md:max-w-none">
+                <span className="text-center break-words">🔥 Claim Your Beta Spot – Only 500 Spots Available!</span>
+                <ArrowRight className="w-5 h-5 ml-2 flex-shrink-0" />
               </Button>
             </div>
             
@@ -630,12 +630,11 @@ and Free Premium for 2 months! 🔥</p>
               </div>
             </div>
             
-            <div className="relative inline-block">
-              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto text-lg px-8 py-4">
-                Join the Beta – Limited Spots!
-                <ArrowRight className="w-5 h-5" />
+            <div className="relative inline-block w-full max-w-xs mx-auto md:max-w-none md:w-auto">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full md:w-auto text-lg px-8 py-4">
+                <span className="text-center break-words">Join the Beta – Limited Spots!</span>
+                <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </button>
-              
             </div>
           </div>
         </section>
@@ -646,7 +645,7 @@ and Free Premium for 2 months! 🔥</p>
               Join the <span className="text-neon-purple">PlatinumPath Beta</span> Today!
             </h2>
             
-            <div className="flex justify-center space-x-8 mb-8 text-sm">
+            <div className="flex flex-wrap justify-center gap-4 md:space-x-8 mb-8 text-sm">
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-neon-pink" />
                 <span className="text-neutral-300">Exclusive Early Access</span>
@@ -662,14 +661,15 @@ and Free Premium for 2 months! 🔥</p>
             </div>
             
             <div className="flex justify-center mb-12">
-              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap relative">
-                🔥 Join the Waitlist – Limited Early Access!
-                <ArrowRight className="w-4 h-4" />
-                
-              </button>
+              <div className="w-full max-w-xs md:max-w-none">
+                <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full md:w-auto">
+                  <span className="text-center break-words">🔥 Join the Waitlist – Limited Early Access!</span>
+                  <ArrowRight className="w-4 h-4 flex-shrink-0" />
+                </button>
+              </div>
             </div>
             
-            <div className="flex justify-center space-x-6 mb-8">
+            <div className="flex flex-wrap justify-center gap-4 md:space-x-6 mb-8">
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">Twitter</a>
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">Discord</a>
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">Reddit</a>
