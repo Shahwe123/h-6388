@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole } from "lucide-react";
@@ -9,7 +8,6 @@ import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
 
 const BetaLanding = () => {
-  const [email, setEmail] = useState("");
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 7,
@@ -56,12 +54,6 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // Now all forms open the newsletter popup directly
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsNewsletterOpen(true);
-  };
   
   // Common function for all CTA buttons
   const openNewsletterForm = () => {
@@ -100,16 +92,15 @@ const BetaLanding = () => {
               </div>
             </div>
             
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-8 max-w-lg mx-auto">
-              <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
-              <div className="relative">
-                <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
-                  🔥 Join the Waitlist – Limited Early Access!
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-                
-              </div>
-            </form>
+            <div className="flex justify-center mb-8 max-w-lg mx-auto">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap relative">
+                🔥 Join the Waitlist – Limited Early Access!
+                <ArrowRight className="w-4 h-4" />
+                <span className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                  Limited Spots Available!
+                </span>
+              </button>
+            </div>
             
             <div className="mt-8 relative">
               <div className="w-full h-64 md:h-80 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30 overflow-hidden">
@@ -419,18 +410,15 @@ const BetaLanding = () => {
               </div>
             </div>
             
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-12 max-w-lg mx-auto">
-              <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
-              <div className="relative">
-                <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
-                  🔥 Join the Waitlist – Limited Early Access!
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-                <div className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+            <div className="flex justify-center mb-12">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap relative">
+                🔥 Join the Waitlist – Limited Early Access!
+                <ArrowRight className="w-4 h-4" />
+                <span className="absolute -top-6 right-0 bg-neon-pink text-black text-xs font-bold px-2 py-1 rounded-full animate-pulse">
                   Limited Spots Available!
-                </div>
-              </div>
-            </form>
+                </span>
+              </button>
+            </div>
             
             <div className="flex justify-center space-x-6 mb-8">
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">Twitter</a>
