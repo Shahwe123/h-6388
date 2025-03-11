@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
-
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -18,7 +17,6 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -59,7 +57,6 @@ const BetaLanding = () => {
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
-
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -93,12 +90,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
-              <Button 
-                onClick={openNewsletterForm} 
-                variant="cta" 
-                size="xl" 
-                className="animate-pulse shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide"
-              >
+              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide">
                 🔥 GET EARLY ACCESS – LIMITED SPOTS!
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -185,25 +177,25 @@ const BetaLanding = () => {
             <div className="grid md:grid-cols-2 gap-8 mb-12">
               <div className="glass-card p-8 rounded-xl">
                 <Trophy className="w-10 h-10 text-neon-pink mb-4" />
-                <h3 className="font-bold text-lg mb-2">Early Access</h3>
+                <h3 className="font-bold text-lg mb-2">Early Access – Try it BEFORE the public release!</h3>
                 <p className="text-neutral-300">Be the first to try it before public release. Explore features months ahead of everyone else.</p>
               </div>
               
               <div className="glass-card p-8 rounded-xl">
                 <Zap className="w-10 h-10 text-neon-blue mb-4" />
-                <h3 className="font-bold text-lg mb-2">Influence Features</h3>
+                <h3 className="font-bold text-lg mb-2">Influence the App – Your feedback SHAPES the final product</h3>
                 <p className="text-neutral-300">Your feedback shapes the final product. Tell us what you want, and we'll build it!</p>
               </div>
               
               <div className="glass-card p-8 rounded-xl">
                 <Shield className="w-10 h-10 text-neon-purple mb-4" />
-                <h3 className="font-bold text-lg mb-2">Exclusive Founder Badge</h3>
+                <h3 className="font-bold text-lg mb-2">Exclusive Founder’s Badge – ONLY available to beta testers!</h3>
                 <p className="text-neutral-300">Get a permanent "PlatinumPath Founder" profile badge that shows you were here first.</p>
               </div>
               
               <div className="glass-card p-8 rounded-xl">
                 <Users className="w-10 h-10 text-neon-green mb-4" />
-                <h3 className="font-bold text-lg mb-2">VIP Access</h3>
+                <h3 className="font-bold text-lg mb-2">Unlock VIP Rewards – Get premium perks when we launch.</h3>
                 <p className="text-neutral-300">Beta testers get premium perks and benefits when we officially launch.</p>
               </div>
             </div>
