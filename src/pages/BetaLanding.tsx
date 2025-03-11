@@ -257,7 +257,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">2</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Get Your Invite</h3>
-                <p className="text-neutral-300">Receive an email with your exclusive beta access link.</p>
+                <p className="text-neutral-300">We’ll notify you before launch and send you instructions.</p>
                 <div className="mt-4 text-center">
                   <Mail className="w-12 h-12 text-neon-blue mx-auto" />
                 </div>
