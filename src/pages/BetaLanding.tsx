@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
+
 const BetaLanding = () => {
   const [email, setEmail] = useState("");
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
@@ -19,7 +20,6 @@ const BetaLanding = () => {
     toast
   } = useToast();
 
-  // Countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -55,6 +55,7 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
@@ -67,10 +68,10 @@ const BetaLanding = () => {
     }
     setIsNewsletterOpen(true);
   };
+
   return <div className="min-h-screen">
       <Header />
       <main>
-        {/* 1️⃣ Hero Section (Above the Fold) */}
         <section className="pt-32 pb-16 container-padding bg-black text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-40 bg-hero-pattern bg-cover bg-center"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-primary"></div>
@@ -103,13 +104,12 @@ const BetaLanding = () => {
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-8 max-w-lg mx-auto">
               <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
               <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
-                Get Beta Access – Limited Spots!
+                🔥 Join the Waitlist – Limited Early Access!
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
             
             <div className="mt-8 relative">
-              {/* Placeholder for dashboard screenshot */}
               <div className="w-full h-64 md:h-80 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30 overflow-hidden">
                 <div className="text-center">
                   <Trophy className="w-16 h-16 text-neon-pink mb-4 mx-auto" />
@@ -121,7 +121,6 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        {/* 2️⃣ "Why This Matters" (Pain Point & Solution Section) */}
         <section id="problem-solution" className="py-16 container-padding bg-primary">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
@@ -179,7 +178,6 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        {/* 3️⃣ "Why Join the Beta?" (Exclusive Perks Section) */}
         <section id="beta-perks" className="py-16 container-padding bg-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
@@ -215,7 +213,6 @@ const BetaLanding = () => {
               </div>
             </div>
             
-            {/* GIF/Animation placeholder */}
             <div className="mb-12 flex justify-center">
               <div className="w-64 h-64 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
                 <div className="text-center">
@@ -235,7 +232,6 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        {/* 4️⃣ How It Works (Signup Process – Remove Hesitation) */}
         <section id="how-it-works" className="py-16 container-padding bg-primary">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
@@ -291,7 +287,6 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        {/* 5️⃣ Social Proof & Credibility (Trust-Building Section) */}
         <section id="testimonials" className="py-16 container-padding bg-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
@@ -331,7 +326,6 @@ const BetaLanding = () => {
               </div>
             </div>
             
-            {/* Platform logos */}
             <div className="flex justify-center gap-8 mb-8">
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
                 <p className="text-xs text-neutral-400">PlayStation Logo</p>
@@ -353,7 +347,6 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        {/* 6️⃣ Urgency & FOMO (Make Them Sign Up NOW) */}
         <section id="urgency" className="py-16 container-padding bg-primary">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
@@ -398,7 +391,6 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        {/* 7️⃣ Final Call-to-Action (End with a Bang!) */}
         <section className="py-16 container-padding bg-gradient-to-b from-primary to-black">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-white">
@@ -423,7 +415,7 @@ const BetaLanding = () => {
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-12 max-w-lg mx-auto">
               <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
               <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
-                Join Beta Waitlist
+                🔥 Join the Waitlist – Limited Early Access!
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
@@ -442,4 +434,5 @@ const BetaLanding = () => {
       {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
     </div>;
 };
+
 export default BetaLanding;
