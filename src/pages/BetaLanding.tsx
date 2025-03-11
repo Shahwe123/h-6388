@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
-
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -18,7 +17,6 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
-
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -54,15 +52,13 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
-
   return <div className="min-h-screen">
       <Header />
       <main>
-        <section className="pt-32 pb-16 container-padding bg-gradient-to-b from-black to-primary text-white relative overflow-hidden">
+        <section className="pt-32 pb-16 container-padding bg-black text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-40 bg-hero-pattern bg-cover bg-center"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-primary"></div>
           
@@ -110,7 +106,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="problem-solution" className="py-16 container-padding bg-gradient-to-b from-primary to-black">
+        <section id="problem-solution" className="py-16 container-padding bg-primary">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
               The <span className="text-neon-purple">Problem</span> & Our <span className="text-neon-purple">Solution</span>
@@ -167,7 +163,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="beta-perks" className="py-16 container-padding bg-gradient-to-b from-black to-primary">
+        <section id="beta-perks" className="py-16 container-padding bg-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
               Why Join the <span className="text-neon-purple">PlatinumPath Beta</span>?
@@ -221,7 +217,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="how-it-works" className="py-16 container-padding bg-gradient-to-b from-primary to-black">
+        <section id="how-it-works" className="py-16 container-padding bg-primary">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
               ⚡How It Works – Get Started in <span className="text-neon-purple">3 Simple Steps!</span>
@@ -247,7 +243,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">2</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Get Your Invite</h3>
-                <p className="text-neutral-300">We'll emailyou before launch when it's time to join.</p>
+                <p className="text-neutral-300">We will email you before the beta launch when it's time to join.</p>
                 <div className="mt-4 text-center">
                   <Mail className="w-12 h-12 text-neon-blue mx-auto" />
                 </div>
@@ -278,7 +274,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="testimonials" className="py-16 container-padding bg-gradient-to-b from-black to-primary">
+        <section id="testimonials" className="py-16 container-padding bg-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
               <span className="text-neon-purple">Gamers</span> Are Hyped for PlatinumPath!
@@ -338,7 +334,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="urgency" className="py-16 container-padding bg-gradient-to-b from-primary to-black">
+        <section id="urgency" className="py-16 container-padding bg-primary">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
               <span className="text-neon-pink">Limited Beta Spots – Join Now Before It's Too Late!</span>
@@ -384,7 +380,7 @@ and Free Premium for 2 months! 🔥</p>
           </div>
         </section>
 
-        <section className="py-16 container-padding bg-gradient-to-b from-black via-primary to-black">
+        <section className="py-16 container-padding bg-gradient-to-b from-primary to-black">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-white">
               Join the <span className="text-neon-purple">PlatinumPath Beta</span> Today!
@@ -427,5 +423,4 @@ and Free Premium for 2 months! 🔥</p>
       {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
     </div>;
 };
-
 export default BetaLanding;
