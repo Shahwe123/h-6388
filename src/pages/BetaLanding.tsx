@@ -69,8 +69,8 @@ const BetaLanding = () => {
               <p className="text-sm font-medium text-neon-purple animate-pulse">🔥 LIMITED BETA ACCESS NOW AVAILABLE! 🔥</p>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">Track All Your Gaming Achievements in One Place – Join the Beta Waitlist Now!</h1>
-            <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">Be among the first to access AI-powered trophy tracking for PlayStation, Xbox, &amp; Steam.</h2>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">The Ultimate Achievement Tracker – Join the Beta Before It’s Too Late!</h1>
+            <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">Tired of tracking achievements across multiple platforms? PlatinumPath syncs your trophies from PlayStation, Xbox, & Steam – all in one place. 🚀</h2>
             
             <div className="flex justify-center mb-6">
               <div className="bg-black/30 backdrop-blur-md rounded-lg p-3 flex gap-6 border border-neon-purple/20">
@@ -90,7 +90,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
-              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide">
+              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide ">
                 🔥 GET EARLY ACCESS – LIMITED SPOTS!
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -258,7 +258,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">3</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Start Tracking</h3>
-                <p className="text-neutral-300">Connect your accounts and start tracking your achievements!</p>
+                <p className="text-neutral-300">Connect  and be among the first to flex your achievements.</p>
                 <div className="mt-4 text-center">
                   <Trophy className="w-12 h-12 text-neon-green mx-auto" />
                 </div>
