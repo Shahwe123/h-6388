@@ -83,7 +83,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
         "pulse": "pulse 2s ease-in-out infinite",
-        "pulse-slow": "pulse-slow 6s ease-in-out infinite", // Changed from 4s to 6s
+        "pulse-slow": "pulse-slow 4s ease-in-out infinite",
         "glow": "glow 2s ease-in-out infinite",
       },
       backgroundImage: {
