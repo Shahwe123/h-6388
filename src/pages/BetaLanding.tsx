@@ -1,25 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  ArrowRight, 
-  CheckCircle, 
-  XCircle, 
-  Trophy, 
-  Zap, 
-  Users, 
-  Shield, 
-  Clock, 
-  HelpCircle, 
-  Mail,
-  LockKeyhole
-} from "lucide-react";
+import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
-
 const BetaLanding = () => {
   const [email, setEmail] = useState("");
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
@@ -29,42 +15,59 @@ const BetaLanding = () => {
     minutes: 59,
     seconds: 59
   });
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
 
   // Countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
+          return {
+            ...prev,
+            seconds: prev.seconds - 1
+          };
         } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+          return {
+            ...prev,
+            minutes: prev.minutes - 1,
+            seconds: 59
+          };
         } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+          return {
+            ...prev,
+            hours: prev.hours - 1,
+            minutes: 59,
+            seconds: 59
+          };
         } else if (prev.days > 0) {
-          return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
+          return {
+            ...prev,
+            days: prev.days - 1,
+            hours: 23,
+            minutes: 59,
+            seconds: 59
+          };
         }
         return prev;
       });
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
       toast({
         title: "Invalid email",
         description: "Please enter a valid email address.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
     setIsNewsletterOpen(true);
   };
-
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       <Header />
       <main>
         {/* 1️⃣ Hero Section (Above the Fold) */}
@@ -77,12 +80,8 @@ const BetaLanding = () => {
               <p className="text-sm font-medium text-neon-purple animate-pulse">🔥 LIMITED BETA ACCESS NOW AVAILABLE! 🔥</p>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">
-              Track All Your Gaming Achievements in One Place – Join the Beta!
-            </h1>
-            <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
-              AI-powered tracking for PlayStation, Xbox, and Steam – get early access now!
-            </h2>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">Track All Your Gaming Achievements in One Place – Join the Beta Waitlist!</h1>
+            <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">Be among the first to access AI-powered trophy tracking for PlayStation, Xbox, &amp; Steam.</h2>
             
             <div className="flex justify-center mb-6">
               <div className="bg-black/30 backdrop-blur-md rounded-lg p-3 flex gap-6 border border-neon-purple/20">
@@ -102,14 +101,7 @@ const BetaLanding = () => {
             </div>
             
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-8 max-w-lg mx-auto">
-              <input 
-                type="email"
-                placeholder="Your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow"
-                required
-              />
+              <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
               <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
                 Get Beta Access – Limited Spots!
                 <ArrowRight className="w-4 h-4" />
@@ -179,10 +171,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button 
-                onClick={() => setIsNewsletterOpen(true)}
-                className="cyber-button flex items-center justify-center gap-2 mx-auto"
-              >
+              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Solve This Problem Now – Join the Beta!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -238,10 +227,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button 
-                onClick={() => setIsNewsletterOpen(true)}
-                className="cyber-button flex items-center justify-center gap-2 mx-auto"
-              >
+              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Get Exclusive Perks – Join the Beta!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -297,10 +283,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button 
-                onClick={() => setIsNewsletterOpen(true)}
-                className="cyber-button flex items-center justify-center gap-2 mx-auto"
-              >
+              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Easy to Join – Get Started Now!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -362,10 +345,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="text-center">
-              <button 
-                onClick={() => setIsNewsletterOpen(true)}
-                className="cyber-button flex items-center justify-center gap-2 mx-auto"
-              >
+              <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Join Other Gamers – Get Beta Access!
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -411,10 +391,7 @@ const BetaLanding = () => {
               </div>
             </div>
             
-            <button 
-              onClick={() => setIsNewsletterOpen(true)}
-              className="cyber-button flex items-center justify-center gap-2 mx-auto text-lg px-8 py-4"
-            >
+            <button onClick={() => setIsNewsletterOpen(true)} className="cyber-button flex items-center justify-center gap-2 mx-auto text-lg px-8 py-4">
               Join the Beta – Limited Spots!
               <ArrowRight className="w-5 h-5" />
             </button>
@@ -444,14 +421,7 @@ const BetaLanding = () => {
             </div>
             
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 justify-center mb-12 max-w-lg mx-auto">
-              <input 
-                type="email"
-                placeholder="Your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow"
-                required
-              />
+              <input type="email" placeholder="Your email address" value={email} onChange={e => setEmail(e.target.value)} className="px-4 py-3 rounded-md bg-black/50 backdrop-blur-sm border border-neon-purple/30 text-white flex-grow" required />
               <button type="submit" className="cyber-button flex items-center justify-center gap-2 whitespace-nowrap">
                 Join Beta Waitlist
                 <ArrowRight className="w-4 h-4" />
@@ -469,11 +439,7 @@ const BetaLanding = () => {
       </main>
       <Footer />
       
-      {isNewsletterOpen && (
-        <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />
-      )}
-    </div>
-  );
+      {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
+    </div>;
 };
-
 export default BetaLanding;
