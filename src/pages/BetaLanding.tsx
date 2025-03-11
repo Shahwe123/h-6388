@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
+
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -17,6 +18,7 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -52,9 +54,11 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
+
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -67,7 +71,7 @@ const BetaLanding = () => {
               <p className="text-sm font-medium text-neon-purple animate-pulse">🔥 LIMITED BETA ACCESS NOW AVAILABLE! 🔥</p>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">The Ultimate Achievement Tracker – Join the Beta Before It’s Too Late!</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">The Ultimate Achievement Tracker – Join the Beta Before It's Too Late!</h1>
             <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">Tired of tracking achievements across multiple platforms? PlatinumPath syncs your trophies from PlayStation, Xbox, & Steam – all in one place. 🚀</h2>
             
             <div className="flex justify-center mb-6">
@@ -88,7 +92,7 @@ const BetaLanding = () => {
             </div>
             
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
-              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse-slow shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide ">
+              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse-slow shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide max-w-[90%] md:max-w-full">
                 🔥 Claim Your Beta Spot – Only 500 Spots Available!
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -251,7 +255,6 @@ const BetaLanding = () => {
                 <ArrowRight className="w-8 h-8 text-neon-purple" />
               </div>
               
-              
             </div>
             
             <div className="text-center">
@@ -407,4 +410,5 @@ and Free Premium for 2 months! 🔥</p>
       {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
     </div>;
 };
+
 export default BetaLanding;
