@@ -14,11 +14,18 @@ afterEach(() => {
 // Add missing global types for jest-dom matchers
 declare global {
   namespace Vi {
-    interface Assertion {
-      toBeInTheDocument(): void;
-      toBeVisible(): void;
-      toHaveTextContent(text: string): void;
-      toHaveAttribute(attr: string, value?: string): void;
+    interface Assertion<T = any> {
+      toBeInTheDocument(): T;
+      toBeVisible(): T;
+      toHaveTextContent(text: string): T;
+      toHaveAttribute(attr: string, value?: string): T;
+      toBeDisabled(): T;
+      toBeEnabled(): T;
+      toBeChecked(): T;
+      toBeEmptyDOMElement(): T;
+      toHaveClass(className: string): T;
+      toHaveFocus(): T;
+      toHaveValue(value: any): T;
     }
   }
 }
