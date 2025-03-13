@@ -100,12 +100,26 @@ const App = () => {
             <Route path="/leaderboard" element={<Leaderboard />} />
 
             {/* Protected routes */}
-            <Route element={<AuthRequired />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/friends" element={<Friends />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/link-accounts" element={<LinkAccounts />} />
-            </Route>
+            <Route path="/profile" element={
+              <AuthRequired>
+                <Profile />
+              </AuthRequired>
+            } />
+            <Route path="/friends" element={
+              <AuthRequired>
+                <Friends />
+              </AuthRequired>
+            } />
+            <Route path="/settings" element={
+              <AuthRequired>
+                <Settings />
+              </AuthRequired>
+            } />
+            <Route path="/link-accounts" element={
+              <AuthRequired>
+                <LinkAccounts />
+              </AuthRequired>
+            } />
           </Routes>
           <Footer />
         </BrowserRouter>
