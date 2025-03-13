@@ -88,7 +88,7 @@ describe('Authentication E2E Flow', () => {
   
   it('should allow user to sign in successfully', async () => {
     const mockToast = vi.fn();
-    (useToast as jest.Mock).mockReturnValue({
+    (useToast as any).mockReturnValue({
       toast: mockToast,
     });
 
@@ -119,7 +119,7 @@ describe('Authentication E2E Flow', () => {
   
   it('should allow user to sign up successfully', async () => {
     const mockToast = vi.fn();
-    (useToast as jest.Mock).mockReturnValue({
+    (useToast as any).mockReturnValue({
       toast: mockToast,
     });
 
@@ -161,7 +161,7 @@ describe('Authentication E2E Flow', () => {
   
   it('should handle forgot password flow', async () => {
     const mockToast = vi.fn();
-    (useToast as jest.Mock).mockReturnValue({
+    (useToast as any).mockReturnValue({
       toast: mockToast,
     });
 
@@ -214,7 +214,7 @@ describe('Authentication E2E Flow', () => {
     );
     
     const mockToast = vi.fn();
-    (useToast as jest.Mock).mockReturnValue({
+    (useToast as any).mockReturnValue({
       toast: mockToast,
     });
 
