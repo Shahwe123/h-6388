@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
@@ -64,22 +63,13 @@ const Auth = () => {
         throw error;
       }
 
-      const { error: userError } = await supabase
-        .from('profiles')
-        .insert([
-          { id: data.user?.id, username: username, email: email },
-        ]);
-
-      if (userError) {
-        throw userError;
-      }
-
       toast({
         title: 'Signed up successfully',
         description: 'Please check your email to verify your account',
       });
       setMode('login');
     } catch (error: any) {
+      console.error('Signup error:', error);
       toast({
         title: 'Error signing up',
         description: error.message,
