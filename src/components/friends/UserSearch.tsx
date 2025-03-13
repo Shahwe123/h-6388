@@ -33,7 +33,7 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
     
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('id, username, avatar_url')
         .ilike('username', `%${searchQuery}%`)
         .neq('id', userId)

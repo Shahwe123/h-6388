@@ -226,6 +226,39 @@ export type Database = {
           },
         ]
       }
+      users: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          cover_url: string | null
+          created_at: string | null
+          email: string
+          id: string
+          is_private: boolean | null
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          email: string
+          id: string
+          is_private?: boolean | null
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_private?: boolean | null
+          username?: string
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           created_at: string

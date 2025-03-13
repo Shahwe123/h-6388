@@ -31,7 +31,7 @@ const Friends = () => {
         setUserId(session.user.id);
         
         const { data: userData, error: userError } = await supabase
-          .from('users')
+          .from('profiles')
           .select('username')
           .eq('id', session.user.id)
           .single();

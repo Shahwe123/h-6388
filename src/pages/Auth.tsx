@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
@@ -64,7 +65,7 @@ const Auth = () => {
       }
 
       const { error: userError } = await supabase
-        .from('users')
+        .from('profiles')
         .insert([
           { id: data.user?.id, username: username, email: email },
         ]);

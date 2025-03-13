@@ -69,15 +69,15 @@ export const useFriends = (userId: string | null) => {
       
       const friendIds = data.map(item => item.friend_id);
       
-      const { data: usersData, error: usersError } = await supabase
-        .from('users')
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
         .select('id, username, avatar_url')
         .in('id', friendIds);
         
-      if (usersError) throw usersError;
+      if (userError) throw userError;
       
       const formattedFriends: Friend[] = data.map(item => {
-        const user = usersData?.find(p => p.id === item.friend_id);
+        const user = userData?.find(p => p.id === item.friend_id);
         return {
           id: `${item.user_id}-${item.friend_id}`, // Create a unique ID from the composite key
           friend: {
