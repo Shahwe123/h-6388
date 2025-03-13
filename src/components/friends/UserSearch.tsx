@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { X, Search, UserCircle, UserPlus, Check, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,16 +28,12 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   const { toast } = useToast();
   const dispatch = useDispatch();
   
-  // Get user data from redux store as fallback
   const reduxUserData = useSelector((state: any) => state.user?.userData);
-  // Get friends list from redux store to check existing friends
   const { friends } = useSelector((state: any) => state.friends);
   
-  // Use props or fallback to redux state
   const userId = propsUserId || reduxUserData?.id;
   const username = propsUsername || reduxUserData?.username;
   
-  // Load current authentication session on component mount
   useEffect(() => {
     const loadSession = async () => {
       const { data, error } = await supabase.auth.getSession();
@@ -59,7 +54,6 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
     loadSession();
   }, []);
   
-  // Log user data for debugging
   useEffect(() => {
     console.log("UserSearch component initialized with:");
     console.log("Session user ID:", currentSession?.user?.id);
@@ -72,9 +66,15 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
     console.log("Current friends:", friends);
   }, [propsUserId, propsUsername, reduxUserData, currentSession, friends]);
 
-  // Check if a user is already a friend
   const isExistingFriend = (userId: string) => {
-    return friends.some((friend: any) => friend.friend.id === userId);
+    if (!friends || !Array.isArray(friends)) {
+      console.log("Friends list is not available or not an array");
+      return false;
+    }
+    
+    const isFriend = friends.some((friend: any) => friend.friend && friend.friend.id === userId);
+    console.log(`Checking if ${userId} is a friend:`, isFriend);
+    return isFriend;
   };
 
   const handleSearch = async () => {
@@ -133,8 +133,8 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   const sendFriendRequest = async (recipientId: string, recipientUsername: string) => {
     console.log("Sending friend request to:", { recipientId, recipientUsername });
     
-    // Check if this user is already a friend
     if (isExistingFriend(recipientId)) {
+      console.log(`User ${recipientId} is already a friend, preventing friend request`);
       toast({
         title: 'Already friends',
         description: `You are already friends with ${recipientUsername}`,
@@ -142,7 +142,6 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       return;
     }
     
-    // Check authentication
     if (!currentSession?.user?.id) {
       console.error("No authenticated user session");
       toast({
@@ -159,8 +158,6 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
     console.log("Current user:", { currentUserId, currentUsername });
 
     try {
-      // Check for existing friend requests
-      console.log("Checking for existing friend requests");
       const { data: existingRequests, error: checkError } = await supabase
         .from('notifications')
         .select()
@@ -182,9 +179,6 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
         return;
       }
       
-      console.log("Inserting new friend request notification");
-      
-      // Insert notification for the recipient (not for the sender)
       const { data, error } = await supabase
         .from('notifications')
         .insert({
@@ -203,7 +197,6 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       
       console.log("Friend request sent successfully:", data);
       
-      // Update UI state but don't add to sender's notifications
       toast({
         title: 'Friend request sent',
         description: `A friend request has been sent to ${recipientUsername}`,
@@ -220,6 +213,8 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       });
     }
   };
+
+  const filteredSearchResults = searchResults.filter(user => !isExistingFriend(user.id));
 
   return (
     <div className="bg-primary border border-neon-purple/30 rounded-xl w-full max-w-md">
@@ -275,44 +270,49 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
             </div>
           ) : (
             <div className="space-y-3">
-              {searchResults.map((user) => (
-                <div
-                  key={user.id}
-                  className="p-3 bg-black/30 rounded-lg flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <Avatar className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
-                      {user.avatar_url ? (
-                        <AvatarImage 
-                          src={user.avatar_url} 
-                          alt={user.username} 
-                          className="w-full h-full object-cover" 
-                        />
-                      ) : (
-                        <AvatarFallback>
-                          <UserCircle className="w-8 h-8 text-neutral-400" />
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">{user.username}</div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => sendFriendRequest(user.id, user.username)}
-                    className="p-2 bg-black/40 hover:bg-neon-purple/20 rounded transition-colors"
-                    disabled={pendingFriendRequests.includes(user.id) || isExistingFriend(user.id)}
+              {filteredSearchResults.map((user) => {
+                const isFriend = isExistingFriend(user.id);
+                const isPending = pendingFriendRequests.includes(user.id);
+                
+                return (
+                  <div
+                    key={user.id}
+                    className="p-3 bg-black/30 rounded-lg flex items-center justify-between"
                   >
-                    {pendingFriendRequests.includes(user.id) ? (
-                      <Check className="w-5 h-5 text-green-500" />
-                    ) : isExistingFriend(user.id) ? (
-                      <UserCheck className="w-5 h-5 text-neon-blue" />
-                    ) : (
-                      <UserPlus className="w-5 h-5 text-neutral-300" />
-                    )}
-                  </button>
-                </div>
-              ))}
+                    <div className="flex items-center gap-3 flex-1">
+                      <Avatar className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
+                        {user.avatar_url ? (
+                          <AvatarImage 
+                            src={user.avatar_url} 
+                            alt={user.username} 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <AvatarFallback>
+                            <UserCircle className="w-8 h-8 text-neutral-400" />
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{user.username}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => sendFriendRequest(user.id, user.username)}
+                      className="p-2 bg-black/40 hover:bg-neon-purple/20 rounded transition-colors"
+                      disabled={isPending || isFriend}
+                    >
+                      {isPending ? (
+                        <Check className="w-5 h-5 text-green-500" />
+                      ) : isFriend ? (
+                        <UserCheck className="w-5 h-5 text-neon-blue" />
+                      ) : (
+                        <UserPlus className="w-5 h-5 text-neutral-300" />
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
