@@ -1,10 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Search, UserCircle, UserPlus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addNotification } from '@/redux/slices/notificationsSlice';
 
 interface Profile {
@@ -19,7 +19,7 @@ interface UserSearchProps {
   onClose: () => void;
 }
 
-const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
+const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: UserSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
   const [searching, setSearching] = useState(false);
@@ -27,14 +27,50 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
   const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
   const { toast } = useToast();
   const dispatch = useDispatch();
+  
+  // Get user data from redux store as fallback
+  const reduxUserData = useSelector((state: any) => state.user?.userData);
+  
+  // Use props or fallback to redux state
+  const userId = propsUserId || reduxUserData?.id;
+  const username = propsUsername || reduxUserData?.username;
+  
+  // Log user data for debugging
+  useEffect(() => {
+    console.log("UserSearch component initialized with:");
+    console.log("Props userId:", propsUserId);
+    console.log("Props username:", propsUsername);
+    console.log("Redux userId:", reduxUserData?.id);
+    console.log("Redux username:", reduxUserData?.username);
+    console.log("Effective userId:", userId);
+    console.log("Effective username:", username);
+  }, [propsUserId, propsUsername, reduxUserData]);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() || !userId) return;
+    console.log("Search triggered with:", { searchQuery, userId });
+    if (!searchQuery.trim()) {
+      console.log("Search query is empty, aborting search");
+      toast({
+        title: 'Please enter a username to search',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    if (!userId) {
+      console.log("No user ID available, aborting search");
+      toast({
+        title: 'You must be logged in to search for friends',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     setSearching(true);
     setHasSearched(true);
     
     try {
+      console.log("Executing search query for:", searchQuery);
       const { data, error } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
@@ -42,12 +78,15 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         .neq('id', userId)
         .limit(10);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Search error:", error);
+        throw error;
+      }
       
-      // Here we'd normally filter out existing friends, but we need to pass friends list
-      // Since we don't have access to friends list here, we'll show all results
+      console.log("Search results:", data);
       setSearchResults(data || []);
     } catch (error: any) {
+      console.error("Search error:", error);
       toast({
         title: 'Error searching users',
         description: error.message,
@@ -59,9 +98,22 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
   };
   
   const sendFriendRequest = async (recipientId: string, recipientUsername: string) => {
-    if (!userId || !username) return;
+    console.log("Sending friend request to:", { recipientId, recipientUsername });
+    console.log("Current user:", { userId, username });
+    
+    if (!userId || !username) {
+      console.error("Missing sender data:", { userId, username });
+      toast({
+        title: 'Error sending friend request',
+        description: 'User information is missing',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     try {
+      // Check for existing friend requests
+      console.log("Checking for existing friend requests");
       const { data: existingRequests, error: checkError } = await supabase
         .from('notifications')
         .select()
@@ -69,9 +121,13 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         .eq('recipient_id', recipientId)
         .eq('type', 'friend_request');
         
-      if (checkError) throw checkError;
+      if (checkError) {
+        console.error("Error checking existing requests:", checkError);
+        throw checkError;
+      }
       
       if (existingRequests && existingRequests.length > 0) {
+        console.log("Friend request already sent:", existingRequests);
         toast({
           title: 'Friend request already sent',
           description: `You've already sent a request to ${recipientUsername}`,
@@ -79,6 +135,7 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         return;
       }
       
+      console.log("Inserting new friend request notification");
       const { data, error } = await supabase
         .from('notifications')
         .insert({
@@ -90,7 +147,12 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         })
         .select();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Error inserting friend request:", error);
+        throw error;
+      }
+      
+      console.log("Friend request sent successfully:", data);
       
       // Update Redux store with the new notification
       if (data && data.length > 0) {
@@ -105,6 +167,7 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
       setPendingFriendRequests(prev => [...prev, recipientId]);
       setSearchResults(prev => prev.filter(user => user.id !== recipientId));
     } catch (error: any) {
+      console.error("Error sending friend request:", error);
       toast({
         title: 'Error sending friend request',
         description: error.message,

@@ -16,14 +16,17 @@ const Friends = () => {
   const { toast } = useToast();
   
   // Use Redux for friends data
-  const { friends, loading: friendsLoading } = useSelector((state) => state.friends);
+  const { friends, loading: friendsLoading } = useSelector((state: any) => state.friends);
+  const reduxUserData = useSelector((state: any) => state.user?.userData);
   
-  // We still need to fetch the userId and username for the UserSearch component
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        console.log("Fetching user session data");
         const { data: { session } } = await supabase.auth.getSession();
+        
         if (session) {
+          console.log("Session found, user ID:", session.user.id);
           setUserId(session.user.id);
           
           const { data: userData, error: userError } = await supabase
@@ -32,10 +35,18 @@ const Friends = () => {
             .eq('id', session.user.id)
             .single();
             
-          if (userError) throw userError;
+          if (userError) {
+            console.error("Error fetching user profile:", userError);
+            throw userError;
+          }
+          
+          console.log("User profile data:", userData);
           setUsername(userData.username);
+        } else {
+          console.log("No session found");
         }
-      } catch (error) {
+      } catch (error: any) {
+        console.error("Error in fetchUserData:", error);
         toast({
           title: 'Error fetching user data',
           description: error.message,
@@ -46,6 +57,15 @@ const Friends = () => {
     
     fetchUserData();
   }, [toast]);
+
+  // Log the values for debugging
+  useEffect(() => {
+    console.log("Friends component - User data:");
+    console.log("userId from state:", userId);
+    console.log("username from state:", username);
+    console.log("userId from Redux:", reduxUserData?.id);
+    console.log("username from Redux:", reduxUserData?.username);
+  }, [userId, username, reduxUserData]);
 
   if (friendsLoading) {
     return (
@@ -70,7 +90,10 @@ const Friends = () => {
             
             <Button 
               className="cyber-button-sm flex items-center gap-2"
-              onClick={() => setShowSearchModal(true)}
+              onClick={() => {
+                console.log("Opening search modal with user data:", { userId, username });
+                setShowSearchModal(true);
+              }}
             >
               <UserPlus className="h-4 w-4" />
               Add Friend
