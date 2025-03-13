@@ -1,19 +1,31 @@
 
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest';
 import { setupServer } from 'msw/node';
 import { rest } from 'msw';
 import { screen, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import Auth from '../pages/Auth';
 
 // Mock implementation of window object for E2E testing
 const mockWindow = {
   location: {
     href: 'http://localhost:8080/auth',
     origin: 'http://localhost:8080',
+    pathname: '/auth',
+    replace: vi.fn(),
   },
 };
 
 global.window = mockWindow as any;
+
+// Mock toast for notifications
+vi.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({
+    toast: vi.fn(),
+  }),
+}));
 
 // Setup MSW server to intercept API requests
 const server = setupServer(
@@ -44,36 +56,165 @@ const server = setupServer(
     );
   }),
   
-  // Add more mock endpoints as needed
+  rest.post('https://nvjjragekchczuxgdvvo.supabase.co/auth/v1/recover', (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        message: 'Password recovery email sent',
+      })
+    );
+  }),
+  
+  rest.post('https://nvjjragekchczuxgdvvo.supabase.co/rest/v1/profiles', (req, res, ctx) => {
+    return res(
+      ctx.status(201),
+      ctx.json({
+        id: 'mock-user-id',
+        username: 'testuser',
+        email: 'test@example.com',
+      })
+    );
+  }),
 );
 
 describe('Authentication E2E Flow', () => {
   beforeAll(() => server.listen());
   afterAll(() => server.close());
+  beforeEach(() => server.resetHandlers());
   
-  it('should navigate through the complete auth flow', async () => {
-    // This is a high-level E2E test skeleton
-    // In a real implementation, tools like Playwright or Cypress would be better suited
+  it('should allow user to sign in successfully', async () => {
+    // Render the Auth component
+    render(
+      <BrowserRouter>
+        <Auth />
+      </BrowserRouter>
+    );
     
-    // Load the auth page
-    document.body.innerHTML = '<div id="root"></div>';
+    // Fill in login credentials
+    await userEvent.type(screen.getByLabelText('Email'), 'test@example.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'password123');
     
-    // For a proper E2E test, we would:
-    // 1. Visit the auth page
-    // const authPage = await page.goto('http://localhost:8080/auth');
+    // Click login button
+    await userEvent.click(screen.getByRole('button', { name: /Sign In/i }));
     
-    // 2. Fill in login credentials
-    // await page.fill('[name="email"]', 'test@example.com');
-    // await page.fill('[name="password"]', 'password123');
+    // Assert toast notification
+    await waitFor(() => {
+      expect(toast).toHaveBeenCalledWith({
+        title: 'Signed in successfully',
+      });
+    });
     
-    // 3. Click login button
-    // await page.click('button[type="submit"]');
+    // Assert navigation to profile page
+    expect(window.location.replace).toHaveBeenCalledWith('/profile');
+  });
+  
+  it('should allow user to sign up successfully', async () => {
+    // Render the Auth component
+    render(
+      <BrowserRouter>
+        <Auth />
+      </BrowserRouter>
+    );
     
-    // 4. Assert redirection to profile page
-    // await page.waitForURL('http://localhost:8080/profile');
-    // expect(page.url()).toBe('http://localhost:8080/profile');
+    // Click on "Create an account" link
+    await userEvent.click(screen.getByText('Create an account'));
     
-    // For now, we'll just demonstrate the concept with a placeholder assertion
-    expect(true).toBe(true);
+    // Fill in registration form
+    await waitFor(() => {
+      expect(screen.getByLabelText('Username')).toBeInTheDocument();
+    });
+    
+    await userEvent.type(screen.getByLabelText('Username'), 'testuser');
+    await userEvent.type(screen.getByLabelText('Email'), 'test@example.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'password123');
+    
+    // Click sign up button
+    await userEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
+    
+    // Assert toast notification
+    await waitFor(() => {
+      expect(toast).toHaveBeenCalledWith({
+        title: 'Signed up successfully',
+        description: 'Please check your email to verify your account',
+      });
+    });
+    
+    // Assert redirection to login page
+    await waitFor(() => {
+      expect(screen.getByText('Sign in to your account')).toBeInTheDocument();
+    });
+  });
+  
+  it('should handle forgot password flow', async () => {
+    // Render the Auth component
+    render(
+      <BrowserRouter>
+        <Auth />
+      </BrowserRouter>
+    );
+    
+    // Click on "Forgot password?" link
+    await userEvent.click(screen.getByText('Forgot password?'));
+    
+    // Fill in email
+    await waitFor(() => {
+      expect(screen.getByText('Reset your password')).toBeInTheDocument();
+    });
+    
+    await userEvent.type(screen.getByLabelText('Email'), 'test@example.com');
+    
+    // Click reset password button
+    await userEvent.click(screen.getByRole('button', { name: /Reset Password/i }));
+    
+    // Assert toast notification
+    await waitFor(() => {
+      expect(toast).toHaveBeenCalledWith({
+        title: 'Reset password email sent',
+        description: 'Please check your email to reset your password',
+      });
+    });
+    
+    // Assert redirection to login page
+    await waitFor(() => {
+      expect(screen.getByText('Sign in to your account')).toBeInTheDocument();
+    });
+  });
+  
+  it('should show error messages for invalid login', async () => {
+    // Override the success handler with an error response
+    server.use(
+      rest.post('https://nvjjragekchczuxgdvvo.supabase.co/auth/v1/token', (req, res, ctx) => {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            error: 'Invalid login credentials',
+            message: 'Email or password is incorrect',
+          })
+        );
+      })
+    );
+    
+    // Render the Auth component
+    render(
+      <BrowserRouter>
+        <Auth />
+      </BrowserRouter>
+    );
+    
+    // Fill in login credentials
+    await userEvent.type(screen.getByLabelText('Email'), 'test@example.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'wrongpassword');
+    
+    // Click login button
+    await userEvent.click(screen.getByRole('button', { name: /Sign In/i }));
+    
+    // Assert error toast notification
+    await waitFor(() => {
+      expect(toast).toHaveBeenCalledWith({
+        title: 'Error signing in',
+        description: 'Email or password is incorrect',
+        variant: 'destructive',
+      });
+    });
   });
 });
