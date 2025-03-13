@@ -27,10 +27,19 @@ const FriendsList = ({ friends, setFriends }: FriendsListProps) => {
 
   const removeFriend = async (friendId: string, friendUsername: string) => {
     try {
+      // Get the current user's ID
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('You must be logged in to remove a friend');
+      }
+      
+      const userId = session.user.id;
+      
+      // Delete the friendship relationship in both directions
       const { error } = await supabase
         .from('friends')
         .delete()
-        .or(`and(user_id.eq.${friendId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${friendId})`);
+        .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`);
         
       if (error) throw error;
       

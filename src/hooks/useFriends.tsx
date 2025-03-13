@@ -10,7 +10,7 @@ interface User {
 }
 
 interface Friend {
-  id: string;
+  id: string; // This will now be composite key (user_id, friend_id)
   friend: User;
 }
 
@@ -56,7 +56,7 @@ export const useFriends = (userId: string | null) => {
     try {
       const { data, error } = await supabase
         .from('friends')
-        .select('id, friend_id')
+        .select('user_id, friend_id, created_at')
         .eq('user_id', userId);
         
       if (error) throw error;
@@ -69,21 +69,21 @@ export const useFriends = (userId: string | null) => {
       
       const friendIds = data.map(item => item.friend_id);
       
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
         .select('id, username, avatar_url')
         .in('id', friendIds);
         
-      if (profilesError) throw profilesError;
+      if (usersError) throw usersError;
       
       const formattedFriends: Friend[] = data.map(item => {
-        const profile = profilesData?.find(p => p.id === item.friend_id);
+        const user = usersData?.find(p => p.id === item.friend_id);
         return {
-          id: item.id,
+          id: `${item.user_id}-${item.friend_id}`, // Create a unique ID from the composite key
           friend: {
-            id: profile?.id || '',
-            username: profile?.username || 'Unknown User',
-            avatar_url: profile?.avatar_url
+            id: user?.id || '',
+            username: user?.username || 'Unknown User',
+            avatar_url: user?.avatar_url
           }
         };
       }).filter(friend => friend.friend.id !== '');

@@ -63,15 +63,14 @@ const Auth = () => {
         throw error;
       }
 
-      // Create a user profile in the profiles table
-      const { error: profileError } = await supabase
-        .from('profiles')
+      const { error: userError } = await supabase
+        .from('users')
         .insert([
           { id: data.user?.id, username: username, email: email },
         ]);
 
-      if (profileError) {
-        throw profileError;
+      if (userError) {
+        throw userError;
       }
 
       toast({
