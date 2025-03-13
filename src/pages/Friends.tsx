@@ -1,51 +1,20 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Gamepad2 } from 'lucide-react';
+import { Users, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FriendsList from '@/components/friends/FriendsList';
 import UserSearch from '@/components/friends/UserSearch';
 import FriendActivity from '@/components/friends/FriendActivity';
 import { useSelector } from 'react-redux';
-import { supabase } from '@/integrations/supabase/client';
 
 const Friends = () => {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const { toast } = useToast();
   
-  // Use Redux for friends data
+  // Use Redux for friends data and user data
   const { friends, loading: friendsLoading } = useSelector((state) => state.friends);
-  
-  // We still need to fetch the userId and username for the UserSearch component
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          setUserId(session.user.id);
-          
-          const { data: userData, error: userError } = await supabase
-            .from('profiles')
-            .select('username')
-            .eq('id', session.user.id)
-            .single();
-            
-          if (userError) throw userError;
-          setUsername(userData.username);
-        }
-      } catch (error) {
-        toast({
-          title: 'Error fetching user data',
-          description: error.message,
-          variant: 'destructive',
-        });
-      }
-    };
-    
-    fetchUserData();
-  }, [toast]);
+  const { user } = useSelector((state) => state.user);
 
   if (friendsLoading) {
     return (
@@ -88,8 +57,8 @@ const Friends = () => {
       {showSearchModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <UserSearch 
-            userId={userId} 
-            username={username} 
+            userId={user?.id || null} 
+            username={user?.user_metadata?.username || null} 
             onClose={() => setShowSearchModal(false)} 
           />
         </div>
