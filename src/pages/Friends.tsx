@@ -30,14 +30,14 @@ const Friends = () => {
         
         setUserId(session.user.id);
         
-        const { data: profileData, error: profileError } = await supabase
+        const { data: userData, error: userError } = await supabase
           .from('profiles')
           .select('username')
           .eq('id', session.user.id)
           .single();
           
-        if (profileError) throw profileError;
-        setUsername(profileData.username);
+        if (userError) throw userError;
+        setUsername(userData.username);
       } catch (error: any) {
         toast({
           title: 'Error fetching user data',
