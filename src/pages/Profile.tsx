@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon, Link, Medal, BarChart, ChartPie } from 'lucide-react';
@@ -13,6 +12,7 @@ import AchievementBadge from '@/components/profile/AchievementBadge';
 import RarityCard from '@/components/profile/RarityCard';
 import StatCharts from '@/components/profile/StatCharts';
 import SocialShare from '@/components/profile/SocialShare';
+import { useSelector } from 'react-redux';
 
 interface Profile {
   id: string;
@@ -27,14 +27,44 @@ interface Profile {
   is_private: boolean | null;
 }
 
-// Mock data for demonstration
+// Mock trophy data 
 const mockTrophies = [
-  { id: '1', name: 'Platinum Master', type: 'platinum' as const, game: 'God of War', rarity: '0.1%' },
+  { id: '1', name: 'Platinum Master', type: 'platinum' as const, game: 'God of War', rarity: '0.1%', image: '/trophy1.png' },
   { id: '2', name: 'Gold Champion', type: 'gold' as const, game: 'Elden Ring', rarity: '1.2%' },
   { id: '3', name: 'Silver Star', type: 'silver' as const, game: 'Cyberpunk 2077', rarity: '5.7%' },
   { id: '4', name: 'Bronze Medal', type: 'bronze' as const, game: 'Call of Duty', rarity: '15.3%' },
   { id: '5', name: 'Ultra Rare', type: 'ultra-rare' as const, game: 'Red Dead Redemption 2', rarity: '0.01%' },
   { id: '6', name: 'Legendary', type: 'platinum' as const, game: 'The Last of Us', rarity: '0.5%' },
+  { id: '7', name: 'Master Collector', type: 'gold' as const, game: 'Assassin\'s Creed', rarity: '2.3%' },
+  { id: '8', name: 'First Blood', type: 'bronze' as const, game: 'Fortnite', rarity: '45.2%' },
+];
+
+// Mock friend comparison data
+const mockFriendsForComparison = [
+  {
+    id: 'friend-1',
+    username: 'GameMaster42',
+    avatar_url: null,
+    trophies: 30,
+    platinums: 1,
+    comparison: '+15'
+  },
+  {
+    id: 'friend-2',
+    username: 'TrophyHunter99',
+    avatar_url: null,
+    trophies: 42,
+    platinums: 3,
+    comparison: '+3'
+  },
+  {
+    id: 'friend-3',
+    username: 'ProGamer2023',
+    avatar_url: null,
+    trophies: 22,
+    platinums: 0,
+    comparison: '+23'
+  }
 ];
 
 const Profile = () => {
@@ -381,59 +411,72 @@ const Profile = () => {
             </div>}
         </div>
         
-        {/* Friends Comparison Section */}
-        <div className="glass-card rounded-xl p-6 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Compare with Friends</h2>
-            <Button 
-              variant="outline"
-              size="sm"
-              className="bg-black/40 border-neon-purple/30 hover:bg-black/60"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              View All
-            </Button>
-          </div>
-          
-          {friendCount > 0 ? (
-            <div className="space-y-4">
-              <p className="text-sm text-neutral-400">
-                You have 13 more Platinum trophies than your friends on average!
-              </p>
-              
-              <div className="bg-black/30 p-4 rounded-lg">
-                <div className="mb-3 flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gray-700 rounded-full overflow-hidden"></div>
-                    <span className="ml-2 font-medium">JohnDoe</span>
-                  </div>
-                  <RankBadge rank="Trophy Hunter" />
-                </div>
+        {/* Friends Comparison Section - ONLY show for the user's own profile */}
+        {isOwnProfile && (
+          <div className="glass-card rounded-xl p-6 mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Compare with Friends</h2>
+              <Button 
+                variant="outline"
+                size="sm"
+                className="bg-black/40 border-neon-purple/30 hover:bg-black/60"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                View All
+              </Button>
+            </div>
+            
+            {friendCount > 0 ? (
+              <div className="space-y-4">
+                <p className="text-sm text-neutral-400">
+                  You have 13 more Platinum trophies than your friends on average!
+                </p>
                 
-                <div className="grid grid-cols-3 gap-4 text-center text-sm">
-                  <div>
-                    <div className="font-bold">30</div>
-                    <div className="text-xs text-neutral-500">Trophies</div>
-                  </div>
-                  <div>
-                    <div className="font-bold">1</div>
-                    <div className="text-xs text-neutral-500">Platinums</div>
-                  </div>
-                  <div>
-                    <div className="font-bold text-green-500">+15</div>
-                    <div className="text-xs text-neutral-500">Your Lead</div>
-                  </div>
+                {/* Mock friends comparison cards */}
+                <div className="space-y-3">
+                  {mockFriendsForComparison.map(friend => (
+                    <div key={friend.id} className="bg-black/30 p-4 rounded-lg">
+                      <div className="mb-3 flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 bg-gray-700 rounded-full overflow-hidden flex items-center justify-center">
+                            {friend.avatar_url ? (
+                              <img src={friend.avatar_url} alt={friend.username} className="w-full h-full object-cover" />
+                            ) : (
+                              <UserCircle className="w-6 h-6 text-neutral-400" />
+                            )}
+                          </div>
+                          <span className="ml-2 font-medium">{friend.username}</span>
+                        </div>
+                        <RankBadge rank="Trophy Hunter" />
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                        <div>
+                          <div className="font-bold">{friend.trophies}</div>
+                          <div className="text-xs text-neutral-500">Trophies</div>
+                        </div>
+                        <div>
+                          <div className="font-bold">{friend.platinums}</div>
+                          <div className="text-xs text-neutral-500">Platinums</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-green-500">{friend.comparison}</div>
+                          <div className="text-xs text-neutral-500">Your Lead</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="text-neutral-400 text-center py-8">
-              <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>No friends to compare with</p>
-              <p className="text-sm mt-1">Add friends to compare your achievements</p>
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="text-neutral-400 text-center py-8">
+                <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No friends to compare with</p>
+                <p className="text-sm mt-1">Add friends to compare your achievements</p>
+              </div>
+            )}
+          </div>
+        )}
         
         {/* Games Collection Section */}
         <div className="glass-card rounded-xl p-6">
