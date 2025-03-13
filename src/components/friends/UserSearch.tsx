@@ -25,6 +25,7 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   const [searching, setSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
+  const [currentSession, setCurrentSession] = useState<any>(null);
   const { toast } = useToast();
   const dispatch = useDispatch();
   
@@ -35,33 +36,41 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   const userId = propsUserId || reduxUserData?.id;
   const username = propsUsername || reduxUserData?.username;
   
+  // Load current authentication session on component mount
+  useEffect(() => {
+    const loadSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error("Error fetching auth session:", error);
+        return;
+      }
+      
+      if (data && data.session) {
+        console.log("Session loaded:", data.session.user.id);
+        setCurrentSession(data.session);
+      } else {
+        console.log("No active session");
+      }
+    };
+    
+    loadSession();
+  }, []);
+  
   // Log user data for debugging
   useEffect(() => {
     console.log("UserSearch component initialized with:");
+    console.log("Session user ID:", currentSession?.user?.id);
     console.log("Props userId:", propsUserId);
     console.log("Props username:", propsUsername);
     console.log("Redux userId:", reduxUserData?.id);
     console.log("Redux username:", reduxUserData?.username);
     console.log("Effective userId:", userId);
     console.log("Effective username:", username);
-  }, [propsUserId, propsUsername, reduxUserData]);
-
-  // Get current session to ensure we have the most up-to-date user ID
-  useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        console.log("Current authenticated user ID:", data.session.user.id);
-      } else {
-        console.log("No active session found");
-      }
-    };
-    
-    getSession();
-  }, []);
+  }, [propsUserId, propsUsername, reduxUserData, currentSession]);
 
   const handleSearch = async () => {
-    console.log("Search triggered with:", { searchQuery, userId });
+    console.log("Search triggered with:", { searchQuery, userId: currentSession?.user?.id || userId });
     if (!searchQuery.trim()) {
       console.log("Search query is empty, aborting search");
       toast({
@@ -71,8 +80,8 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       return;
     }
     
-    if (!userId) {
-      console.log("No user ID available, aborting search");
+    if (!currentSession?.user?.id && !userId) {
+      console.log("No authenticated user ID available, aborting search");
       toast({
         title: 'You must be logged in to search for friends',
         variant: 'destructive',
@@ -85,11 +94,13 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
     
     try {
       console.log("Executing search query for:", searchQuery);
+      const authUserId = currentSession?.user?.id || userId;
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
         .ilike('username', `%${searchQuery}%`)
-        .neq('id', userId)
+        .neq('id', authUserId)
         .limit(10);
         
       if (error) {
@@ -113,34 +124,30 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   
   const sendFriendRequest = async (recipientId: string, recipientUsername: string) => {
     console.log("Sending friend request to:", { recipientId, recipientUsername });
-    console.log("Current user:", { userId, username });
     
-    if (!userId || !username) {
-      console.error("Missing sender data:", { userId, username });
+    // Check authentication
+    if (!currentSession?.user?.id) {
+      console.error("No authenticated user session");
       toast({
-        title: 'Error sending friend request',
-        description: 'User information is missing',
+        title: 'Authentication Error',
+        description: 'Please log in to send friend requests',
         variant: 'destructive',
       });
       return;
     }
 
+    const currentUserId = currentSession.user.id;
+    const currentUsername = username || 'User';
+    
+    console.log("Current user:", { currentUserId, currentUsername });
+
     try {
-      // First, get current session to ensure we're using the authenticated user ID
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        throw new Error('You must be logged in to send a friend request');
-      }
-      
-      const authenticatedUserId = sessionData.session.user.id;
-      console.log("Authenticated user ID:", authenticatedUserId);
-      
       // Check for existing friend requests
       console.log("Checking for existing friend requests");
       const { data: existingRequests, error: checkError } = await supabase
         .from('notifications')
         .select()
-        .eq('sender_id', authenticatedUserId)
+        .eq('sender_id', currentUserId)
         .eq('recipient_id', recipientId)
         .eq('type', 'friend_request');
         
@@ -159,12 +166,14 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       }
       
       console.log("Inserting new friend request notification");
+      
+      // Insert with our current authenticated user ID (not the one from props/redux)
       const { data, error } = await supabase
         .from('notifications')
         .insert({
           recipient_id: recipientId,
-          sender_id: authenticatedUserId,
-          sender_username: username,
+          sender_id: currentUserId,
+          sender_username: currentUsername,
           type: 'friend_request',
           read: false
         })

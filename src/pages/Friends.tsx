@@ -13,6 +13,7 @@ const Friends = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [authSession, setAuthSession] = useState<any>(null);
   const { toast } = useToast();
   
   // Use Redux for friends data
@@ -23,10 +24,16 @@ const Friends = () => {
     const fetchUserData = async () => {
       try {
         console.log("Fetching user session data");
-        const { data } = await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error fetching auth session:", error);
+          return;
+        }
         
         if (data.session) {
           console.log("Session found, user ID:", data.session.user.id);
+          setAuthSession(data.session);
           setUserId(data.session.user.id);
           
           const { data: userData, error: userError } = await supabase
@@ -61,11 +68,12 @@ const Friends = () => {
   // Log the values for debugging
   useEffect(() => {
     console.log("Friends component - User data:");
+    console.log("session userId:", authSession?.user?.id);
     console.log("userId from state:", userId);
     console.log("username from state:", username);
     console.log("userId from Redux:", reduxUserData?.id);
     console.log("username from Redux:", reduxUserData?.username);
-  }, [userId, username, reduxUserData]);
+  }, [userId, username, reduxUserData, authSession]);
 
   if (friendsLoading) {
     return (
@@ -91,7 +99,11 @@ const Friends = () => {
             <Button 
               className="cyber-button-sm flex items-center gap-2"
               onClick={() => {
-                console.log("Opening search modal with user data:", { userId, username });
+                console.log("Opening search modal with user data:", { 
+                  userId, 
+                  username,
+                  sessionId: authSession?.user?.id 
+                });
                 setShowSearchModal(true);
               }}
             >
