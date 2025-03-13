@@ -35,6 +35,9 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
     setHasSearched(true);
     
     try {
+      // Log the search query for debugging
+      console.log('Searching for:', searchQuery);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
@@ -44,10 +47,13 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         
       if (error) throw error;
       
+      console.log('Search results:', data);
+      
       // Here we'd normally filter out existing friends, but we need to pass friends list
       // Since we don't have access to friends list here, we'll show all results
       setSearchResults(data || []);
     } catch (error: any) {
+      console.error('Search error:', error);
       toast({
         title: 'Error searching users',
         description: error.message,
