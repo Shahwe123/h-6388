@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Profile {
+interface User {
   id: string;
   username: string;
   avatar_url: string | null;
@@ -13,7 +13,7 @@ interface Profile {
 
 interface Friend {
   id: string;
-  friend: Profile;
+  friend: User;
 }
 
 interface FriendsListProps {

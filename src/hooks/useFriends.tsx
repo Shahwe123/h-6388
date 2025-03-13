@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface Profile {
+interface User {
   id: string;
   username: string;
   avatar_url: string | null;
@@ -11,7 +11,7 @@ interface Profile {
 
 interface Friend {
   id: string;
-  friend: Profile;
+  friend: User;
 }
 
 export const useFriends = (userId: string | null) => {
@@ -69,21 +69,21 @@ export const useFriends = (userId: string | null) => {
       
       const friendIds = data.map(item => item.friend_id);
       
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
         .select('id, username, avatar_url')
         .in('id', friendIds);
         
-      if (profilesError) throw profilesError;
+      if (usersError) throw usersError;
       
       const formattedFriends: Friend[] = data.map(item => {
-        const profile = profilesData?.find(p => p.id === item.friend_id);
+        const user = usersData?.find(p => p.id === item.friend_id);
         return {
           id: item.id,
           friend: {
-            id: profile?.id || '',
-            username: profile?.username || 'Unknown User',
-            avatar_url: profile?.avatar_url
+            id: user?.id || '',
+            username: user?.username || 'Unknown User',
+            avatar_url: user?.avatar_url
           }
         };
       }).filter(friend => friend.friend.id !== '');
