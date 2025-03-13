@@ -1,10 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Search, UserCircle, UserPlus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addNotification } from '@/redux/slices/notificationsSlice';
 
 interface Profile {
@@ -19,6 +19,18 @@ interface UserSearchProps {
   onClose: () => void;
 }
 
+// Define RootState interface to properly type the Redux state
+interface RootState {
+  user: {
+    user: {
+      id: string;
+      user_metadata: {
+        username: string;
+      };
+    } | null;
+  };
+}
+
 const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
@@ -27,26 +39,54 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
   const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
   const { toast } = useToast();
   const dispatch = useDispatch();
+  
+  // Get user data directly from Redux as a fallback
+  const reduxUserData = useSelector((state: RootState) => state.user.user);
+  
+  // Use effect to log important information for debugging
+  useEffect(() => {
+    console.log('UserSearch component mounted with props:', { userId, username });
+    console.log('Redux user data:', reduxUserData);
+  }, [userId, username, reduxUserData]);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() || !userId) {
-      console.log('Search cancelled: Empty query or missing userId', { searchQuery, userId });
+    // Use the userId from props or fall back to Redux if available
+    const effectiveUserId = userId || reduxUserData?.id;
+    const effectiveUsername = username || reduxUserData?.user_metadata?.username;
+    
+    console.log('Search triggered with:', { 
+      searchQuery, 
+      effectiveUserId, 
+      effectiveUsername,
+      reduxAvailable: !!reduxUserData
+    });
+    
+    if (!searchQuery.trim()) {
+      console.log('Search cancelled: Empty query');
       return;
     }
     
-    console.log('Search triggered with query:', searchQuery);
+    if (!effectiveUserId) {
+      console.log('Search cancelled: Missing userId - This is the root cause of the issue');
+      toast({
+        title: 'Authentication error',
+        description: 'Could not determine your user ID. Please try logging in again.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setSearching(true);
     setHasSearched(true);
     
     try {
-      console.log('Executing Supabase query for:', searchQuery);
+      console.log('Executing Supabase query for:', searchQuery, 'with user ID:', effectiveUserId);
       
-      // Make sure we're using the correct query format
       const { data, error } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
         .ilike('username', `%${searchQuery}%`)
-        .neq('id', userId)
+        .neq('id', effectiveUserId)
         .limit(10);
         
       console.log('Query completed. Error:', error);
@@ -70,13 +110,24 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
   };
   
   const sendFriendRequest = async (recipientId: string, recipientUsername: string) => {
-    if (!userId || !username) return;
+    // Use the userId from props or fall back to Redux if available
+    const effectiveUserId = userId || reduxUserData?.id;
+    const effectiveUsername = username || reduxUserData?.user_metadata?.username;
+    
+    if (!effectiveUserId || !effectiveUsername) {
+      toast({
+        title: 'Authentication error',
+        description: 'Could not determine your user ID. Please try logging in again.',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     try {
       const { data: existingRequests, error: checkError } = await supabase
         .from('notifications')
         .select()
-        .eq('sender_id', userId)
+        .eq('sender_id', effectiveUserId)
         .eq('recipient_id', recipientId)
         .eq('type', 'friend_request');
         
@@ -94,8 +145,8 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         .from('notifications')
         .insert({
           recipient_id: recipientId,
-          sender_id: userId,
-          sender_username: username,
+          sender_id: effectiveUserId,
+          sender_username: effectiveUsername,
           type: 'friend_request',
           read: false
         })

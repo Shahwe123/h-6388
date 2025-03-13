@@ -49,6 +49,9 @@ const Friends = () => {
   const { friends, loading: friendsLoading } = useSelector((state: RootState) => state.friends);
   const { user } = useSelector((state: RootState) => state.user);
 
+  // Log user data for debugging
+  console.log('Friends page - user data from Redux:', user);
+
   if (friendsLoading) {
     return (
       <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">
@@ -72,7 +75,10 @@ const Friends = () => {
             
             <Button 
               className="cyber-button-sm flex items-center gap-2"
-              onClick={() => setShowSearchModal(true)}
+              onClick={() => {
+                console.log('Opening friend search modal with user:', user?.id);
+                setShowSearchModal(true);
+              }}
             >
               <UserPlus className="h-4 w-4" />
               Add Friend
