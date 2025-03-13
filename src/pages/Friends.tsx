@@ -23,16 +23,16 @@ const Friends = () => {
     const fetchUserData = async () => {
       try {
         console.log("Fetching user session data");
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data } = await supabase.auth.getSession();
         
-        if (session) {
-          console.log("Session found, user ID:", session.user.id);
-          setUserId(session.user.id);
+        if (data.session) {
+          console.log("Session found, user ID:", data.session.user.id);
+          setUserId(data.session.user.id);
           
           const { data: userData, error: userError } = await supabase
             .from('profiles')
             .select('username')
-            .eq('id', session.user.id)
+            .eq('id', data.session.user.id)
             .single();
             
           if (userError) {

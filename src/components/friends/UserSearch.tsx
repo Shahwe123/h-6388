@@ -46,6 +46,20 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
     console.log("Effective username:", username);
   }, [propsUserId, propsUsername, reduxUserData]);
 
+  // Get current session to ensure we have the most up-to-date user ID
+  useEffect(() => {
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        console.log("Current authenticated user ID:", data.session.user.id);
+      } else {
+        console.log("No active session found");
+      }
+    };
+    
+    getSession();
+  }, []);
+
   const handleSearch = async () => {
     console.log("Search triggered with:", { searchQuery, userId });
     if (!searchQuery.trim()) {
@@ -110,14 +124,23 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       });
       return;
     }
-    
+
     try {
+      // First, get current session to ensure we're using the authenticated user ID
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error('You must be logged in to send a friend request');
+      }
+      
+      const authenticatedUserId = sessionData.session.user.id;
+      console.log("Authenticated user ID:", authenticatedUserId);
+      
       // Check for existing friend requests
       console.log("Checking for existing friend requests");
       const { data: existingRequests, error: checkError } = await supabase
         .from('notifications')
         .select()
-        .eq('sender_id', userId)
+        .eq('sender_id', authenticatedUserId)
         .eq('recipient_id', recipientId)
         .eq('type', 'friend_request');
         
@@ -140,7 +163,7 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
         .from('notifications')
         .insert({
           recipient_id: recipientId,
-          sender_id: userId,
+          sender_id: authenticatedUserId,
           sender_username: username,
           type: 'friend_request',
           read: false
