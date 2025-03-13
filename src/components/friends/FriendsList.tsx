@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeFriend } from '@/redux/slices/friendsSlice';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface User {
   id: string;
@@ -86,13 +87,19 @@ const FriendsList = ({ friends }: { friends: Friend[] }) => {
             className="flex items-center gap-3 flex-1 cursor-pointer"
             onClick={() => navigateToProfile(friend.friend.id)}
           >
-            <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
+            <Avatar className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
               {friend.friend.avatar_url ? (
-                <img src={friend.friend.avatar_url} alt={friend.friend.username} className="w-full h-full object-cover" />
+                <AvatarImage 
+                  src={friend.friend.avatar_url} 
+                  alt={friend.friend.username} 
+                  className="w-full h-full object-cover" 
+                />
               ) : (
-                <UserCircle className="w-8 h-8 text-neutral-400" />
+                <AvatarFallback>
+                  <UserCircle className="w-8 h-8 text-neutral-400" />
+                </AvatarFallback>
               )}
-            </div>
+            </Avatar>
             <div>
               <div className="font-medium">{friend.friend.username}</div>
             </div>

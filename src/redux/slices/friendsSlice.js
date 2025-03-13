@@ -28,7 +28,7 @@ export const fetchFriendsData = createAsyncThunk(
         
       if (userError) throw userError;
       
-      // Format friends data
+      // Format friends data - ensure avatar_url is properly included
       const formattedFriends = data.map(item => {
         const user = userData?.find(p => p.id === item.friend_id);
         return {
@@ -36,7 +36,7 @@ export const fetchFriendsData = createAsyncThunk(
           friend: {
             id: user?.id || '',
             username: user?.username || 'Unknown User',
-            avatar_url: user?.avatar_url
+            avatar_url: user?.avatar_url || null
           }
         };
       }).filter(friend => friend.friend.id !== '');

@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { X, Search, UserCircle, UserPlus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useDispatch, useSelector } from 'react-redux';
-import { addNotification } from '@/redux/slices/notificationsSlice';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface Profile {
   id: string;
@@ -263,13 +264,19 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
                   className="p-3 bg-black/30 rounded-lg flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
+                    <Avatar className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center overflow-hidden">
                       {user.avatar_url ? (
-                        <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+                        <AvatarImage 
+                          src={user.avatar_url} 
+                          alt={user.username} 
+                          className="w-full h-full object-cover" 
+                        />
                       ) : (
-                        <UserCircle className="w-8 h-8 text-neutral-400" />
+                        <AvatarFallback>
+                          <UserCircle className="w-8 h-8 text-neutral-400" />
+                        </AvatarFallback>
                       )}
-                    </div>
+                    </Avatar>
                     <div>
                       <div className="font-medium">{user.username}</div>
                     </div>
