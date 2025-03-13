@@ -7,15 +7,23 @@ import { Menu, X, LogOut, Gamepad } from 'lucide-react';
 import NavLinks from './navbar/NavLinks';
 import NotificationButton from './navbar/NotificationButton';
 import MobileMenu from './navbar/MobileMenu';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+  setNotifications, 
+  addNotification, 
+  fetchNotificationsStart,
+  fetchNotificationsFailure
+} from '@/redux/slices/notificationsSlice';
 
 const Navbar = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const dispatch = useDispatch();
+  const notifications = useSelector((state: any) => state.notifications.notifications);
   
   useEffect(() => {
     supabase.auth.getSession()
@@ -40,7 +48,7 @@ const Navbar = () => {
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
-          setNotifications(prev => [payload.new, ...prev]);
+          dispatch(addNotification(payload.new));
           setHasUnreadNotifications(true);
         })
         .on('postgres_changes', { 
@@ -56,9 +64,11 @@ const Navbar = () => {
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
-          setNotifications(prev => 
-            prev.map(notif => notif.id === payload.new.id ? payload.new : notif)
-          );
+          dispatch(setNotifications(
+            notifications.map((notif: any) => 
+              notif.id === payload.new.id ? payload.new : notif
+            )
+          ));
         })
         .subscribe();
         
@@ -66,12 +76,18 @@ const Navbar = () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [session?.user?.id]);
+  }, [session?.user?.id, dispatch]);
+
+  useEffect(() => {
+    setHasUnreadNotifications(notifications?.some((notif: any) => !notif.read) || false);
+  }, [notifications]);
 
   const fetchNotifications = async () => {
     if (!session?.user?.id) return;
     
     try {
+      dispatch(fetchNotificationsStart());
+      
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -81,10 +97,11 @@ const Navbar = () => {
         
       if (error) throw error;
       
-      setNotifications(data || []);
+      dispatch(setNotifications(data || []));
       setHasUnreadNotifications(data?.some(notif => !notif.read) || false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching notifications:', error);
+      dispatch(fetchNotificationsFailure(error.message));
     }
   };
 
@@ -141,7 +158,6 @@ const Navbar = () => {
           <span className="font-bold text-xl text-white neon-text">PlatinumPath</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
           <NavLinks session={session} />
           
@@ -168,7 +184,6 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
         <button 
           className="md:hidden text-neutral-300 focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -181,7 +196,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       <MobileMenu 
         session={session}
         isOpen={isMobileMenuOpen}

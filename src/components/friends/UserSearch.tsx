@@ -4,6 +4,8 @@ import { X, Search, UserCircle, UserPlus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useDispatch } from 'react-redux';
+import { addNotification } from '@/redux/slices/notificationsSlice';
 
 interface Profile {
   id: string;
@@ -24,6 +26,7 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
   const [hasSearched, setHasSearched] = useState(false);
   const [pendingFriendRequests, setPendingFriendRequests] = useState<string[]>([]);
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   const handleSearch = async () => {
     if (!searchQuery.trim() || !userId) return;
@@ -76,7 +79,7 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         return;
       }
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('notifications')
         .insert({
           recipient_id: recipientId,
@@ -84,9 +87,15 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
           sender_username: username,
           type: 'friend_request',
           read: false
-        });
+        })
+        .select();
         
       if (error) throw error;
+      
+      // Update Redux store with the new notification
+      if (data && data.length > 0) {
+        dispatch(addNotification(data[0]));
+      }
       
       toast({
         title: 'Friend request sent',

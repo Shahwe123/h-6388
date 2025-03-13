@@ -3,6 +3,8 @@ import { Bell, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useDispatch } from 'react-redux';
+import { removeNotification } from '@/redux/slices/notificationsSlice';
 
 type Notification = {
   id: string;
@@ -30,6 +32,7 @@ const NotificationsDropdown = ({
   isMobile = false
 }: NotificationsDropdownProps) => {
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   const handleFriendAction = async (notificationId: string, accept: boolean, friendId: string | null) => {
     if (!userId || !friendId) return;
@@ -91,6 +94,10 @@ const NotificationsDropdown = ({
         
       if (error) throw error;
       
+      // Update Redux store
+      dispatch(removeNotification(notificationId));
+      
+      // Also update local state for backward compatibility
       setNotifications(prev => 
         prev.filter(notif => notif.id !== notificationId)
       );
