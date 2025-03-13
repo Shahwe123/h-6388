@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { X, Search, UserCircle, UserPlus, Check } from 'lucide-react';
+import { X, Search, UserCircle, UserPlus, Check, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,6 +31,8 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   
   // Get user data from redux store as fallback
   const reduxUserData = useSelector((state: any) => state.user?.userData);
+  // Get friends list from redux store to check existing friends
+  const { friends } = useSelector((state: any) => state.friends);
   
   // Use props or fallback to redux state
   const userId = propsUserId || reduxUserData?.id;
@@ -67,7 +69,13 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
     console.log("Redux username:", reduxUserData?.username);
     console.log("Effective userId:", userId);
     console.log("Effective username:", username);
-  }, [propsUserId, propsUsername, reduxUserData, currentSession]);
+    console.log("Current friends:", friends);
+  }, [propsUserId, propsUsername, reduxUserData, currentSession, friends]);
+
+  // Check if a user is already a friend
+  const isExistingFriend = (userId: string) => {
+    return friends.some((friend: any) => friend.friend.id === userId);
+  };
 
   const handleSearch = async () => {
     console.log("Search triggered with:", { searchQuery, userId: currentSession?.user?.id || userId });
@@ -124,6 +132,15 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   
   const sendFriendRequest = async (recipientId: string, recipientUsername: string) => {
     console.log("Sending friend request to:", { recipientId, recipientUsername });
+    
+    // Check if this user is already a friend
+    if (isExistingFriend(recipientId)) {
+      toast({
+        title: 'Already friends',
+        description: `You are already friends with ${recipientUsername}`,
+      });
+      return;
+    }
     
     // Check authentication
     if (!currentSession?.user?.id) {
@@ -284,10 +301,12 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
                   <button
                     onClick={() => sendFriendRequest(user.id, user.username)}
                     className="p-2 bg-black/40 hover:bg-neon-purple/20 rounded transition-colors"
-                    disabled={pendingFriendRequests.includes(user.id)}
+                    disabled={pendingFriendRequests.includes(user.id) || isExistingFriend(user.id)}
                   >
                     {pendingFriendRequests.includes(user.id) ? (
                       <Check className="w-5 h-5 text-green-500" />
+                    ) : isExistingFriend(user.id) ? (
+                      <UserCheck className="w-5 h-5 text-neon-blue" />
                     ) : (
                       <UserPlus className="w-5 h-5 text-neutral-300" />
                     )}
