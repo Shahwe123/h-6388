@@ -69,21 +69,21 @@ export const useFriends = (userId: string | null) => {
       
       const friendIds = data.map(item => item.friend_id);
       
-      const { data: usersData, error: usersError } = await supabase
-        .from('users')
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
         .select('id, username, avatar_url')
         .in('id', friendIds);
         
-      if (usersError) throw usersError;
+      if (profilesError) throw profilesError;
       
       const formattedFriends: Friend[] = data.map(item => {
-        const user = usersData?.find(p => p.id === item.friend_id);
+        const profile = profilesData?.find(p => p.id === item.friend_id);
         return {
           id: item.id,
           friend: {
-            id: user?.id || '',
-            username: user?.username || 'Unknown User',
-            avatar_url: user?.avatar_url
+            id: profile?.id || '',
+            username: profile?.username || 'Unknown User',
+            avatar_url: profile?.avatar_url
           }
         };
       }).filter(friend => friend.friend.id !== '');
