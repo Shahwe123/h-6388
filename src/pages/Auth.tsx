@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, User, ArrowLeft, Key } from 'lucide-react';
+import { useDispatch } from "react-redux";
+import { loginStart, loginSuccess, loginFailure, registerStart, registerSuccess, registerFailure } from '../redux/slices/userSlice'
 
 type AuthMode = 'login' | 'register' | 'forgotPassword' | null;
 
@@ -15,20 +17,27 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    dispatch(loginStart())
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
 
       if (error) {
+        dispatch(loginFailure())
         throw error;
       }
+      //TODO: app reaches here even though error
+      console.log(data);
+      dispatch(loginSuccess(data))
+      // TODO: grab friends data
 
       toast({
         title: 'Signed in successfully',
@@ -48,8 +57,9 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+    dispatch(registerStart())
     try {
+
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -61,24 +71,12 @@ const Auth = () => {
       });
 
       if (error) {
+        dispatch(registerFailure())
         throw error;
       }
 
-      const { error: userError } = await supabase
-        .from('profiles')
-        .insert([
-          { id: data.user?.id, username: username, email: email },
-        ]);
+      dispatch(registerSuccess(data))
 
-      if (userError) {
-        throw userError;
-      }
-
-      toast({
-        title: 'Signed up successfully',
-        description: 'Please check your email to verify your account',
-      });
-      setMode('login');
     } catch (error: any) {
       toast({
         title: 'Error signing up',
@@ -90,6 +88,7 @@ const Auth = () => {
     }
   };
 
+  //TODO: check if working
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

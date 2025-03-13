@@ -19,6 +19,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthRequired from "./components/AuthRequired";
 
+import './App.css';
+import './index.css';
 const queryClient = new QueryClient();
 
 // Component to handle redirecting authenticated users away from the auth page
@@ -32,18 +34,18 @@ const AuthRedirect = () => {
       setSession(data.session);
       setLoading(false);
     };
-    
+
     getSession();
-    
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
       }
     );
-    
+
     return () => subscription.unsubscribe();
   }, []);
-  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-primary flex items-center justify-center">
@@ -54,12 +56,12 @@ const AuthRedirect = () => {
       </div>
     );
   }
-  
+
   // If user is logged in, redirect to profile page, else show the Auth component
   if (session) {
     return <Navigate to="/profile" replace />;
   }
-  
+
   return <Auth />;
 };
 
@@ -80,7 +82,7 @@ const App = () => {
         console.error('Error creating avatars bucket:', error);
       }
     };
-    
+
     createAvatarsBucket();
   }, []);
 
@@ -96,7 +98,7 @@ const App = () => {
             <Route path="/beta" element={<BetaLanding />} />
             <Route path="/auth" element={<AuthRedirect />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
-            
+
             {/* Protected routes */}
             <Route element={<AuthRequired />}>
               <Route path="/profile" element={<Profile />} />

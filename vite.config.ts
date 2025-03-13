@@ -9,6 +9,10 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  css: {
+    // Ensure CSS is processed correctly
+    devSourcemap: true,
+  },
   plugins: [
     react(),
     mode === 'development' && componentTagger(),

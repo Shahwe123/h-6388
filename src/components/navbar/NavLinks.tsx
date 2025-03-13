@@ -19,8 +19,8 @@ const NavLinks = ({ session, isMobile = false, onClick }: NavLinksProps) => {
     { path: '/link-accounts', label: 'Link Accounts' },
     { path: '/settings', label: 'Settings' }
   ] : [
+    { path: '/', label: 'Home' },
     { path: '/auth', label: 'Sign In' },
-    { path: '/leaderboard', label: 'Leaderboard' }
   ];
 
   return (
