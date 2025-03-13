@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Auth from '../pages/Auth';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock implementation of window object for E2E testing
 const mockWindow = {
@@ -22,7 +23,7 @@ global.window = mockWindow as any;
 
 // Mock toast for notifications
 vi.mock('@/hooks/use-toast', () => ({
-  useToast: () => ({
+  useToast: vi.fn().mockReturnValue({
     toast: vi.fn(),
   }),
 }));
@@ -80,9 +81,17 @@ const server = setupServer(
 describe('Authentication E2E Flow', () => {
   beforeAll(() => server.listen());
   afterAll(() => server.close());
-  beforeEach(() => server.resetHandlers());
+  beforeEach(() => {
+    server.resetHandlers();
+    vi.clearAllMocks();
+  });
   
   it('should allow user to sign in successfully', async () => {
+    const mockToast = vi.fn();
+    vi.mocked(useToast).mockReturnValue({
+      toast: mockToast,
+    });
+
     // Render the Auth component
     render(
       <BrowserRouter>
@@ -99,7 +108,7 @@ describe('Authentication E2E Flow', () => {
     
     // Assert toast notification
     await waitFor(() => {
-      expect(toast).toHaveBeenCalledWith({
+      expect(mockToast).toHaveBeenCalledWith({
         title: 'Signed in successfully',
       });
     });
@@ -109,6 +118,11 @@ describe('Authentication E2E Flow', () => {
   });
   
   it('should allow user to sign up successfully', async () => {
+    const mockToast = vi.fn();
+    vi.mocked(useToast).mockReturnValue({
+      toast: mockToast,
+    });
+
     // Render the Auth component
     render(
       <BrowserRouter>
@@ -133,7 +147,7 @@ describe('Authentication E2E Flow', () => {
     
     // Assert toast notification
     await waitFor(() => {
-      expect(toast).toHaveBeenCalledWith({
+      expect(mockToast).toHaveBeenCalledWith({
         title: 'Signed up successfully',
         description: 'Please check your email to verify your account',
       });
@@ -146,6 +160,11 @@ describe('Authentication E2E Flow', () => {
   });
   
   it('should handle forgot password flow', async () => {
+    const mockToast = vi.fn();
+    vi.mocked(useToast).mockReturnValue({
+      toast: mockToast,
+    });
+
     // Render the Auth component
     render(
       <BrowserRouter>
@@ -168,7 +187,7 @@ describe('Authentication E2E Flow', () => {
     
     // Assert toast notification
     await waitFor(() => {
-      expect(toast).toHaveBeenCalledWith({
+      expect(mockToast).toHaveBeenCalledWith({
         title: 'Reset password email sent',
         description: 'Please check your email to reset your password',
       });
@@ -194,6 +213,11 @@ describe('Authentication E2E Flow', () => {
       })
     );
     
+    const mockToast = vi.fn();
+    vi.mocked(useToast).mockReturnValue({
+      toast: mockToast,
+    });
+
     // Render the Auth component
     render(
       <BrowserRouter>
@@ -210,7 +234,7 @@ describe('Authentication E2E Flow', () => {
     
     // Assert error toast notification
     await waitFor(() => {
-      expect(toast).toHaveBeenCalledWith({
+      expect(mockToast).toHaveBeenCalledWith({
         title: 'Error signing in',
         description: 'Email or password is incorrect',
         variant: 'destructive',
