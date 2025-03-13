@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import FriendsList from '@/components/friends/FriendsList';
 import UserSearch from '@/components/friends/UserSearch';
 import FriendActivity from '@/components/friends/FriendActivity';
-import { useFriends } from '@/hooks/useFriends';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Friends = () => {
   const [loading, setLoading] = useState(true);
@@ -16,9 +16,9 @@ const Friends = () => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const { toast } = useToast();
   
-  // Use the custom hook for friends data
-  const { friends, setFriends, loading: friendsLoading } = useFriends(userId);
-
+  // Use Redux for friends data
+  const { friends, loading: friendsLoading } = useSelector((state: any) => state.friends);
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -51,28 +51,6 @@ const Friends = () => {
     
     fetchUserData();
   }, [toast]);
-  
-  useEffect(() => {
-    if (!userId) return;
-    
-    const notificationsChannel = supabase
-      .channel('public:notifications')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'notifications',
-        filter: `recipient_id=eq.${userId}`
-      }, payload => {
-        if (payload.new.type === 'friend_accepted') {
-          // Friend acceptance handling is now in the useFriends hook
-        }
-      })
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(notificationsChannel);
-    };
-  }, [userId]);
 
   if (loading || friendsLoading) {
     return (
@@ -105,7 +83,7 @@ const Friends = () => {
           </div>
           
           <div className="bg-black/20 rounded-lg p-4">
-            <FriendsList friends={friends} setFriends={setFriends} />
+            <FriendsList friends={friends} />
           </div>
         </div>
         

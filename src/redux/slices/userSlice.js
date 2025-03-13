@@ -1,3 +1,4 @@
+
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -46,6 +47,11 @@ const userSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
       },
+
+      // 🔹 UPDATE USER ACTION
+      updateUser: (state, action) => {
+        state.user = { ...state.user, ...action.payload };
+      },
   },
 });
 
@@ -57,6 +63,7 @@ export const {
     registerSuccess,
     registerFailure,
     logout,
+    updateUser,
   } = userSlice.actions;
 
 export default userSlice.reducer;

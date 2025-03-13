@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "./redux/slices/userSlice";
+import { useInitializeData } from "./hooks/useInitializeData";
 import Index from "./pages/Index";
 import BetaLanding from "./pages/BetaLanding";
 import Auth from "./pages/Auth";
@@ -27,11 +30,18 @@ const queryClient = new QueryClient();
 const AuthRedirect = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
+      
+      // Dispatch loginSuccess if session exists
+      if (data.session) {
+        dispatch(loginSuccess(data.session));
+      }
+      
       setLoading(false);
     };
 
@@ -40,11 +50,15 @@ const AuthRedirect = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
+        // Update Redux state on auth state change
+        if (session) {
+          dispatch(loginSuccess(session));
+        }
       }
     );
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -63,6 +77,35 @@ const AuthRedirect = () => {
   }
 
   return <Auth />;
+};
+
+// App level data initializer
+const AppDataInitializer = () => {
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const getUserId = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) {
+        setUserId(data.user.id);
+      }
+    };
+    
+    getUserId();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUserId(session?.user?.id || null);
+      }
+    );
+    
+    return () => subscription.unsubscribe();
+  }, []);
+  
+  // Initialize data when user is logged in
+  useInitializeData(userId);
+  
+  return null;
 };
 
 // Wrapper to conditionally render the Navbar
@@ -92,6 +135,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <AppDataInitializer />
           <NavbarWrapper />
           <Routes>
             <Route path="/" element={<Index />} />

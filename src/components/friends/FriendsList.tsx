@@ -4,6 +4,8 @@ import { UserCircle, UserMinus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeFriend } from '@/redux/slices/friendsSlice';
 
 interface User {
   id: string;
@@ -16,16 +18,12 @@ interface Friend {
   friend: User;
 }
 
-interface FriendsListProps {
-  friends: Friend[];
-  setFriends: React.Dispatch<React.SetStateAction<Friend[]>>;
-}
-
-const FriendsList = ({ friends, setFriends }: FriendsListProps) => {
+const FriendsList = ({ friends }: { friends: Friend[] }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
-  const removeFriend = async (friendId: string, friendUsername: string) => {
+  const removeFriendHandler = async (friendId: string, friendUsername: string) => {
     try {
       // Get the current user's ID
       const { data: { session } } = await supabase.auth.getSession();
@@ -48,7 +46,8 @@ const FriendsList = ({ friends, setFriends }: FriendsListProps) => {
         description: `${friendUsername} has been removed from your friends list`,
       });
       
-      setFriends(prev => prev.filter(f => f.friend.id !== friendId));
+      // Update Redux store
+      dispatch(removeFriend(friendId));
     } catch (error: any) {
       toast({
         title: 'Error removing friend',
@@ -99,7 +98,7 @@ const FriendsList = ({ friends, setFriends }: FriendsListProps) => {
             </div>
           </div>
           <button
-            onClick={() => removeFriend(friend.friend.id, friend.friend.username)}
+            onClick={() => removeFriendHandler(friend.friend.id, friend.friend.username)}
             className="p-2 hover:bg-red-500/20 hover:border hover:border-red-500/50 rounded transition-colors"
             title="Remove friend"
           >

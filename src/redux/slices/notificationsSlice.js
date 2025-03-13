@@ -1,5 +1,25 @@
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { supabase } from "@/integrations/supabase/client";
+
+export const fetchNotificationsData = createAsyncThunk(
+  "notifications/fetchNotificationsData",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('recipient_id', userId)
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      
+      return data || [];
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const initialState = {
   notifications: [],
@@ -36,6 +56,21 @@ const notificationsSlice = createSlice({
       state.error = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchNotificationsData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchNotificationsData.fulfilled, (state, action) => {
+        state.notifications = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchNotificationsData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 
 export const { 
@@ -46,4 +81,5 @@ export const {
   fetchNotificationsStart,
   fetchNotificationsFailure
 } = notificationsSlice.actions;
+
 export default notificationsSlice.reducer;
