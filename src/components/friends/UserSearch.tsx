@@ -29,15 +29,19 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
   const dispatch = useDispatch();
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() || !userId) return;
+    if (!searchQuery.trim() || !userId) {
+      console.log('Search cancelled: Empty query or missing userId', { searchQuery, userId });
+      return;
+    }
     
+    console.log('Search triggered with query:', searchQuery);
     setSearching(true);
     setHasSearched(true);
     
     try {
-      // Log the search query for debugging
-      console.log('Searching for:', searchQuery);
+      console.log('Executing Supabase query for:', searchQuery);
       
+      // Make sure we're using the correct query format
       const { data, error } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
@@ -45,13 +49,13 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         .neq('id', userId)
         .limit(10);
         
+      console.log('Query completed. Error:', error);
+      console.log('Query completed. Data:', data);
+        
       if (error) throw error;
       
-      console.log('Search results:', data);
-      
-      // Here we'd normally filter out existing friends, but we need to pass friends list
-      // Since we don't have access to friends list here, we'll show all results
       setSearchResults(data || []);
+      console.log('Search results set to state:', data ? data.length : 0, 'results');
     } catch (error: any) {
       console.error('Search error:', error);
       toast({
@@ -61,6 +65,7 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
       });
     } finally {
       setSearching(false);
+      console.log('Search completed, searching state set to false');
     }
   };
   
@@ -126,6 +131,7 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
         <button 
           className="p-1 text-neutral-400 hover:text-white transition-colors"
           onClick={() => {
+            console.log('Modal closed');
             onClose();
             setSearchQuery('');
             setSearchResults([]);
@@ -143,10 +149,14 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
               type="text"
               placeholder="Search by username..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                console.log('Search input changed:', e.target.value);
+                setSearchQuery(e.target.value);
+              }}
               className="w-full bg-black/70 border border-neutral-700 rounded-md pl-10 pr-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-neon-purple"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
+                  console.log('Enter key pressed, triggering search');
                   handleSearch();
                 }
               }}
@@ -155,7 +165,10 @@ const UserSearch = ({ userId, username, onClose }: UserSearchProps) => {
           </div>
           <Button 
             className="cyber-button-sm"
-            onClick={handleSearch}
+            onClick={() => {
+              console.log('Search button clicked');
+              handleSearch();
+            }}
             disabled={searching || !searchQuery.trim()}
           >
             {searching ? 'Searching...' : 'Search'}
