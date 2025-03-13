@@ -8,13 +8,46 @@ import UserSearch from '@/components/friends/UserSearch';
 import FriendActivity from '@/components/friends/FriendActivity';
 import { useSelector } from 'react-redux';
 
+// Define types for our Redux state
+interface Friend {
+  id: string;
+  friend: {
+    id: string;
+    username: string;
+    avatar_url: string | null;
+  };
+}
+
+interface FriendsState {
+  friends: Friend[];
+  loading: boolean;
+  error: string | null;
+}
+
+interface UserState {
+  user: {
+    id: string;
+    user_metadata?: {
+      username: string;
+    };
+  } | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
+interface RootState {
+  friends: FriendsState;
+  user: UserState;
+}
+
 const Friends = () => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const { toast } = useToast();
   
-  // Use Redux for friends data and user data
-  const { friends, loading: friendsLoading } = useSelector((state) => state.friends);
-  const { user } = useSelector((state) => state.user);
+  // Use Redux for friends data and user data with proper typing
+  const { friends, loading: friendsLoading } = useSelector((state: RootState) => state.friends);
+  const { user } = useSelector((state: RootState) => state.user);
 
   if (friendsLoading) {
     return (
