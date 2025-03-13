@@ -5,20 +5,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Gamepad, User, X } from 'lucide-react';
-// import psnApi from 'psn-api';
-// const { exchangeNpssoForCode } = psnApi;
-// const { exchangeCodeForAccessToken } = psnApi;
-// const { getUserTitles } = psnApi;
+import { Gamepad, User, X, Loader2 } from 'lucide-react';
 import { exchangeNpssoForCode } from "psn-api";
 import { exchangeCodeForAccessToken } from "psn-api";
-import  { getUserTitles }from "psn-api";
-import  { exchangeRefreshTokenForAuthTokens } from "psn-api";
+import { getUserTitles } from "psn-api";
+import { exchangeRefreshTokenForAuthTokens } from "psn-api";
 
-// Platform-specific icons
 const SteamIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M11.979 0C5.678 0 0.511 4.86 0.022 11.037l6.432 2.658c0.545-0.371 1.203-0.59 1.912-0.59 0.063 0 0.125 0.004 0.188 0.008l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-0.105l-4.076 2.911c0 0.052 0.004 0.105 0.004 0.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L0.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-0.61c0.262 0.543 0.714 0.999 1.314 1.25 1.297 0.539 2.793-0.076 3.332-1.375 0.263-0.63 0.264-1.319 0.005-1.949s-0.75-1.121-1.377-1.383c-0.624-0.26-1.29-0.249-1.878-0.03l1.523 0.63c0.956 0.4 1.409 1.5 1.009 2.455-0.397 0.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-0.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/>
+    <path d="M11.979 0C5.678 0 0.511 4.86 0.022 11.037l6.432 2.658c0.545-0.371 1.203-0.59 1.912-0.59 0.063 0 0.125 0.004 0.188 0.008l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-0.105l-4.076 2.911c0 0.052 0.004 0.105 0.004 0.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L0.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-0.61c0.262 0.543 0.714 0.999 1.314 1.25 1.297 0.539 2.793-0.076 3.332-1.375 0.263-0.63 0.264-1.319 0.005-1.949s-0.75-1.121-1.377-1.383c-0.624-0.26-1.29-0.249-1.878-0.03l1.523 0.63c0.956 0.4 1.409 1.5 1.009 2.455-0.397 0.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-0.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.266-1.253 0-2.265-1.014-2.265-2.265z"/>
   </svg>
 );
 
@@ -182,6 +177,8 @@ const LinkAccounts = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [currentPlatform, setCurrentPlatform] = useState<string | null>(null);
+  const [processingData, setProcessingData] = useState<boolean>(false);
+  const [processingPlatform, setProcessingPlatform] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -230,26 +227,180 @@ const LinkAccounts = () => {
 
   const fetchSteamData = async (steamId) => {
     if (steamId) {
+      try {
+        setProcessingData(true);
+        setProcessingPlatform('Steam');
+        
+        toast({
+          title: 'Processing Steam Data',
+          description: 'We are retrieving and processing your Steam data. This may take a moment.',
+        });
 
-      const { data : {session}} = await supabase.auth.getSession()
-      const token = session.access_token
+        const { data : {session}} = await supabase.auth.getSession();
+        const token = session.access_token;
 
-      fetch("https://nvjjragekchczuxgdvvo.supabase.co/functions/v1/fetch-steam-data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json, Authorization",
-          "Authorization":`Bearer ${token}`
-        },
-        mode: "cors",
-        body:JSON.stringify({
-          "steamId":steamId
-        })
-
-      }).then((res) => res.json())
-      .then((data) => console.log(data)) //TODO: add data to redux store
-      .catch((err) => console.error(err));
+        const response = await fetch("https://nvjjragekchczuxgdvvo.supabase.co/functions/v1/fetch-steam-data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            "steamId": steamId
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch Steam data');
+        }
+        
+        const data = await response.json();
+        console.log('Steam data fetched:', data);
+        
+        await processAndStoreSteamData(data, session.user.id);
+        
+        toast({
+          title: 'Steam Account Linked',
+          description: 'Your Steam data has been successfully processed.',
+        });
+      } catch (error) {
+        console.error('Error fetching Steam data:', error);
+        toast({
+          title: 'Error Processing Steam Data',
+          description: error.message || 'Failed to process Steam data',
+          variant: 'destructive',
+        });
+      } finally {
+        setProcessingData(false);
+        setProcessingPlatform(null);
+      }
     } else {
       console.error("Steam ID not found");
+    }
+  };
+
+  const processAndStoreSteamData = async (steamData, userId) => {
+    if (!steamData || !userId) return;
+    
+    try {
+      const { error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update({
+          steam_games: steamData.games || []
+        })
+        .eq('id', userId);
+        
+      if (profileUpdateError) throw profileUpdateError;
+      
+      if (steamData.games && Array.isArray(steamData.games)) {
+        for (const game of steamData.games) {
+          if (!game.appid || typeof game.appid !== 'number') {
+            console.warn('Invalid game appid:', game.appid, 'for game:', game.name);
+            continue; // Skip this game
+          }
+
+          const { data: existingGame, error: gameCheckError } = await supabase
+            .from('games')
+            .select('id')
+            .eq('steam_app_id', game.appid)
+            .maybeSingle();
+            
+          if (gameCheckError) throw gameCheckError;
+          
+          let gameId;
+          
+          if (!existingGame) {
+            const { data: newGame, error: gameInsertError } = await supabase
+              .from('games')
+              .insert({
+                steam_app_id: game.appid,
+                name: game.name || 'Unknown Game',
+                icon_url: game.img_icon_url ? `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg` : null
+              })
+              .select('id')
+              .single();
+              
+            if (gameInsertError) throw gameInsertError;
+            
+            gameId = newGame.id;
+            
+            if (game.achievements && Array.isArray(game.achievements)) {
+              const achievementsToInsert = game.achievements
+                .filter(achievement => 
+                  achievement && 
+                  typeof achievement === 'object' && 
+                  achievement.apiname
+                )
+                .map(achievement => ({
+                  game_id: gameId,
+                  platform: 'steam',
+                  platform_api_name: achievement.apiname,
+                  name: achievement.name || 'Unknown Achievement',
+                  description: achievement.description || null,
+                  icon_url: achievement.icon || null,
+                  locked_icon_url: achievement.icongray || null
+                }));
+              
+              if (achievementsToInsert.length > 0) {
+                const { error: achievementsInsertError } = await supabase
+                  .from('achievements')
+                  .insert(achievementsToInsert);
+                  
+                if (achievementsInsertError) throw achievementsInsertError;
+              }
+            }
+          } else {
+            gameId = existingGame.id;
+          }
+          
+          if (game.achievements && Array.isArray(game.achievements)) {
+            for (const achievement of game.achievements) {
+              if (achievement && achievement.achieved && achievement.apiname) {
+                const { data: achievementData, error: achievementError } = await supabase
+                  .from('achievements')
+                  .select('id')
+                  .eq('game_id', gameId)
+                  .eq('platform', 'steam')
+                  .eq('platform_api_name', achievement.apiname)
+                  .maybeSingle();
+                  
+                if (achievementError) throw achievementError;
+                
+                if (achievementData) {
+                  const unlockTime = achievement.unlocktime && achievement.unlocktime > 0
+                    ? new Date(achievement.unlocktime * 1000).toISOString()
+                    : null;
+                  
+                  const { error: userAchievementError } = await supabase
+                    .from('user_achievements')
+                    .upsert({
+                      user_id: userId,
+                      achievement_id: achievementData.id,
+                      unlocked: true,
+                      unlock_time: unlockTime
+                    });
+                    
+                  if (userAchievementError) throw userAchievementError;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      const { data: updatedProfile, error: profileRefreshError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (profileRefreshError) throw profileRefreshError;
+      
+      setProfile(updatedProfile);
+      
+    } catch (error) {
+      console.error('Error processing Steam data:', error);
+      throw new Error('Failed to process Steam data: ' + error.message);
     }
   };
 
@@ -285,8 +436,10 @@ const LinkAccounts = () => {
       switch (currentPlatform) {
         case 'Steam':
           updates.steam_id = value;
-          fetchSteamData(updates.steam_id)
-          //TODO: add steam name and change in to that on link accounts
+          toast({
+            title: 'Account linked',
+            description: `Your ${currentPlatform} account has been successfully linked. We'll now fetch your game data.`,
+          });
           break;
         case 'Xbox':
           updates.xbox_gamertag = value;
@@ -306,12 +459,11 @@ const LinkAccounts = () => {
 
       setProfile({ ...profile, ...updates });
 
-      toast({
-        title: 'Account linked',
-        description: `Your ${currentPlatform} account has been successfully linked.`,
-      });
-
       handleCloseModal();
+      
+      if (currentPlatform === 'Steam') {
+        fetchSteamData(updates.steam_id);
+      }
     } catch (error: any) {
       toast({
         title: 'Error linking account',
@@ -330,6 +482,7 @@ const LinkAccounts = () => {
       switch (platform) {
         case 'Steam':
           updates.steam_id = null;
+          updates.steam_games = [];
           break;
         case 'Xbox':
           updates.xbox_gamertag = null;
@@ -345,6 +498,10 @@ const LinkAccounts = () => {
         .eq('id', profile.id);
 
       if (error) throw error;
+
+      if (platform === 'Steam') {
+        console.log('Removed Steam games from profile');
+      }
 
       setProfile({ ...profile, ...updates });
 
@@ -384,6 +541,20 @@ const LinkAccounts = () => {
           <p className="text-neutral-300 mb-8">
             Connect your gaming platform accounts to track achievements, stats, and more in one place.
           </p>
+
+          {processingData && (
+            <div className="bg-black/30 rounded-lg p-4 mb-6 border border-neon-purple/30">
+              <div className="flex items-center">
+                <Loader2 className="h-5 w-5 text-neon-blue animate-spin mr-3" />
+                <div>
+                  <h3 className="font-medium">Processing {processingPlatform} Data</h3>
+                  <p className="text-sm text-neutral-400">
+                    We're retrieving and processing your game data. This may take a moment, but you can continue using the app.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-4">
             <PlatformCard

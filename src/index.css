@@ -14,6 +14,23 @@
     @apply bg-primary text-white antialiased;
     font-feature-settings: "ss01" on, "ss02" on, "cv01" on, "cv03" on;
   }
+
+  /* Custom Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-primary/70 rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-game rounded-full border-2 border-primary;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neon-purple;
+  }
 }
 
 @layer components {

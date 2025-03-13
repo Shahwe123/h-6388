@@ -1,9 +1,6 @@
-
 import { ArrowRight, Trophy, Zap, Target } from "lucide-react";
-
 const Hero = () => {
-  return (
-    <section className="pt-32 pb-16 container-padding bg-black text-white relative overflow-hidden">
+  return <section className="pt-32 pb-16 container-padding bg-black text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-40 bg-hero-pattern bg-cover bg-center"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-primary"></div>
       
@@ -15,9 +12,7 @@ const Hero = () => {
         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">
           Track. Compete. Conquer.
         </h1>
-        <p className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
-          Across PlayStation, Xbox, Steam, and More. Every trophy, achievement, and milestone in one place.
-        </p>
+        <p className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">PlatinumPath is the ultimate game achievement tracker for PlayStation, Xbox &amp; Steam. Sync, compare, and complete your gaming trophies in one dashboard. Get started now</p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <button className="cyber-button flex items-center justify-center gap-2">
@@ -49,8 +44,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;

@@ -32,6 +32,7 @@ export default {
           pink: "#F97316",
           blue: "#0EA5E9",
           purple: "#8B5CF6",
+          green: "#10B981",
         },
         neutral: {
           50: "#FAFAF8",
@@ -68,6 +69,10 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.5' },
         },
+        "pulse-slow": {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' },
+        },
         glow: {
           '0%, 100%': { textShadow: '0 0 5px #D946EF, 0 0 15px #D946EF' },
           '50%': { textShadow: '0 0 20px #D946EF, 0 0 30px #D946EF' },
@@ -78,11 +83,15 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
         "pulse": "pulse 2s ease-in-out infinite",
+        "pulse-slow": "pulse-slow 6s ease-in-out infinite", // Changed from 4s to 6s to slow down
         "glow": "glow 2s ease-in-out infinite",
       },
       backgroundImage: {
         'hero-pattern': "url('/lovable-uploads/f85054f1-73fb-4801-ad6a-b98da6f62038.png')",
         'gradient-game': 'linear-gradient(90deg, #D946EF 0%, #8B5CF6 100%)',
+        'gradient-primary-black': 'linear-gradient(180deg, #1A1F2C 0%, #191919 100%)',
+        'gradient-black-primary': 'linear-gradient(180deg, #191919 0%, #1A1F2C 100%)',
+        'gradient-cta': 'linear-gradient(90deg, #F97316 0%, #D946EF 100%)',
       },
     },
   },
