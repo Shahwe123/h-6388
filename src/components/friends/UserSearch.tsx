@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { X, Search, UserCircle, UserPlus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -167,7 +166,7 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       
       console.log("Inserting new friend request notification");
       
-      // Insert with our current authenticated user ID (not the one from props/redux)
+      // Insert notification for the recipient (not for the sender)
       const { data, error } = await supabase
         .from('notifications')
         .insert({
@@ -186,11 +185,7 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
       
       console.log("Friend request sent successfully:", data);
       
-      // Update Redux store with the new notification
-      if (data && data.length > 0) {
-        dispatch(addNotification(data[0]));
-      }
-      
+      // Update UI state but don't add to sender's notifications
       toast({
         title: 'Friend request sent',
         description: `A friend request has been sent to ${recipientUsername}`,

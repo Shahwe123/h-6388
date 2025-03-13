@@ -12,7 +12,8 @@ import {
   setNotifications, 
   addNotification, 
   fetchNotificationsStart,
-  fetchNotificationsFailure
+  fetchNotificationsFailure,
+  fetchNotificationsData
 } from '@/redux/slices/notificationsSlice';
 
 const Navbar = () => {
@@ -29,17 +30,21 @@ const Navbar = () => {
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
         setSession(session);
+        if (session?.user?.id) {
+          dispatch(fetchNotificationsData(session.user.id));
+        }
       });
 
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session?.user?.id) {
+        dispatch(fetchNotificationsData(session.user.id));
+      }
     });
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (session?.user?.id) {
-      fetchNotifications();
-      
       const channel = supabase
         .channel('public:notifications')
         .on('postgres_changes', { 
@@ -48,6 +53,7 @@ const Navbar = () => {
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
+          console.log("New notification received:", payload.new);
           dispatch(addNotification(payload.new));
           setHasUnreadNotifications(true);
         })
@@ -56,7 +62,7 @@ const Navbar = () => {
           schema: 'public', 
           table: 'notifications'
         }, () => {
-          fetchNotifications();
+          dispatch(fetchNotificationsData(session.user.id));
         })
         .on('postgres_changes', { 
           event: 'UPDATE', 
@@ -64,6 +70,7 @@ const Navbar = () => {
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
+          console.log("Notification updated:", payload.new);
           dispatch(setNotifications(
             notifications.map((notif: any) => 
               notif.id === payload.new.id ? payload.new : notif
@@ -76,34 +83,11 @@ const Navbar = () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [session?.user?.id, dispatch]);
+  }, [session?.user?.id, dispatch, notifications]);
 
   useEffect(() => {
     setHasUnreadNotifications(notifications?.some((notif: any) => !notif.read) || false);
   }, [notifications]);
-
-  const fetchNotifications = async () => {
-    if (!session?.user?.id) return;
-    
-    try {
-      dispatch(fetchNotificationsStart());
-      
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('recipient_id', session.user.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-        
-      if (error) throw error;
-      
-      dispatch(setNotifications(data || []));
-      setHasUnreadNotifications(data?.some(notif => !notif.read) || false);
-    } catch (error: any) {
-      console.error('Error fetching notifications:', error);
-      dispatch(fetchNotificationsFailure(error.message));
-    }
-  };
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -142,9 +126,9 @@ const Navbar = () => {
       
       setHasUnreadNotifications(false);
       
-      setNotifications(prev => 
-        prev.map(notif => ({ ...notif, read: true }))
-      );
+      dispatch(setNotifications(
+        notifications.map((notif: any) => ({ ...notif, read: true }))
+      ));
     } catch (error) {
       console.error('Error marking notifications as read:', error);
     }
