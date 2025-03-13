@@ -1,56 +1,51 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus } from 'lucide-react';
+import { Users, UserPlus, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FriendsList from '@/components/friends/FriendsList';
 import UserSearch from '@/components/friends/UserSearch';
 import FriendActivity from '@/components/friends/FriendActivity';
 import { useSelector } from 'react-redux';
-
-// Define types for our Redux state
-interface Friend {
-  id: string;
-  friend: {
-    id: string;
-    username: string;
-    avatar_url: string | null;
-  };
-}
-
-interface FriendsState {
-  friends: Friend[];
-  loading: boolean;
-  error: string | null;
-}
-
-interface UserState {
-  user: {
-    id: string;
-    user_metadata?: {
-      username: string;
-    };
-  } | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
-}
-
-interface RootState {
-  friends: FriendsState;
-  user: UserState;
-}
+import { supabase } from '@/integrations/supabase/client';
 
 const Friends = () => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const { toast } = useToast();
   
-  // Use Redux for friends data and user data with proper typing
-  const { friends, loading: friendsLoading } = useSelector((state: RootState) => state.friends);
-  const { user } = useSelector((state: RootState) => state.user);
-
-  // Log user data for debugging
-  console.log('Friends page - user data from Redux:', user);
+  // Use Redux for friends data
+  const { friends, loading: friendsLoading } = useSelector((state) => state.friends);
+  
+  // We still need to fetch the userId and username for the UserSearch component
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setUserId(session.user.id);
+          
+          const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (userError) throw userError;
+          setUsername(userData.username);
+        }
+      } catch (error) {
+        toast({
+          title: 'Error fetching user data',
+          description: error.message,
+          variant: 'destructive',
+        });
+      }
+    };
+    
+    fetchUserData();
+  }, [toast]);
 
   if (friendsLoading) {
     return (
@@ -75,10 +70,7 @@ const Friends = () => {
             
             <Button 
               className="cyber-button-sm flex items-center gap-2"
-              onClick={() => {
-                console.log('Opening friend search modal with user:', user?.id);
-                setShowSearchModal(true);
-              }}
+              onClick={() => setShowSearchModal(true)}
             >
               <UserPlus className="h-4 w-4" />
               Add Friend
@@ -96,8 +88,8 @@ const Friends = () => {
       {showSearchModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <UserSearch 
-            userId={user?.id || null} 
-            username={user?.user_metadata?.username || null} 
+            userId={userId} 
+            username={username} 
             onClose={() => setShowSearchModal(false)} 
           />
         </div>
