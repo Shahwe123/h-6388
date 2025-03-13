@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
@@ -78,6 +77,7 @@ const Auth = () => {
       dispatch(registerSuccess(data))
 
     } catch (error: any) {
+      console.error('Signup error:', error);
       toast({
         title: 'Error signing up',
         description: error.message,
