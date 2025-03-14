@@ -423,17 +423,7 @@ const LinkAccounts = () => {
         }
       }
 
-      // returns the updata profile TODO: should not need to return this, rather populate the redux store, above
-      // const { data: updatedProfile, error: profileRefreshError } = await supabase
-      //   .from('profiles')
-      //   .select('*')
-      //   .eq('id', userId)
-      //   .single();
-
-      // if (profileRefreshError) throw profileRefreshError;
-
       // // TODO: should be updaated to use redux
-      // setProfile(updatedProfile);
       const getGames = async (userId) => {
         const { data, error } = await supabase
         .from('user_games')
@@ -441,58 +431,82 @@ const LinkAccounts = () => {
         .eq('user_id', userId);
         // TODO: add if not games found
         const gameIds = data.map(g => g.game_id);
+
         const { data: games } = await supabase
             .from('games')
-            .select('steam_app_id, name, icon_url')
+            .select('id, steam_app_id, name, icon_url')
             .in('id', gameIds);
+        console.log(games);
 
-        return games
-      }
-
-      const getAchievements = async (userId) => {
-        const { data } = await supabase
+        const { data: userAchievements} = await supabase
         .from('user_achievements')
         .select('id, achievement_id, unlock_time')
         .eq('user_id', userId)
-        .order('earned_at', { ascending: false });
-        if (!data) {
-          return
+        .order('unlock_time', { ascending: false });
+
+        if (userAchievements) {
+
+          const achievementIds = userAchievements.map(a => a.id);
+          const { data: achievements } = await supabase
+              .from('achievements')
+              .select('id, name, description, game_id, icon_url, locked_icon_url')
+              .in('id', achievementIds);
+
+          const mergedData = []
+          games.forEach(game => {
+            achievements.forEach(achievement => {
+              if (achievement.game_id === game.id) {
+                mergedData.push({
+                  game, achievement
+                })
+              }
+            });
+          });
+          console.log(mergedData);
+          return mergedData
         }
-        const achievementIds = data.map(a => a.id);
-        const { data: achievements } = await supabase
-            .from('achievements')
-            .select('id, name, description, game_id, icon_url, locked_icon_url')
-            .in('id', achievementIds);
-
-        // Get game details
-        const gameIds = achievements.map(a => a.game_id);
-        const { data: games } = await supabase
-            .from('games')
-            .select('id, name')
-            .in('id', gameIds);
-
-        // Merge results
-        return data.map(ua => ({
-          ...ua,
-          ...achievements.find(a => a.id === ua.achievement_id),
-          game_name: games.find(g => g.id === achievements.find(a => a.id === ua.achievement_id)?.game_id)?.name
-        }));
+        return games
       }
+      // TODO: can in future combine both tehse, so games and achievemsnts are combnined
+      // const getAchievements = async (userId) => {
+      //   const { data } = await supabase
+      //   .from('user_achievements')
+      //   .select('id, achievement_id, unlock_time')
+      //   .eq('user_id', userId)
+      //   .order('earned_at', { ascending: false });
+      //   if (!data) {
+      //     return
+      //   }
+      //   const achievementIds = data.map(a => a.id);
+      //   const { data: achievements } = await supabase
+      //       .from('achievements')
+      //       .select('id, name, description, game_id, icon_url, locked_icon_url')
+      //       .in('id', achievementIds);
+
+      //   // Get game details
+      //   const gameIds = achievements.map(a => a.game_id);
+      //   const { data: games } = await supabase
+      //       .from('games')
+      //       .select('id, name')
+      //       .in('id', gameIds);
+
+      //   // Merge results
+      //   return data.map(ua => ({
+      //     ...ua,
+      //     ...achievements.find(a => a.id === ua.achievement_id),
+      //     game_name: games.find(g => g.id === achievements.find(a => a.id === ua.achievement_id)?.game_id)?.name
+      //   }));
+      // }
 
       const userGames = await getGames(userId)
-      // const userGames = {
-      //   steam_app_id: response.steam_app_id,
-      //   name: response.name,
-      //   icon_url: response.icon_url,
+      // const userAchievements = await getAchievements(userId)
+      // if (!userAchievements) {
+
+      //   dispatch(setAchievements({}))
+      // } else {
+      //   dispatch(setAchievements(userAchievements))
+
       // }
-      const userAchievements = getAchievements(userId)
-      if (!userAchievements) {
-
-        dispatch(setAchievements({}))
-      } else {
-        dispatch(setAchievements(userAchievements))
-
-      }
       dispatch(fetchGamesSuccess(userGames))
     } catch (error) {
       console.error('Error processing Steam data:', error);
@@ -626,7 +640,7 @@ const LinkAccounts = () => {
       </div>
     );
   }
-  console.log(games);
+  console.log(games)
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
       <div className="container-padding mx-auto max-w-3xl">
