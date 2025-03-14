@@ -352,27 +352,6 @@ const LinkAccounts = () => {
                   icon_url: achievement.icon || null,
                   locked_icon_url: achievement.lockedIcon || null
                 }));
-              // const achievementsToInsert = [];
-              // for (let i = 0; i < game.achievements.length; i++) {
-              //     const achievement = game.achievements[i];
-
-              //     if (achievement && typeof achievement === 'object' && achievement.apiName) {
-              //         achievementsToInsert.push({
-              //             game_id: gameId,
-              //             platform: 'steam',
-              //             platform_api_name: achievement.apiName,
-              //             name: achievement.name || 'Unknown Achievement',
-              //             description: achievement.description || null,
-              //             icon_url: achievement.icon || null,
-              //             locked_icon_url: achievement.lockedIcon || null
-              //         });
-
-              //         if (achievement.unlocked) {
-              //           // TODO:
-              //         }
-              //     }
-              // }
-
 
               // Adds achievement data to data for the respective game
               if (achievementsToInsert.length > 0) {
@@ -436,16 +415,13 @@ const LinkAccounts = () => {
             .from('games')
             .select('id, steam_app_id, name, icon_url')
             .in('id', gameIds);
-        console.log(games);
 
         const { data: userAchievements} = await supabase
         .from('user_achievements')
         .select('id, achievement_id, unlock_time')
         .eq('user_id', userId)
         .order('unlock_time', { ascending: false });
-
         if (userAchievements) {
-
           const achievementIds = userAchievements.map(a => a.id);
           const { data: achievements } = await supabase
               .from('achievements')
@@ -467,46 +443,9 @@ const LinkAccounts = () => {
         }
         return games
       }
-      // TODO: can in future combine both tehse, so games and achievemsnts are combnined
-      // const getAchievements = async (userId) => {
-      //   const { data } = await supabase
-      //   .from('user_achievements')
-      //   .select('id, achievement_id, unlock_time')
-      //   .eq('user_id', userId)
-      //   .order('earned_at', { ascending: false });
-      //   if (!data) {
-      //     return
-      //   }
-      //   const achievementIds = data.map(a => a.id);
-      //   const { data: achievements } = await supabase
-      //       .from('achievements')
-      //       .select('id, name, description, game_id, icon_url, locked_icon_url')
-      //       .in('id', achievementIds);
-
-      //   // Get game details
-      //   const gameIds = achievements.map(a => a.game_id);
-      //   const { data: games } = await supabase
-      //       .from('games')
-      //       .select('id, name')
-      //       .in('id', gameIds);
-
-      //   // Merge results
-      //   return data.map(ua => ({
-      //     ...ua,
-      //     ...achievements.find(a => a.id === ua.achievement_id),
-      //     game_name: games.find(g => g.id === achievements.find(a => a.id === ua.achievement_id)?.game_id)?.name
-      //   }));
-      // }
+      // TODO: check if the above merge works
 
       const userGames = await getGames(userId)
-      // const userAchievements = await getAchievements(userId)
-      // if (!userAchievements) {
-
-      //   dispatch(setAchievements({}))
-      // } else {
-      //   dispatch(setAchievements(userAchievements))
-
-      // }
       dispatch(fetchGamesSuccess(userGames))
     } catch (error) {
       console.error('Error processing Steam data:', error);
@@ -640,7 +579,6 @@ const LinkAccounts = () => {
       </div>
     );
   }
-  console.log(games)
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
       <div className="container-padding mx-auto max-w-3xl">
