@@ -10,6 +10,8 @@ import { exchangeNpssoForCode } from "psn-api";
 import { exchangeCodeForAccessToken } from "psn-api";
 import { getUserTitles } from "psn-api";
 import { exchangeRefreshTokenForAuthTokens } from "psn-api";
+import { useDispatch } from 'react-redux';
+import { fetchGamesSuccess } from '@/redux/slices/gamesSlice';
 
 const SteamIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -180,6 +182,7 @@ const LinkAccounts = () => {
   const [processingData, setProcessingData] = useState<boolean>(false);
   const [processingPlatform, setProcessingPlatform] = useState<string | null>(null);
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -259,6 +262,11 @@ const LinkAccounts = () => {
         
         await processAndStoreSteamData(data, session.user.id);
         
+        // Update Redux store with the games
+        if (data.games && Array.isArray(data.games)) {
+          dispatch(fetchGamesSuccess(data.games));
+        }
+        
         toast({
           title: 'Steam Account Linked',
           description: 'Your Steam data has been successfully processed.',
@@ -283,6 +291,7 @@ const LinkAccounts = () => {
     if (!steamData || !userId) return;
     
     try {
+      // Store steam_games JSON in profile for backward compatibility
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .update({
@@ -293,12 +302,14 @@ const LinkAccounts = () => {
       if (profileUpdateError) throw profileUpdateError;
       
       if (steamData.games && Array.isArray(steamData.games)) {
+        // Process each game
         for (const game of steamData.games) {
           if (!game.appid || typeof game.appid !== 'number') {
             console.warn('Invalid game appid:', game.appid, 'for game:', game.name);
             continue; // Skip this game
           }
 
+          // Check if game exists in games table
           const { data: existingGame, error: gameCheckError } = await supabase
             .from('games')
             .select('id')
@@ -309,6 +320,7 @@ const LinkAccounts = () => {
           
           let gameId;
           
+          // If game doesn't exist, add it to games table
           if (!existingGame) {
             const { data: newGame, error: gameInsertError } = await supabase
               .from('games')
@@ -324,6 +336,7 @@ const LinkAccounts = () => {
             
             gameId = newGame.id;
             
+            // Process achievements for new game
             if (game.achievements && Array.isArray(game.achievements)) {
               const achievementsToInsert = game.achievements
                 .filter(achievement => 
@@ -353,6 +366,23 @@ const LinkAccounts = () => {
             gameId = existingGame.id;
           }
           
+          // Add game to user_games table
+          const { error: userGameError } = await supabase
+            .from('user_games')
+            .upsert({
+              user_id: userId,
+              game_id: gameId,
+              platform_name: 'steam'
+            }, {
+              onConflict: 'user_id,game_id,platform_name'
+            });
+            
+          if (userGameError) {
+            console.error('Error adding user game:', userGameError);
+            throw userGameError;
+          }
+
+          // Process achievements for this game
           if (game.achievements && Array.isArray(game.achievements)) {
             for (const achievement of game.achievements) {
               if (achievement && achievement.achieved && achievement.apiname) {
@@ -388,6 +418,7 @@ const LinkAccounts = () => {
         }
       }
       
+      // Refresh profile data
       const { data: updatedProfile, error: profileRefreshError } = await supabase
         .from('profiles')
         .select('*')
