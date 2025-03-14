@@ -10,6 +10,8 @@ import { exchangeNpssoForCode } from "psn-api";
 import { exchangeCodeForAccessToken } from "psn-api";
 import { getUserTitles } from "psn-api";
 import { exchangeRefreshTokenForAuthTokens } from "psn-api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGamesStart, fetchGamesSuccess, fetchGamesFailure, setAchievements } from '../redux/slices/gamesSlice.js'
 
 const SteamIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -180,6 +182,8 @@ const LinkAccounts = () => {
   const [processingData, setProcessingData] = useState<boolean>(false);
   const [processingPlatform, setProcessingPlatform] = useState<string | null>(null);
   const { toast } = useToast();
+  const dispatch = useDispatch()
+  const games = useSelector((state) => state.games);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -230,7 +234,8 @@ const LinkAccounts = () => {
       try {
         setProcessingData(true);
         setProcessingPlatform('Steam');
-        
+        dispatch(fetchGamesStart())
+
         toast({
           title: 'Processing Steam Data',
           description: 'We are retrieving and processing your Steam data. This may take a moment.',
@@ -249,22 +254,22 @@ const LinkAccounts = () => {
             "steamId": steamId
           })
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch Steam data');
         }
-        
+
         const data = await response.json();
-        console.log('Steam data fetched:', data);
-        
+
         await processAndStoreSteamData(data, session.user.id);
-        
+
         toast({
           title: 'Steam Account Linked',
           description: 'Your Steam data has been successfully processed.',
         });
       } catch (error) {
         console.error('Error fetching Steam data:', error);
+        dispatch(fetchGamesFailure())
         toast({
           title: 'Error Processing Steam Data',
           description: error.message || 'Failed to process Steam data',
@@ -281,96 +286,126 @@ const LinkAccounts = () => {
 
   const processAndStoreSteamData = async (steamData, userId) => {
     if (!steamData || !userId) return;
-    
+
     try {
-      const { error: profileUpdateError } = await supabase
-        .from('profiles')
-        .update({
-          steam_games: steamData.games || []
-        })
-        .eq('id', userId);
-        
-      if (profileUpdateError) throw profileUpdateError;
-      
+
+      // Loops through
       if (steamData.games && Array.isArray(steamData.games)) {
+        // console.log(steamData);
         for (const game of steamData.games) {
-          if (!game.appid || typeof game.appid !== 'number') {
-            console.warn('Invalid game appid:', game.appid, 'for game:', game.name);
+          if (!game.appId || typeof game.appId !== 'number') {
+            console.warn('Invalid game appid:', game.appId, 'for game:', game.gameName);
             continue; // Skip this game
           }
 
+          // TODO: change this to use indexing
           const { data: existingGame, error: gameCheckError } = await supabase
             .from('games')
             .select('id')
-            .eq('steam_app_id', game.appid)
+            .eq('steam_app_id', game.appId)
             .maybeSingle();
-            
+
           if (gameCheckError) throw gameCheckError;
-          
+
           let gameId;
-          
+
+          // TODO: each game even if on multiple platform has to have own table,
+          // Checks if game exists in database
           if (!existingGame) {
+
+            // if game is not in the database, its added
             const { data: newGame, error: gameInsertError } = await supabase
               .from('games')
               .insert({
-                steam_app_id: game.appid,
-                name: game.name || 'Unknown Game',
+                steam_app_id: game.appId,
+                name: game.gameName || 'Unknown Game',
                 icon_url: game.img_icon_url ? `https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg` : null
               })
               .select('id')
               .single();
-              
+
             if (gameInsertError) throw gameInsertError;
-            
+
             gameId = newGame.id;
-            
+            //TODO: Add playtime to usergames table
+            const { error: profileUpdateError } = await supabase.from('user_games').insert([{ user_id: userId, game_id: gameId, platform_name: 'steam' }])
+            if (profileUpdateError) throw profileUpdateError;
+
+
+            //TODO: maybe get the gameid to reference the app id from the platform
+            // Loops through the games achievements
             if (game.achievements && Array.isArray(game.achievements)) {
+              console.log(JSON.stringify(game.achievements));
+              // grabs necessary data
               const achievementsToInsert = game.achievements
-                .filter(achievement => 
-                  achievement && 
-                  typeof achievement === 'object' && 
-                  achievement.apiname
+                .filter(achievement =>
+                  achievement &&
+                  typeof achievement === 'object' &&
+                  achievement.apiName
                 )
                 .map(achievement => ({
                   game_id: gameId,
                   platform: 'steam',
-                  platform_api_name: achievement.apiname,
+                  platform_api_name: achievement.apiName,
                   name: achievement.name || 'Unknown Achievement',
                   description: achievement.description || null,
                   icon_url: achievement.icon || null,
-                  locked_icon_url: achievement.icongray || null
+                  locked_icon_url: achievement.lockedIcon || null
                 }));
-              
+              // const achievementsToInsert = [];
+              // for (let i = 0; i < game.achievements.length; i++) {
+              //     const achievement = game.achievements[i];
+
+              //     if (achievement && typeof achievement === 'object' && achievement.apiName) {
+              //         achievementsToInsert.push({
+              //             game_id: gameId,
+              //             platform: 'steam',
+              //             platform_api_name: achievement.apiName,
+              //             name: achievement.name || 'Unknown Achievement',
+              //             description: achievement.description || null,
+              //             icon_url: achievement.icon || null,
+              //             locked_icon_url: achievement.lockedIcon || null
+              //         });
+
+              //         if (achievement.unlocked) {
+              //           // TODO:
+              //         }
+              //     }
+              // }
+
+
+              // Adds achievement data to data for the respective game
               if (achievementsToInsert.length > 0) {
                 const { error: achievementsInsertError } = await supabase
                   .from('achievements')
                   .insert(achievementsToInsert);
-                  
+
                 if (achievementsInsertError) throw achievementsInsertError;
               }
             }
           } else {
+            // game exists
             gameId = existingGame.id;
           }
-          
+          // TODO: this can be moved to the prev function filter/map
           if (game.achievements && Array.isArray(game.achievements)) {
             for (const achievement of game.achievements) {
-              if (achievement && achievement.achieved && achievement.apiname) {
+              if (achievement && achievement.unlocked && achievement.apiName) {
                 const { data: achievementData, error: achievementError } = await supabase
                   .from('achievements')
                   .select('id')
                   .eq('game_id', gameId)
-                  .eq('platform', 'steam')
+                  // .eq('platform', 'steam')
                   .eq('platform_api_name', achievement.apiname)
                   .maybeSingle();
-                  
+
                 if (achievementError) throw achievementError;
-                
+
                 if (achievementData) {
-                  const unlockTime = achievement.unlocktime && achievement.unlocktime > 0
+                  const unlockTime = achievement.unlockTime && achievement.unlocktime > 0
                     ? new Date(achievement.unlocktime * 1000).toISOString()
                     : null;
-                  
+
                   const { error: userAchievementError } = await supabase
                     .from('user_achievements')
                     .upsert({
@@ -379,7 +414,7 @@ const LinkAccounts = () => {
                       unlocked: true,
                       unlock_time: unlockTime
                     });
-                    
+
                   if (userAchievementError) throw userAchievementError;
                 }
               }
@@ -387,22 +422,84 @@ const LinkAccounts = () => {
           }
         }
       }
-      
-      const { data: updatedProfile, error: profileRefreshError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
-      if (profileRefreshError) throw profileRefreshError;
-      
-      setProfile(updatedProfile);
-      
+
+      // returns the updata profile TODO: should not need to return this, rather populate the redux store, above
+      // const { data: updatedProfile, error: profileRefreshError } = await supabase
+      //   .from('profiles')
+      //   .select('*')
+      //   .eq('id', userId)
+      //   .single();
+
+      // if (profileRefreshError) throw profileRefreshError;
+
+      // // TODO: should be updaated to use redux
+      // setProfile(updatedProfile);
+      const getGames = async (userId) => {
+        const { data, error } = await supabase
+        .from('user_games')
+        .select('game_id, platform_name')
+        .eq('user_id', userId);
+        // TODO: add if not games found
+        const gameIds = data.map(g => g.game_id);
+        const { data: games } = await supabase
+            .from('games')
+            .select('steam_app_id, name, icon_url')
+            .in('id', gameIds);
+
+        return games
+      }
+
+      const getAchievements = async (userId) => {
+        const { data } = await supabase
+        .from('user_achievements')
+        .select('id, achievement_id, unlock_time')
+        .eq('user_id', userId)
+        .order('earned_at', { ascending: false });
+        if (!data) {
+          return
+        }
+        const achievementIds = data.map(a => a.id);
+        const { data: achievements } = await supabase
+            .from('achievements')
+            .select('id, name, description, game_id, icon_url, locked_icon_url')
+            .in('id', achievementIds);
+
+        // Get game details
+        const gameIds = achievements.map(a => a.game_id);
+        const { data: games } = await supabase
+            .from('games')
+            .select('id, name')
+            .in('id', gameIds);
+
+        // Merge results
+        return data.map(ua => ({
+          ...ua,
+          ...achievements.find(a => a.id === ua.achievement_id),
+          game_name: games.find(g => g.id === achievements.find(a => a.id === ua.achievement_id)?.game_id)?.name
+        }));
+      }
+
+      const userGames = await getGames(userId)
+      // const userGames = {
+      //   steam_app_id: response.steam_app_id,
+      //   name: response.name,
+      //   icon_url: response.icon_url,
+      // }
+      const userAchievements = getAchievements(userId)
+      if (!userAchievements) {
+
+        dispatch(setAchievements({}))
+      } else {
+        dispatch(setAchievements(userAchievements))
+
+      }
+      dispatch(fetchGamesSuccess(userGames))
     } catch (error) {
       console.error('Error processing Steam data:', error);
       throw new Error('Failed to process Steam data: ' + error.message);
     }
   };
+//TODO: find out why games in store starts as a promise
 
   const fetchXboxData = async (gamerTag) => {
     if (gamerTag) {
@@ -460,7 +557,7 @@ const LinkAccounts = () => {
       setProfile({ ...profile, ...updates });
 
       handleCloseModal();
-      
+
       if (currentPlatform === 'Steam') {
         fetchSteamData(updates.steam_id);
       }
@@ -499,6 +596,7 @@ const LinkAccounts = () => {
 
       if (error) throw error;
 
+      //TODO: should give the option to ser if unlinking, would you liket o detelet game data as well
       if (platform === 'Steam') {
         console.log('Removed Steam games from profile');
       }
@@ -528,7 +626,7 @@ const LinkAccounts = () => {
       </div>
     );
   }
-
+  console.log(games);
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
       <div className="container-padding mx-auto max-w-3xl">
