@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Gamepad, User, X, Loader2 } from 'lucide-react';
+import { Gamepad, User, X, Loader2, AlertCircle, Lock } from 'lucide-react';
 import { exchangeNpssoForCode } from "psn-api";
 import { exchangeCodeForAccessToken } from "psn-api";
 import { getUserTitles } from "psn-api";
@@ -181,6 +181,7 @@ const LinkAccounts = () => {
   const [currentPlatform, setCurrentPlatform] = useState<string | null>(null);
   const [processingData, setProcessingData] = useState<boolean>(false);
   const [processingPlatform, setProcessingPlatform] = useState<string | null>(null);
+  const [psnLinkError, setPsnLinkError] = useState<string | null>(null);
   const { toast } = useToast();
   const dispatch = useDispatch();
 
@@ -221,6 +222,7 @@ const LinkAccounts = () => {
   }, [toast]);
 
   const handleOpenModal = (platform: string) => {
+    setPsnLinkError(null);
     setCurrentPlatform(platform);
   };
 
@@ -458,6 +460,156 @@ const LinkAccounts = () => {
     }
   }
 
+  const fetchPlayStationData = async (npssoCode) => {
+    if (!npssoCode || !profile) return;
+    
+    try {
+      setProcessingData(true);
+      setProcessingPlatform('PlayStation');
+      
+      toast({
+        title: 'Processing PlayStation Data',
+        description: 'We are authenticating and retrieving your PlayStation data. This may take a moment.',
+      });
+      
+      // Exchange NPSSO for authorization code
+      const accessCode = await exchangeNpssoForCode(npssoCode);
+      if (!accessCode) {
+        throw new Error('Failed to get access code from NPSSO');
+      }
+      
+      // Exchange authorization code for access token
+      const authorization = await exchangeCodeForAccessToken(accessCode);
+      if (!authorization) {
+        throw new Error('Failed to exchange code for access token');
+      }
+      
+      // Store the refresh token in the profile for future use
+      const { error: tokenUpdateError } = await supabase
+        .from('profiles')
+        .update({
+          playstation_refresh_token: authorization.refreshToken
+        })
+        .eq('id', profile.id);
+        
+      if (tokenUpdateError) throw tokenUpdateError;
+      
+      // Get user's games (titles)
+      const titles = await getUserTitles({ accessToken: authorization.accessToken });
+      
+      if (!titles || !titles.trophyTitles) {
+        throw new Error('Failed to retrieve PlayStation titles');
+      }
+      
+      console.log('PlayStation titles retrieved:', titles.trophyTitles.length);
+      
+      // Process the titles/games
+      await processPlayStationData(titles.trophyTitles, profile.id, authorization);
+      
+      toast({
+        title: 'PlayStation Account Linked',
+        description: 'Your PlayStation data has been successfully processed.',
+      });
+    } catch (error) {
+      console.error('Error processing PlayStation data:', error);
+      setPsnLinkError(error.message || 'Failed to process PlayStation data');
+      toast({
+        title: 'Error Processing PlayStation Data',
+        description: error.message || 'Failed to process PlayStation data',
+        variant: 'destructive',
+      });
+    } finally {
+      setProcessingData(false);
+      setProcessingPlatform(null);
+    }
+  };
+  
+  const processPlayStationData = async (trophyTitles, userId, authorization) => {
+    if (!trophyTitles || !Array.isArray(trophyTitles) || trophyTitles.length === 0) {
+      console.warn('No trophy titles to process');
+      return;
+    }
+    
+    try {
+      // Process each game/title
+      for (const title of trophyTitles) {
+        // Check if game exists
+        const { data: existingGame, error: gameCheckError } = await supabase
+          .from('games')
+          .select('id')
+          .eq('playstation_id', title.npCommunicationId)
+          .maybeSingle();
+          
+        if (gameCheckError) throw gameCheckError;
+        
+        let gameId;
+        
+        // If game doesn't exist, add it
+        if (!existingGame) {
+          const { data: newGame, error: gameInsertError } = await supabase
+            .from('games')
+            .insert({
+              playstation_id: title.npCommunicationId,
+              name: title.trophyTitleName || 'Unknown PlayStation Game',
+              icon_url: title.trophyTitleIconUrl || null
+            })
+            .select('id')
+            .single();
+            
+          if (gameInsertError) throw gameInsertError;
+          
+          gameId = newGame.id;
+        } else {
+          gameId = existingGame.id;
+        }
+        
+        // Add game to user_games table
+        const { error: userGameError } = await supabase
+          .from('user_games')
+          .upsert({
+            user_id: userId,
+            game_id: gameId,
+            platform_name: 'playstation'
+          }, {
+            onConflict: 'user_id,game_id,platform_name'
+          });
+          
+        if (userGameError) {
+          console.error('Error adding user game:', userGameError);
+          throw userGameError;
+        }
+        
+        // TODO: Add trophy processing in a future update
+        // This would involve fetching trophies for each game and adding them to the achievements table
+      }
+      
+      // Update profile with PlayStation username
+      const { error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update({
+          playstation_username: authorization.accountId || 'PSN User'
+        })
+        .eq('id', userId);
+        
+      if (profileUpdateError) throw profileUpdateError;
+      
+      // Refresh profile data
+      const { data: updatedProfile, error: profileRefreshError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (profileRefreshError) throw profileRefreshError;
+      
+      setProfile(updatedProfile);
+      
+    } catch (error) {
+      console.error('Error processing PlayStation data:', error);
+      throw error;
+    }
+  };
+
   const handleLinkAccount = async (value: string) => {
     if (!profile) return;
 
@@ -474,11 +626,14 @@ const LinkAccounts = () => {
           break;
         case 'Xbox':
           updates.xbox_gamertag = value;
-          fetchXboxData(updates.xbox_gamertag)
+          fetchXboxData(updates.xbox_gamertag);
           break;
         case 'PlayStation':
-          updates.playstation_username = value;
-          break;
+          // For PlayStation, we don't update the profile directly
+          // We'll use the NPSSO code to authenticate and then update
+          handleCloseModal();
+          fetchPlayStationData(value);
+          return; // Exit early as we don't want to update profiles yet
       }
 
       const { error } = await supabase
@@ -520,6 +675,7 @@ const LinkAccounts = () => {
           break;
         case 'PlayStation':
           updates.playstation_username = null;
+          updates.playstation_refresh_token = null;
           break;
       }
 
@@ -648,11 +804,50 @@ const LinkAccounts = () => {
         onClose={handleCloseModal}
         platformName="PlayStation"
         platformIcon={<PlayStationIcon />}
-        inputLabel="PlayStation Username"
-        inputPlaceholder="Enter your PlayStation Username (PSN ID)"
+        inputLabel="PlayStation NPSSO Code"
+        inputPlaceholder="Enter your NPSSO Code"
         onSubmit={handleLinkAccount}
-        guideText="Your PlayStation Username (also called PSN ID) is what you use to sign in to PlayStation Network. You can find it by checking your profile on your PlayStation console or in the PlayStation app."
+        guideText="To get your NPSSO code, sign in to the PlayStation website, then go to https://ca.account.sony.com/api/v1/ssocookie. Copy the 64-character code shown. This is a temporary code used to authorize our app."
       />
+
+      {psnLinkError && (
+        <Dialog open={!!psnLinkError} onOpenChange={() => setPsnLinkError(null)}>
+          <DialogContent className="bg-primary border border-red-500/20 text-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <AlertCircle className="h-5 w-5 text-red-500" />
+                <span>PlayStation Connection Error</span>
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <p className="text-neutral-300">{psnLinkError}</p>
+              
+              <div className="bg-black/30 p-3 rounded-md border border-neutral-700">
+                <h4 className="text-sm font-medium mb-2 flex items-center">
+                  <Lock className="h-4 w-4 mr-2 text-neutral-400" />
+                  NPSSO Code Instructions
+                </h4>
+                <ol className="text-xs text-neutral-400 space-y-2 list-decimal pl-4">
+                  <li>Sign in to <a href="https://ca.account.sony.com" target="_blank" rel="noopener noreferrer" className="text-neon-blue hover:underline">account.sony.com</a></li>
+                  <li>After signing in, go to <a href="https://ca.account.sony.com/api/v1/ssocookie" target="_blank" rel="noopener noreferrer" className="text-neon-blue hover:underline">ca.account.sony.com/api/v1/ssocookie</a></li>
+                  <li>Copy the 64-character code shown on that page</li>
+                  <li>NPSSO codes expire after a short time, so make sure to use a fresh one</li>
+                </ol>
+              </div>
+              
+              <div className="flex justify-end">
+                <Button 
+                  onClick={() => setPsnLinkError(null)}
+                  className="bg-black/50 hover:bg-black/70 text-white border border-neutral-700"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
