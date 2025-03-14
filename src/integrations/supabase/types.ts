@@ -226,6 +226,39 @@ export type Database = {
           },
         ]
       }
+      user_games: {
+        Row: {
+          game_id: number
+          platform_name: string
+          user_id: string
+        }
+        Insert: {
+          game_id: number
+          platform_name: string
+          user_id: string
+        }
+        Update: {
+          game_id?: number
+          platform_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_games_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_games_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
