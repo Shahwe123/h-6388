@@ -73,6 +73,14 @@ const Profile = () => {
           throw error;
         }
 
+        // Convert string 'true'/'false' to boolean if needed
+        if (data && data.is_private !== null) {
+          // Fix: Convert is_private to boolean if it's a string
+          if (typeof data.is_private === 'string') {
+            data.is_private = data.is_private === 'true';
+          }
+        }
+
         setProfile(data as Profile);
 
         const { count, error: friendError } = await supabase
