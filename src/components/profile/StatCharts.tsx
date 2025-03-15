@@ -3,12 +3,14 @@ import React from 'react';
 import { BarChart, Bar, PieChart, Pie, LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 
 type StatChartsProps = {
+  chartType?: 'bar' | 'pie';
   rarityData?: Array<{name: string; value: number; color: string}>;
   genreData?: Array<{name: string; value: number; color: string}>;
   completionData?: Array<{month: string; value: number;}>;
 };
 
 export const StatCharts: React.FC<StatChartsProps> = ({ 
+  chartType = 'bar',
   rarityData = [
     { name: 'Ultra Rare', value: 3, color: '#D946EF' },
     { name: 'Rare', value: 15, color: '#8B5CF6' },
