@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, UserCircle, BarChart3, Clock, Users, Gamepad, ImageIcon, Link, Medal, BarChart, ChartPie } from 'lucide-react';
@@ -65,6 +66,18 @@ const mockFriendsForComparison = [
     comparison: '+23'
   }
 ];
+
+// Add back the playerStats that were deleted
+const playerStats = {
+  level: 42,
+  xp: 4200,
+  nextLevelXp: 5000,
+  rank: 'Trophy Hunter',
+  trophiesCount: 127,
+  platinumCount: 14,
+  totalGames: 48,
+  gamesCompleted: 26,
+};
 
 const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);

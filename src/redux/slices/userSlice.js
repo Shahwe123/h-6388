@@ -46,7 +46,7 @@ const userSlice = createSlice({
       logout: (state) => {
         state.user = null;
         state.isAuthenticated = false;
-        dispatch(resetState());
+        // Remove dispatch() call since it's not available in reducer
         storage.removeItem('persist:root'); // Clear persisted data
         localStorage.removeItem('persist:root')
       },
