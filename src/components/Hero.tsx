@@ -1,10 +1,13 @@
+
 import { ArrowRight, Trophy, Zap, Target } from "lucide-react";
+
 const Hero = () => {
-  return <section className="pt-32 pb-16 container-padding bg-black text-white relative overflow-hidden">
+  return (
+    <section className="w-full pt-32 pb-16 bg-black text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-40 bg-hero-pattern bg-cover bg-center"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-primary"></div>
       
-      <div className="max-w-4xl mx-auto text-center relative z-10">
+      <div className="container-padding max-w-4xl mx-auto text-center relative z-10">
         <div className="inline-block px-4 py-1 rounded-full bg-neon-purple/20 border border-neon-purple/40 mb-4">
           <p className="text-sm font-medium text-neon-purple animate-pulse">🔥 THE ULTIMATE GAMING ACHIEVEMENT TRACKER IS COMING! 🔥</p>
         </div>
@@ -44,6 +47,8 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Hero;

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
@@ -140,7 +141,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed w-full top-0 z-50 bg-black border-b border-neon-purple/10">
-      <div className="container-padding mx-auto flex items-center justify-between h-16">
+      <div className="max-w-full container-padding mx-auto flex items-center justify-between h-16">
         <Link to={session ? "/profile" : "/"} className="flex items-center gap-2">
           <Gamepad className="w-6 h-6 text-neon-purple" />
           <span className="font-bold text-xl text-white neon-text">PlatinumPath</span>

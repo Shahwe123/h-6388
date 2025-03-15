@@ -8,7 +8,7 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-neon-purple/10">
-      <nav className="container-padding mx-auto flex h-16 items-center justify-between">
+      <nav className="max-w-full container-padding mx-auto flex h-16 items-center justify-between">
         <Link to="/" className="text-xl font-bold text-white flex items-center gap-2">
           <Gamepad className="w-6 h-6 text-neon-purple" />
           <span className="neon-text">PlatinumPath</span>

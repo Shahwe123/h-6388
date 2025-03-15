@@ -11,8 +11,11 @@
   }
 
   body {
-    @apply bg-primary text-white antialiased;
+    @apply bg-primary text-white antialiased min-h-screen w-full;
     font-feature-settings: "ss01" on, "ss02" on, "cv01" on, "cv03" on;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 
   /* Custom Scrollbar Styling */
