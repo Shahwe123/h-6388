@@ -1,6 +1,6 @@
 
 import { createSlice } from "@reduxjs/toolkit";
-
+import storage from 'redux-persist/lib/storage';
 const initialState = {
   user: null, // Stores user details
   isAuthenticated: false,
@@ -46,6 +46,9 @@ const userSlice = createSlice({
       logout: (state) => {
         state.user = null;
         state.isAuthenticated = false;
+        dispatch(resetState());
+        storage.removeItem('persist:root'); // Clear persisted data
+        localStorage.removeItem('persist:root')
       },
 
       // 🔹 UPDATE USER ACTION
