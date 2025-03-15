@@ -9,7 +9,7 @@ import { Json } from '@/integrations/supabase/types';
 interface SteamGame {
   appid: number;
   name: string;
-  playtime_forever: number; 
+  playtime_forever: number;
   img_icon_url?: string;
 }
 
@@ -23,7 +23,7 @@ export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
       try {
         // First, get the current user ID if not provided
         let targetUserId = userId;
-        
+
         if (!targetUserId) {
           const { data: user } = await supabase.auth.getUser();
           if (!user?.user) {
@@ -48,20 +48,20 @@ export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
         if (data && data.steam_games) {
           // Parse the steam_games JSON data as an array
           const steamGamesArray = Array.isArray(data.steam_games) ? data.steam_games : [];
-          
+
           // Filter and validate the games data
           const validGames: SteamGame[] = [];
-          
+
           for (const game of steamGamesArray) {
             // Skip null or non-object items
             if (!game || typeof game !== 'object') continue;
-            
+
             // Type assertion with safety checks
             const gameObj = game as Record<string, unknown>;
-            
+
             if (
-              typeof gameObj.appid === 'number' && 
-              typeof gameObj.name === 'string' && 
+              typeof gameObj.appid === 'number' &&
+              typeof gameObj.name === 'string' &&
               typeof gameObj.playtime_forever === 'number'
             ) {
               // Add only games with valid required properties
@@ -73,7 +73,7 @@ export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
               });
             }
           }
-          
+
           setGames(validGames);
         } else {
           // No games found, but not an error

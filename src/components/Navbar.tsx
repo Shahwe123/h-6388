@@ -8,13 +8,14 @@ import NavLinks from './navbar/NavLinks';
 import NotificationButton from './navbar/NotificationButton';
 import MobileMenu from './navbar/MobileMenu';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  setNotifications, 
-  addNotification, 
+import {
+  setNotifications,
+  addNotification,
   fetchNotificationsStart,
   fetchNotificationsFailure,
   fetchNotificationsData
 } from '@/redux/slices/notificationsSlice';
+import {logout} from '../redux/slices/userSlice.js'
 
 const Navbar = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -25,7 +26,8 @@ const Navbar = () => {
   const { toast } = useToast();
   const dispatch = useDispatch();
   const notifications = useSelector((state: any) => state.notifications.notifications);
-  
+  // const user = useSelector((state: any) => state.user);
+
   useEffect(() => {
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
@@ -47,9 +49,9 @@ const Navbar = () => {
     if (session?.user?.id) {
       const channel = supabase
         .channel('public:notifications')
-        .on('postgres_changes', { 
-          event: 'INSERT', 
-          schema: 'public', 
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
@@ -57,28 +59,28 @@ const Navbar = () => {
           dispatch(addNotification(payload.new));
           setHasUnreadNotifications(true);
         })
-        .on('postgres_changes', { 
-          event: 'DELETE', 
-          schema: 'public', 
+        .on('postgres_changes', {
+          event: 'DELETE',
+          schema: 'public',
           table: 'notifications'
         }, () => {
           dispatch(fetchNotificationsData(session.user.id));
         })
-        .on('postgres_changes', { 
-          event: 'UPDATE', 
-          schema: 'public', 
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
           table: 'notifications',
           filter: `recipient_id=eq.${session.user.id}`
         }, payload => {
           console.log("Notification updated:", payload.new);
           dispatch(setNotifications(
-            notifications.map((notif: any) => 
+            notifications.map((notif: any) =>
               notif.id === payload.new.id ? payload.new : notif
             )
           ));
         })
         .subscribe();
-        
+
       return () => {
         supabase.removeChannel(channel);
       };
@@ -98,6 +100,8 @@ const Navbar = () => {
         variant: 'destructive',
       });
     } else {
+      //TODO: logout doesnt delete persist storage
+      dispatch(logout())
       navigate('/auth');
       toast({
         title: 'Signed out successfully',
@@ -114,18 +118,18 @@ const Navbar = () => {
 
   const markNotificationsAsRead = async () => {
     if (!session?.user?.id || !hasUnreadNotifications) return;
-    
+
     try {
       const { error } = await supabase
         .from('notifications')
         .update({ read: true })
         .eq('recipient_id', session.user.id)
         .eq('read', false);
-        
+
       if (error) throw error;
-      
+
       setHasUnreadNotifications(false);
-      
+
       dispatch(setNotifications(
         notifications.map((notif: any) => ({ ...notif, read: true }))
       ));
@@ -144,10 +148,10 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-6">
           <NavLinks session={session} />
-          
+
           {session && (
             <>
-              <NotificationButton 
+              <NotificationButton
                 hasUnreadNotifications={hasUnreadNotifications}
                 isOpen={isNotificationsOpen}
                 onClick={handleNotificationClick}
@@ -156,7 +160,7 @@ const Navbar = () => {
                 setNotifications={setNotifications}
                 userId={session.user.id}
               />
-              
+
               <button
                 onClick={handleSignOut}
                 className="text-sm font-medium text-neutral-400 hover:text-white transition-colors flex items-center"
@@ -168,7 +172,7 @@ const Navbar = () => {
           )}
         </div>
 
-        <button 
+        <button
           className="md:hidden text-neutral-300 focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
@@ -180,7 +184,7 @@ const Navbar = () => {
         </button>
       </div>
 
-      <MobileMenu 
+      <MobileMenu
         session={session}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}

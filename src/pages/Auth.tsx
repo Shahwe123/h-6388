@@ -6,6 +6,7 @@ import { Mail, Lock, User, ArrowLeft, Key } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { loginStart, loginSuccess, loginFailure, registerStart, registerSuccess, registerFailure } from '../redux/slices/userSlice'
 
+import { useSelector } from 'react-redux';
 type AuthMode = 'login' | 'register' | 'forgotPassword' | null;
 
 const Auth = () => {
@@ -22,6 +23,7 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     dispatch(loginStart())
+
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({

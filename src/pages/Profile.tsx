@@ -27,7 +27,7 @@ interface Profile {
   is_private: boolean | null;
 }
 
-// Mock trophy data 
+// Mock trophy data
 const mockTrophies = [
   { id: '1', name: 'Platinum Master', type: 'platinum' as const, game: 'God of War', rarity: '0.1%', image: '/trophy1.png' },
   { id: '2', name: 'Gold Champion', type: 'gold' as const, game: 'Elden Ring', rarity: '1.2%' },
@@ -76,7 +76,6 @@ const Profile = () => {
   const { toast } = useToast();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isFriend, setIsFriend] = useState(false);
-  
   // For the demo UI - these would come from the database in a real implementation
   const [playerStats] = useState({
     level: 12,
@@ -108,9 +107,9 @@ const Profile = () => {
       try {
         setLoading(true);
         const userId = await fetchUserSession();
-        
+
         const targetProfileId = profileId || userId;
-        
+
         if (!targetProfileId) {
           setLoading(false);
           return;
@@ -127,25 +126,25 @@ const Profile = () => {
         }
 
         setProfile(data as Profile);
-        
+
         const { count, error: friendError } = await supabase
           .from('friends')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', targetProfileId);
-          
+
         if (friendError) {
           throw friendError;
         }
-        
+
         setFriendCount(count || 0);
-        
+
         if (userId && profileId && userId !== profileId) {
           const { data: friendData, error: checkFriendError } = await supabase
             .from('friends')
             .select('id')
             .eq('user_id', userId)
             .eq('friend_id', profileId);
-            
+
           if (checkFriendError) {
             console.error('Error checking friend status:', checkFriendError);
           } else {
@@ -162,35 +161,35 @@ const Profile = () => {
         setLoading(false);
       }
     };
-    
+
     fetchProfileData();
-    
+
     if (profileId) {
       const friendsChannel = supabase
         .channel(`profile-friends-${profileId}`)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
           table: 'friends',
           filter: `user_id=eq.${profileId}`
         }, () => {
           fetchFriendCount(profileId);
         })
         .subscribe();
-        
+
       return () => {
         supabase.removeChannel(friendsChannel);
       };
     }
   }, [toast, profileId]);
-  
+
   const fetchFriendCount = async (userId: string) => {
     try {
       const { count, error } = await supabase
         .from('friends')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId);
-        
+
       if (error) throw error;
       setFriendCount(count || 0);
     } catch (error) {
@@ -231,10 +230,10 @@ const Profile = () => {
               <div className="h-40 bg-gradient-game"></div>
             )}
           </div>
-          
+
           <div className="relative mt-20">
             <div className="flex flex-col md:flex-row items-center gap-6">
-              <motion.div 
+              <motion.div
                 className="w-24 h-24 bg-black/50 rounded-full border-4 border-neon-purple flex items-center justify-center overflow-hidden"
                 whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(139, 92, 246, 0.5)' }}
               >
@@ -244,7 +243,7 @@ const Profile = () => {
                   <UserCircle className="w-20 h-20 text-neutral-400" />
                 )}
               </motion.div>
-              
+
               <div className="text-center md:text-left flex-1">
                 <div className="flex items-center flex-wrap justify-center md:justify-start gap-2 mb-1">
                   <h1 className="text-2xl md:text-3xl font-bold neon-text">{profile?.username}</h1>
@@ -252,21 +251,21 @@ const Profile = () => {
                 </div>
                 <p className="text-neutral-300">{profile?.bio || 'No bio yet'}</p>
               </div>
-              
+
               <SocialShare username={profile.username} />
             </div>
-            
+
             {/* Level Progress Bar */}
             <div className="mt-6">
-              <LevelProgress 
-                level={playerStats.level} 
-                xp={playerStats.xp} 
+              <LevelProgress
+                level={playerStats.level}
+                xp={playerStats.xp}
                 nextLevelXp={playerStats.nextLevelXp}
                 rank={playerStats.rank}
               />
             </div>
           </div>
-          
+
           {/* Stats Cards Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
             <div className="bg-black/30 p-4 rounded-lg text-center">
@@ -274,19 +273,19 @@ const Profile = () => {
               <div className="text-xl font-bold">{playerStats.trophiesCount}</div>
               <div className="text-sm text-neutral-400">Trophies</div>
             </div>
-            
+
             <div className="bg-black/30 p-4 rounded-lg text-center">
               <Medal className="w-6 h-6 text-neon-blue mx-auto mb-2" />
               <div className="text-xl font-bold">{playerStats.platinumCount}</div>
               <div className="text-sm text-neutral-400">Platinums</div>
             </div>
-            
+
             <div className="bg-black/30 p-4 rounded-lg text-center">
               <BarChart3 className="w-6 h-6 text-neon-purple mx-auto mb-2" />
               <div className="text-xl font-bold">{completionPercentage}%</div>
               <div className="text-sm text-neutral-400">Completion Rate</div>
             </div>
-            
+
             <div className="bg-black/30 p-4 rounded-lg text-center">
               <Users className="w-6 h-6 text-green-500 mx-auto mb-2" />
               <div className="text-xl font-bold">{friendCount}</div>
@@ -294,43 +293,43 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Trophy Showcase */}
         <TrophyCase trophies={mockTrophies} />
-        
+
         {/* Achievement Highlights */}
         <div className="glass-card rounded-xl p-6 mb-8">
           <h2 className="text-xl font-bold mb-4">Achievement Highlights</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <RarityCard 
-              title="🏆 Ultra-Rare Achievement" 
-              description="Only 0.03% of players unlocked this" 
+            <RarityCard
+              title="🏆 Ultra-Rare Achievement"
+              description="Only 0.03% of players unlocked this"
               icon="trophy"
               percentage="Top 0.1% worldwide"
             />
-            
-            <RarityCard 
-              title="🕐 Fastest Completion" 
-              description="Finished Elden Ring 100% in 72 hours" 
+
+            <RarityCard
+              title="🕐 Fastest Completion"
+              description="Finished Elden Ring 100% in 72 hours"
               icon="time"
               percentage="38% faster than average"
             />
-            
-            <RarityCard 
-              title="🔥 Longest Grind" 
-              description="250 hours spent in Red Dead Redemption 2" 
+
+            <RarityCard
+              title="🔥 Longest Grind"
+              description="250 hours spent in Red Dead Redemption 2"
               icon="grind"
               percentage="Dedication Level: Legend"
             />
           </div>
         </div>
-        
+
         {/* Gaming Stats Charts */}
         <div className="glass-card rounded-xl p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Gaming Stats</h2>
-            
+
             <div className="flex items-center space-x-2">
               <span className="text-sm text-neutral-400">View:</span>
               <div className="flex space-x-1 bg-black/30 p-1 rounded-md">
@@ -343,10 +342,10 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          
+
           <StatCharts />
         </div>
-        
+
         {/* Linked Accounts Section */}
         <div className="glass-card rounded-xl p-6 mb-8">
           <div className="flex justify-between items-center mb-4">
@@ -354,13 +353,13 @@ const Profile = () => {
             {isOwnProfile && (
               <RouterLink to="/link-accounts">
                 <Button className="bg-gradient-game" size="sm">
-                  <Link className="h-4 w-4 mr-1" /> 
+                  <Link className="h-4 w-4 mr-1" />
                   {hasLinkedAccounts ? 'Manage Accounts' : 'Link Accounts'}
                 </Button>
               </RouterLink>
             )}
           </div>
-          
+
           {hasLinkedAccounts ? <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {profile.steam_id && <div className="bg-black/30 p-4 rounded-lg flex items-center gap-3">
                   <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center">
@@ -373,7 +372,7 @@ const Profile = () => {
                     <div className="font-medium">{profile.steam_id}</div>
                   </div>
                 </div>}
-              
+
               {profile.xbox_gamertag && <div className="bg-black/30 p-4 rounded-lg flex items-center gap-3">
                   <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center">
                     <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -385,7 +384,7 @@ const Profile = () => {
                     <div className="font-medium">{profile.xbox_gamertag}</div>
                   </div>
                 </div>}
-              
+
               {profile.playstation_username && <div className="bg-black/30 p-4 rounded-lg flex items-center gap-3">
                   <div className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center">
                     <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -410,13 +409,13 @@ const Profile = () => {
               )}
             </div>}
         </div>
-        
+
         {/* Friends Comparison Section - ONLY show for the user's own profile */}
         {isOwnProfile && (
           <div className="glass-card rounded-xl p-6 mb-8">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Compare with Friends</h2>
-              <Button 
+              <Button
                 variant="outline"
                 size="sm"
                 className="bg-black/40 border-neon-purple/30 hover:bg-black/60"
@@ -425,13 +424,13 @@ const Profile = () => {
                 View All
               </Button>
             </div>
-            
+
             {friendCount > 0 ? (
               <div className="space-y-4">
                 <p className="text-sm text-neutral-400">
                   You have 13 more Platinum trophies than your friends on average!
                 </p>
-                
+
                 {/* Mock friends comparison cards */}
                 <div className="space-y-3">
                   {mockFriendsForComparison.map(friend => (
@@ -449,7 +448,7 @@ const Profile = () => {
                         </div>
                         <RankBadge rank="Trophy Hunter" />
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-4 text-center text-sm">
                         <div>
                           <div className="font-bold">{friend.trophies}</div>
@@ -477,7 +476,7 @@ const Profile = () => {
             )}
           </div>
         )}
-        
+
         {/* Games Collection Section */}
         <div className="glass-card rounded-xl p-6">
           <h2 className="text-xl font-bold mb-4">Games Collection</h2>

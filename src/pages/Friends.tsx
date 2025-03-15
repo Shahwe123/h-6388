@@ -15,40 +15,21 @@ const Friends = () => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [authSession, setAuthSession] = useState<any>(null);
   const { toast } = useToast();
-  
+
   // Use Redux for friends data
   const { friends, loading: friendsLoading } = useSelector((state: any) => state.friends);
-  const reduxUserData = useSelector((state: any) => state.user?.userData);
-  
+  const reduxUserData = useSelector((state: any) => state.user);
+  //TODO: find out how friends data is being populated
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        console.log("Fetching user session data");
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("Error fetching auth session:", error);
-          return;
-        }
-        
-        if (data.session) {
-          console.log("Session found, user ID:", data.session.user.id);
-          setAuthSession(data.session);
-          setUserId(data.session.user.id);
-          
-          const { data: userData, error: userError } = await supabase
-            .from('profiles')
-            .select('username')
-            .eq('id', data.session.user.id)
-            .single();
-            
-          if (userError) {
-            console.error("Error fetching user profile:", userError);
-            throw userError;
-          }
-          
-          console.log("User profile data:", userData);
-          setUsername(userData.username);
+
+        if (reduxUserData.user.session) {
+          setAuthSession(reduxUserData.user.session);
+          setUserId(reduxUserData.user.session.user.id);
+
+
+          setUsername(reduxUserData.user.user.user_metadata.username);
         } else {
           console.log("No session found");
         }
@@ -61,19 +42,9 @@ const Friends = () => {
         });
       }
     };
-    
+
     fetchUserData();
   }, [toast]);
-
-  // Log the values for debugging
-  useEffect(() => {
-    console.log("Friends component - User data:");
-    console.log("session userId:", authSession?.user?.id);
-    console.log("userId from state:", userId);
-    console.log("username from state:", username);
-    console.log("userId from Redux:", reduxUserData?.id);
-    console.log("username from Redux:", reduxUserData?.username);
-  }, [userId, username, reduxUserData, authSession]);
 
   if (friendsLoading) {
     return (
@@ -95,14 +66,14 @@ const Friends = () => {
               <Users className="h-8 w-8 text-neon-purple" />
               <h1 className="text-2xl md:text-3xl font-bold">Friends</h1>
             </div>
-            
-            <Button 
+
+            <Button
               className="cyber-button-sm flex items-center gap-2"
               onClick={() => {
-                console.log("Opening search modal with user data:", { 
-                  userId, 
+                console.log("Opening search modal with user data:", {
+                  userId,
                   username,
-                  sessionId: authSession?.user?.id 
+                  sessionId: authSession?.user?.id
                 });
                 setShowSearchModal(true);
               }}
@@ -111,21 +82,21 @@ const Friends = () => {
               Add Friend
             </Button>
           </div>
-          
+
           <div className="bg-black/20 rounded-lg p-4">
             <FriendsList friends={friends} />
           </div>
         </div>
-        
+
         <FriendActivity />
       </div>
-      
+
       {showSearchModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-          <UserSearch 
-            userId={userId} 
-            username={username} 
-            onClose={() => setShowSearchModal(false)} 
+          <UserSearch
+            userId={userId}
+            username={username}
+            onClose={() => setShowSearchModal(false)}
           />
         </div>
       )}
