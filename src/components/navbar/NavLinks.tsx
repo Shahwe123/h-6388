@@ -1,6 +1,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 /**
  * Props for the NavLinks component
@@ -27,6 +28,9 @@ type NavLinksProps = {
 const NavLinks = ({ session, isMobile = false, onClick }: NavLinksProps) => {
   const location = useLocation();
   const { pathname } = location;
+  
+  // Initialize the scroll to top hook
+  useScrollToTop();
 
   // Different navigation links for authenticated vs unauthenticated users
   const navLinks = session ? [

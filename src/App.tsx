@@ -21,12 +21,25 @@ import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AuthRequired from "./components/AuthRequired";
+import { useScrollToTop } from "./hooks/useScrollToTop";
 
 import './App.css';
 import './index.css';
 
 // Initialize React Query client
 const queryClient = new QueryClient();
+
+/**
+ * ScrollToTop component
+ * 
+ * This component scrolls the window to the top on route changes.
+ * 
+ * @returns {null} This component doesn't render anything
+ */
+const ScrollToTop = () => {
+  useScrollToTop();
+  return null;
+};
 
 /**
  * AuthRedirect component
@@ -175,6 +188,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AppDataInitializer />
+          <ScrollToTop />
           <NavbarWrapper />
           <Routes>
             {/* Public routes */}
