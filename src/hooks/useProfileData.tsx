@@ -23,8 +23,6 @@ export const useProfileData = (username: string | null) => {
 
   const fetchProfileData = useCallback(async () => {
     try {
-      if (!username) return;
-      
       setLoading(true);
       
       // Get current user session
@@ -32,14 +30,45 @@ export const useProfileData = (username: string | null) => {
       const currentUserId = session?.user?.id || null;
       setCurrentUserId(currentUserId);
       
+      // If username is not provided and user is logged in, fetch current user's profile
+      let profileUsername = username;
+      if (!profileUsername && currentUserId) {
+        // Fetch the username for the current user
+        const { data: userData, error: userError } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', currentUserId)
+          .single();
+          
+        if (userError) {
+          console.error('Error fetching current user profile:', userError);
+          setLoading(false);
+          return;
+        }
+        
+        if (userData) {
+          profileUsername = userData.username;
+        }
+      }
+      
+      if (!profileUsername) {
+        console.error('No username provided and user not logged in');
+        setLoading(false);
+        return;
+      }
+      
       // Fetch profile data
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('username', username)
+        .eq('username', profileUsername)
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        setLoading(false);
+        return;
+      }
       
       // Determine if this is the user's own profile
       setIsOwnProfile(currentUserId === data.id);

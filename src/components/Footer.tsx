@@ -1,5 +1,6 @@
 
 import { Gamepad, Trophy, Github, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -9,33 +10,33 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4 text-neon-purple">Platform</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Beta Access</a></li>
+              <li><Link to="/" className="text-neutral-300 hover:text-white transition-colors">Features</Link></li>
+              <li><Link to="/pricing" className="text-neutral-300 hover:text-white transition-colors">Pricing</Link></li>
+              <li><Link to="/beta" className="text-neutral-300 hover:text-white transition-colors">Beta Access</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="font-semibold mb-4 text-neon-purple">Company</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">About</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Contact</a></li>
+              <li><Link to="/about" className="text-neutral-300 hover:text-white transition-colors">About</Link></li>
+              <li><Link to="/blog" className="text-neutral-300 hover:text-white transition-colors">Blog</Link></li>
+              <li><Link to="/contact" className="text-neutral-300 hover:text-white transition-colors">Contact</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="font-semibold mb-4 text-neon-purple">Resources</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Guides</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Support</a></li>
+              <li><Link to="/guides" className="text-neutral-300 hover:text-white transition-colors">Guides</Link></li>
+              <li><Link to="/documentation" className="text-neutral-300 hover:text-white transition-colors">Documentation</Link></li>
+              <li><Link to="/support" className="text-neutral-300 hover:text-white transition-colors">Support</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="font-semibold mb-4 text-neon-purple">Legal</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Privacy</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Terms</a></li>
-              <li><a href="#" className="text-neutral-300 hover:text-white transition-colors">Cookies</a></li>
+              <li><Link to="/privacy" className="text-neutral-300 hover:text-white transition-colors">Privacy</Link></li>
+              <li><Link to="/terms" className="text-neutral-300 hover:text-white transition-colors">Terms</Link></li>
+              <li><Link to="/cookies" className="text-neutral-300 hover:text-white transition-colors">Cookies</Link></li>
             </ul>
           </div>
         </div>

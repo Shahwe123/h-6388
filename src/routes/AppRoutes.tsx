@@ -16,6 +16,18 @@ import Friends from "@/pages/Friends";
 import Leaderboard from "@/pages/Leaderboard";
 import AuthRequired from "@/components/AuthRequired";
 
+// Footer pages
+import About from "@/pages/About";
+import Blog from "@/pages/Blog";
+import Contact from "@/pages/Contact";
+import Pricing from "@/pages/Pricing";
+import Guides from "@/pages/Guides";
+import Documentation from "@/pages/Documentation";
+import Support from "@/pages/Support";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
+import Cookies from "@/pages/Cookies";
+
 /**
  * AuthRedirect component
  * 
@@ -97,12 +109,25 @@ const AppRoutes = () => {
       <Route path="/auth" element={<AuthRedirect />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
 
+      {/* Footer pages */}
+      <Route path="/about" element={<About />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/guides" element={<Guides />} />
+      <Route path="/documentation" element={<Documentation />} />
+      <Route path="/support" element={<Support />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/cookies" element={<Cookies />} />
+
       {/* Protected routes - require authentication */}
       <Route path="/profile" element={
         <AuthRequired>
           <Profile />
         </AuthRequired>
       } />
+      <Route path="/profile/:username" element={<Profile />} />
       <Route path="/friends" element={
         <AuthRequired>
           <Friends />

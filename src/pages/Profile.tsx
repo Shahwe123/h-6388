@@ -32,47 +32,24 @@ const Profile = () => {
   
   const { 
     profile, 
-    loading, 
+    loading: profileLoading, 
     friendCount,
     isOwnProfile,
     fetchProfileData
   } = useProfileData(username || null);
 
   useEffect(() => {
-    const checkProfileExists = async () => {
-      if (!username) return;
-      
-      setIsLoading(true);
-      
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('username', username)
-          .single();
-          
-        if (error || !data) {
-          setProfileExists(false);
-        } else {
-          setProfileExists(true);
-          fetchProfileData();
-        }
-      } catch (error) {
-        console.error('Error checking profile:', error);
-        setProfileExists(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkProfileExists();
-  }, [username, fetchProfileData]);
+    // Profile existence check is now handled by useProfileData hook
+    // Just manage the main loading state here
+    setIsLoading(profileLoading);
+  }, [profileLoading]);
 
-  if (isLoading || loading) {
+  // If loading or profile doesn't exist, show appropriate UI
+  if (isLoading) {
     return <ProfileLoading />;
   }
   
-  if (!profileExists || !profile) {
+  if (!profile) {
     return <ProfileNotFound username={username || 'Unknown'} />;
   }
 
@@ -148,7 +125,7 @@ const Profile = () => {
       
       {showSocialShare && (
         <SocialShare 
-          username={username || ''} 
+          username={username || profile.username || ''} 
           onClose={() => setShowSocialShare(false)} 
         />
       )}
