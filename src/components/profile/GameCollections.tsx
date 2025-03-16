@@ -1,9 +1,8 @@
-
 import { Link as RouterLink } from 'react-router-dom';
 import { Gamepad, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SteamGamesCollection from '@/components/profile/SteamGamesCollection';
-import { Profile } from '@/pages/Profile';
+import { Profile } from '@/types/profile';
 
 interface GameCollectionsProps {
   profile: Profile;
