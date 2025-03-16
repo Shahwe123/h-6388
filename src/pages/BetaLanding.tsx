@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole, Gamepad, BarChart, Flame, MessageCircle } from "lucide-react";
@@ -586,7 +585,10 @@ const BetaLanding = () => {
             </div>
             
             {isNewsletterOpen && (
-              <NewsletterForm onClose={() => setIsNewsletterOpen(false)} />
+              <NewsletterForm 
+                isOpen={isNewsletterOpen} 
+                onClose={() => setIsNewsletterOpen(false)} 
+              />
             )}
           </div>
         </section>
