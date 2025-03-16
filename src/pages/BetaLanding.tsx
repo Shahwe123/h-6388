@@ -94,8 +94,8 @@ const BetaLanding = () => {
             </div>
             
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
-              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse-slow shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide max-w-[90%] md:max-w-none">
-                <span className="text-center break-words">🔥 Claim Your Beta Spot – Only 500 Spots Available!</span>
+              <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse-slow shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide w-full max-w-full">
+                <span className="text-center px-2">🔥 Claim Your Beta Spot – Only 500 Spots Available!</span>
                 <ArrowRight className="w-5 h-5 ml-2 flex-shrink-0" />
               </Button>
             </div>
@@ -626,14 +626,14 @@ const BetaLanding = () => {
             
             <div className="mb-8">
               <div className="px-4 py-2 rounded-lg bg-neon-pink/10 inline-block mb-4">
-                <p className="text-neon-pink font-bold">🔥 First 50 Signups Get an Exclusive Profile Badge 
+                <p className="text-neon-pink font-bold">🔥 First 50 Signups Get an Exclusive Profile Badge 
 and Free Premium for 2 months! 🔥</p>
               </div>
             </div>
             
-            <div className="relative inline-block w-full max-w-xs mx-auto md:max-w-none md:w-auto">
-              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full md:w-auto text-lg px-8 py-4">
-                <span className="text-center break-words">Join the Beta – Limited Spots!</span>
+            <div className="relative w-full max-w-md mx-auto">
+              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full text-lg px-6 py-4">
+                <span className="truncate">Join the Beta – Limited Spots!</span>
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </button>
             </div>
@@ -662,9 +662,9 @@ and Free Premium for 2 months! 🔥</p>
             </div>
             
             <div className="flex justify-center mb-12">
-              <div className="w-full max-w-xs md:max-w-none">
-                <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full md:w-auto">
-                  <span className="text-center break-words">🔥 Join the Waitlist – Limited Early Access!</span>
+              <div className="w-full max-w-md">
+                <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full">
+                  <span className="px-2">🔥 Join the Waitlist – Limited Early Access!</span>
                   <ArrowRight className="w-4 h-4 flex-shrink-0" />
                 </button>
               </div>

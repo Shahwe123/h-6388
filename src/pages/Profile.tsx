@@ -1,106 +1,109 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useSearchParams } from 'react-router-dom';
+import ProfileLoading from '@/components/profile/ProfileLoading';
+import ProfileNotFound from '@/components/profile/ProfileNotFound';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileStats from '@/components/profile/ProfileStats';
+import LevelProgress from '@/components/profile/LevelProgress';
 import TrophyCase from '@/components/profile/TrophyCase';
 import AchievementHighlights from '@/components/profile/AchievementHighlights';
-import GamingStats from '@/components/profile/GamingStats';
-import LinkedAccounts from '@/components/profile/LinkedAccounts';
-import FriendsComparison from '@/components/profile/FriendsComparison';
 import GameCollections from '@/components/profile/GameCollections';
-import { mockTrophies, playerStats } from '@/data/profileData';
+import FriendsComparison from '@/components/profile/FriendsComparison';
+import { useSelector } from 'react-redux';
+import SocialShare from '@/components/profile/SocialShare';
 import { useProfileData } from '@/hooks/useProfileData';
 
 /**
- * Profile interface
+ * Profile page component
  * 
- * Defines the structure for a user profile with all relevant fields.
- */
-export interface Profile {
-  id: string;
-  username: string;
-  email: string;
-  avatar_url: string | null;
-  cover_url: string | null;
-  bio: string | null;
-  steam_id: string | null;
-  xbox_gamertag: string | null;
-  playstation_username: string | null;
-  is_private: boolean | null;
-}
-
-/**
- * Profile Page Component
- * 
- * Displays the user's profile with gaming statistics, achievements, connected
- * accounts, and other gaming-related information.
- * 
- * @returns {JSX.Element} The Profile page UI
+ * This component displays a user's gaming profile including achievements,
+ * trophies, game collection, and social features
  */
 const Profile = () => {
-  const [searchParams] = useSearchParams();
-  const profileId = searchParams.get('id');
+  const { username } = useParams();
+  const navigate = useNavigate();
+  const [profileExists, setProfileExists] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showSocialShare, setShowSocialShare] = useState(false);
+  const currentUser = useSelector((state) => state.user?.userData);
+  
   const { 
-    profile, 
-    loading, 
-    friendCount, 
-    currentUserId, 
-    isFriend,
-    fetchFriendCount
-  } = useProfileData(profileId);
+    profileData, 
+    fetchProfileData, 
+    isOwnProfile,
+    profileUser
+  } = useProfileData(username);
 
-  if (loading) {
+  useEffect(() => {
+    const checkProfileExists = async () => {
+      if (!username) return;
+      
+      setIsLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('username', username)
+          .single();
+          
+        if (error || !data) {
+          setProfileExists(false);
+        } else {
+          setProfileExists(true);
+          fetchProfileData();
+        }
+      } catch (error) {
+        console.error('Error checking profile:', error);
+        setProfileExists(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkProfileExists();
+  }, [username, fetchProfileData]);
+
+  if (isLoading) {
     return <ProfileLoading />;
   }
-
-  if (!profile) {
-    return <ProfileNotFound />;
+  
+  if (!profileExists) {
+    return <ProfileNotFound username={username} />;
   }
 
-  const hasLinkedAccounts = profile.steam_id || profile.xbox_gamertag || profile.playstation_username;
-  const isOwnProfile = currentUserId === profile.id;
-  const completionPercentage = Math.round((playerStats.gamesCompleted / playerStats.totalGames) * 100);
-
   return (
-    <div className="min-h-screen pt-20 pb-12 bg-primary">
-      <div className="container-padding mx-auto max-w-6xl">
+    <div className="min-h-screen bg-primary pb-16">
+      <div className="max-w-7xl mx-auto container-padding">
         <ProfileHeader 
-          profile={profile} 
-          playerStats={playerStats} 
-        />
-
-        <ProfileStats 
-          trophiesCount={playerStats.trophiesCount}
-          platinumCount={playerStats.platinumCount}
-          completionPercentage={completionPercentage}
-          friendCount={friendCount}
+          profile={profileData}
+          isOwnProfile={isOwnProfile === true}
+          onShareClick={() => setShowSocialShare(true)}
         />
         
-        <TrophyCase trophies={mockTrophies} />
-        
-        <AchievementHighlights />
-        
-        <GamingStats />
-        
-        <LinkedAccounts 
-          profile={profile}
-          isOwnProfile={isOwnProfile}
-          hasLinkedAccounts={hasLinkedAccounts}
-        />
-        
-        {isOwnProfile && (
-          <FriendsComparison friendCount={friendCount} />
-        )}
-        
-        <GameCollections 
-          profile={profile}
-          hasLinkedAccounts={hasLinkedAccounts}
-          isOwnProfile={isOwnProfile}
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+          <div className="lg:col-span-1 space-y-6">
+            <ProfileStats profile={profileData} />
+            <LevelProgress profile={profileData} />
+            <FriendsComparison profile={profileData} isOwnProfile={isOwnProfile === true} />
+          </div>
+          
+          <div className="lg:col-span-2 space-y-8">
+            <TrophyCase trophies={profileData?.recentTrophies || []} />
+            <AchievementHighlights achievements={profileData?.achievements || []} />
+            <GameCollections games={profileData?.games || []} />
+          </div>
+        </div>
       </div>
+      
+      {showSocialShare && (
+        <SocialShare 
+          username={username || ''} 
+          onClose={() => setShowSocialShare(false)} 
+        />
+      )}
     </div>
   );
 };
