@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlayStationIcon, XboxIcon, SteamIcon } from "../components/platforms/PlatformIcons";
 
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
@@ -575,13 +576,13 @@ const BetaLanding = () => {
             
             <div className="flex justify-center gap-8 mb-8">
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <p className="text-xs text-neutral-400">PlayStation Logo</p>
+                <PlayStationIcon className="w-12 h-12 text-neon-blue" />
               </div>
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <p className="text-xs text-neutral-400">Xbox Logo</p>
+                <XboxIcon className="w-12 h-12 text-neon-green" />
               </div>
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <p className="text-xs text-neutral-400">Steam Logo</p>
+                <SteamIcon className="w-12 h-12 text-white" />
               </div>
             </div>
             
