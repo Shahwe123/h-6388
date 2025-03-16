@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, UserCircle, ImageIcon, Lock, Unlock } from 'lucide-react';
-import { ImagePopup } from '@/components/ui/image-popup';
 
 interface Profile {
   id: string;
@@ -33,9 +32,6 @@ const Settings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
-  
-  const [showAvatarPopup, setShowAvatarPopup] = useState(false);
-  const [showCoverPopup, setShowCoverPopup] = useState(false);
   
   const { toast } = useToast();
 
@@ -305,10 +301,7 @@ const Settings = () => {
           
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex flex-col items-center">
-              <div 
-                className="w-32 h-32 bg-black/50 rounded-full border-2 border-neon-purple flex items-center justify-center overflow-hidden mb-4 cursor-pointer"
-                onClick={() => avatarUrl && setShowAvatarPopup(true)}
-              >
+              <div className="w-32 h-32 bg-black/50 rounded-full border-2 border-neon-purple flex items-center justify-center overflow-hidden mb-4">
                 {avatarUrl ? (
                   <img 
                     src={avatarUrl} 
@@ -331,10 +324,7 @@ const Settings = () => {
                 {uploadingAvatar ? 'Uploading...' : 'Change Avatar'}
               </label>
               
-              <div 
-                className="w-full bg-black/50 rounded-md border border-neon-purple/30 p-2 mb-2 cursor-pointer"
-                onClick={() => coverUrl && setShowCoverPopup(true)}
-              >
+              <div className="w-full bg-black/50 rounded-md border border-neon-purple/30 p-2 mb-2">
                 <div className="h-24 rounded flex items-center justify-center overflow-hidden">
                   {coverUrl ? (
                     <img 
@@ -506,24 +496,6 @@ const Settings = () => {
           </div>
         </div>
       </div>
-      
-      {avatarUrl && (
-        <ImagePopup
-          isOpen={showAvatarPopup}
-          onClose={() => setShowAvatarPopup(false)}
-          imageUrl={avatarUrl}
-          altText={`${profile?.username}'s avatar`}
-        />
-      )}
-      
-      {coverUrl && (
-        <ImagePopup
-          isOpen={showCoverPopup}
-          onClose={() => setShowCoverPopup(false)}
-          imageUrl={coverUrl}
-          altText="Cover image"
-        />
-      )}
     </div>
   );
 };
