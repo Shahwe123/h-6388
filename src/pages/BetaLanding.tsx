@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayStationIcon, XboxIcon, SteamIcon } from "../components/platforms/PlatformIcons";
 import TrophyUnlockAnimation from "../components/animations/TrophyUnlockAnimation";
+import DashboardMockup from "@/components/dashboard/DashboardMockup";
 
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
@@ -102,11 +103,8 @@ const BetaLanding = () => {
             </div>
             
             <div className="mt-8 relative">
-              <div className="w-full h-64 md:h-80 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30 overflow-hidden">
-                <div className="text-center">
-                  <Trophy className="w-16 h-16 text-neon-pink mb-4 mx-auto" />
-                  <p className="text-neutral-300">Dashboard Mockup Placeholder</p>
-                </div>
+              <div className="w-full h-64 md:h-96 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30 overflow-hidden">
+                <DashboardMockup />
               </div>
               <div className="absolute -bottom-3 left-0 right-0 h-12 bg-gradient-to-t from-primary to-transparent"></div>
             </div>
