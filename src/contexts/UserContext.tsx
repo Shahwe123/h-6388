@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface UserType {
   id: string;
-  name: string;
+  name: string;  // We'll still keep this field in our interface
   email: string;
   avatar: string;
   is_private: boolean;
@@ -35,7 +35,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data) {
           setUser({
             id: data.id,
-            name: data.name || '',
+            name: data.username || '', // Use username property instead of name
             email: data.email || sessionData.session.user.email || '',
             avatar: data.avatar_url || '',
             is_private: data.is_private || false,
