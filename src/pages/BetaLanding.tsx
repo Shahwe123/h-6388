@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole, Gamepad, BarChart, Flame, MessageCircle } from "lucide-react";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
@@ -579,109 +578,4 @@ const BetaLanding = () => {
                 <PlayStationIcon className="w-12 h-12 text-neon-blue" />
               </div>
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <XboxIcon className="w-12 h-12 text-neon-green" />
-              </div>
-              <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <SteamIcon className="w-12 h-12 text-white" />
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
-                Join Other Gamers – Get Beta Access!
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section id="urgency" className="py-16 container-padding bg-gradient-to-b from-primary via-primary to-dark-blue">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-              <span className="text-neon-pink">Limited Beta Spots – Join Now Before It's Too Late!</span>
-            </h2>
-            <p className="text-xl text-neutral-300 mb-8">Only 500 Beta Spots – Once They're Gone, They're Gone!</p>
-            
-            <div className="glass-card p-8 rounded-xl mb-12">
-              <h3 className="font-bold text-xl mb-6">Beta Signup Closes In:</h3>
-              <div className="flex justify-center gap-4">
-                <div className="bg-black p-4 rounded-lg w-20">
-                  <div className="text-3xl font-bold text-neon-purple">{timeLeft.days}</div>
-                  <div className="text-xs text-neutral-400">DAYS</div>
-                </div>
-                <div className="bg-black p-4 rounded-lg w-20">
-                  <div className="text-3xl font-bold text-neon-purple">{timeLeft.hours}</div>
-                  <div className="text-xs text-neutral-400">HOURS</div>
-                </div>
-                <div className="bg-black p-4 rounded-lg w-20">
-                  <div className="text-3xl font-bold text-neon-purple">{timeLeft.minutes}</div>
-                  <div className="text-xs text-neutral-400">MINUTES</div>
-                </div>
-                <div className="bg-black p-4 rounded-lg w-20">
-                  <div className="text-3xl font-bold text-neon-purple">{timeLeft.seconds}</div>
-                  <div className="text-xs text-neutral-400">SECONDS</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mb-8">
-              <div className="px-4 py-2 rounded-lg bg-neon-pink/10 inline-block mb-4">
-                <p className="text-neon-pink font-bold">🔥 First 50 Signups Get an Exclusive Profile Badge 
-and Free Premium for 2 months! 🔥</p>
-              </div>
-            </div>
-            
-            <div className="relative w-full max-w-md mx-auto">
-              <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full text-lg px-6 py-4">
-                <span className="truncate">Join the Beta – Limited Spots!</span>
-                <ArrowRight className="w-5 h-5 flex-shrink-0" />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 container-padding bg-gradient-to-b from-dark-blue via-black to-black">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-white">
-              Join the <span className="text-neon-purple">PlatinumPath Beta</span> Today!
-            </h2>
-            
-            <div className="flex flex-wrap justify-center gap-4 md:space-x-8 mb-8 text-sm">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-neon-pink" />
-                <span className="text-neutral-300">Exclusive Early Access</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-neon-blue" />
-                <span className="text-neutral-300">Founder Badge</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-neon-green" />
-                <span className="text-neutral-300">VIP Beta Perks</span>
-              </div>
-            </div>
-            
-            <div className="flex justify-center mb-12">
-              <div className="w-full max-w-md">
-                <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 w-full">
-                  <span className="px-2">🔥 Join the Waitlist – Limited Early Access!</span>
-                  <ArrowRight className="w-4 h-4 flex-shrink-0" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap justify-center gap-4 md:space-x-6 mb-8">
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">Twitter</a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">Discord</a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">Reddit</a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">YouTube</a>
-            </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-      
-      {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
-    </div>;
-};
-export default BetaLanding;
+                <XboxIcon className="w-12 h-12 text-
