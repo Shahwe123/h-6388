@@ -45,7 +45,6 @@ const Navbar = () => {
                 onClick={handleNotificationClick}
                 onClose={() => setIsNotificationsOpen(false)}
                 notifications={notifications}
-                setNotifications={setNotifications}
                 userId={session.user.id}
               />
 
@@ -73,7 +72,6 @@ const Navbar = () => {
         onClose={() => setIsMobileMenuOpen(false)}
         onSignOut={handleSignOut}
         notifications={notifications}
-        setNotifications={setNotifications}
         hasUnreadNotifications={hasUnreadNotifications}
         onNotificationsRead={markNotificationsAsRead}
       />

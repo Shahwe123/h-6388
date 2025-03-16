@@ -10,7 +10,6 @@ import NotificationsDropdown from './NotificationsDropdown';
  * @property {Function} onClick - Click handler for the notification button
  * @property {Function} onClose - Handler for closing the notifications dropdown
  * @property {Array} notifications - Array of notification objects
- * @property {Function} setNotifications - State setter for notifications
  * @property {string} userId - Current user ID
  */
 type NotificationButtonProps = {
@@ -19,7 +18,6 @@ type NotificationButtonProps = {
   onClick: () => void;
   onClose: () => void;
   notifications: any[];
-  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
   userId?: string;
 };
 
@@ -39,7 +37,6 @@ const NotificationButton = ({
   onClick,
   onClose,
   notifications,
-  setNotifications,
   userId
 }: NotificationButtonProps) => {
   // Ref for detecting clicks outside the dropdown
@@ -77,7 +74,6 @@ const NotificationButton = ({
         <div className="absolute right-0 mt-2 w-80 z-10">
           <NotificationsDropdown 
             notifications={notifications}
-            setNotifications={setNotifications}
             onClose={onClose}
             userId={userId}
           />

@@ -11,7 +11,6 @@ type MobileMenuProps = {
   onClose: () => void;
   onSignOut: () => void;
   notifications: any[];
-  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
   hasUnreadNotifications: boolean;
   onNotificationsRead: () => void;
 };
@@ -22,7 +21,6 @@ const MobileMenu = ({
   onClose, 
   onSignOut,
   notifications,
-  setNotifications,
   hasUnreadNotifications,
   onNotificationsRead
 }: MobileMenuProps) => {
@@ -43,7 +41,6 @@ const MobileMenu = ({
       <div className="fixed inset-0 z-50 bg-black/80 flex flex-col">
         <NotificationsDropdown 
           notifications={notifications}
-          setNotifications={setNotifications}
           onClose={() => setMobileNotificationsOpen(false)}
           userId={session?.user?.id}
           isMobile={true}

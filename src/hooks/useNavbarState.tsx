@@ -7,8 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   setNotifications,
   addNotification,
-  fetchNotificationsStart,
-  fetchNotificationsFailure,
   fetchNotificationsData
 } from '@/redux/slices/notificationsSlice';
 import { logout } from '../redux/slices/userSlice.js';
