@@ -1,6 +1,10 @@
 
 import { Star } from "lucide-react";
 
+/**
+ * Testimonials data array
+ * Each object represents a user testimonial with name, title, quote, and avatar
+ */
 const testimonials = [
   {
     name: "Alex Thompson",
@@ -22,17 +26,28 @@ const testimonials = [
   }
 ];
 
+/**
+ * Testimonials component
+ * 
+ * Displays user testimonials in a grid layout.
+ * Each testimonial includes a user avatar, name, title, rating, and quote.
+ * 
+ * @returns {JSX.Element} The testimonials section UI
+ */
 const Testimonials = () => {
   return (
     <section id="testimonials" className="py-16 container-padding bg-gradient-to-b from-black to-primary">
       <div className="max-w-4xl mx-auto">
+        {/* Section heading */}
         <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center neon-text">
           What Trophy Hunters Are Saying
         </h2>
         
+        {/* Testimonials grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
             <div key={index} className="glass-card p-6 rounded-xl">
+              {/* User info */}
               <div className="flex items-center mb-4">
                 <img 
                   src={testimonial.avatar} 
@@ -45,12 +60,14 @@ const Testimonials = () => {
                 </div>
               </div>
               
+              {/* 5-star rating */}
               <div className="flex mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 fill-neon-purple text-neon-purple" />
                 ))}
               </div>
               
+              {/* Testimonial quote */}
               <p className="text-neutral-300 italic">"{testimonial.quote}"</p>
             </div>
           ))}

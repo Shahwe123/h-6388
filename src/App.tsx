@@ -24,15 +24,26 @@ import AuthRequired from "./components/AuthRequired";
 
 import './App.css';
 import './index.css';
+
+// Initialize React Query client
 const queryClient = new QueryClient();
 
-// Component to handle redirecting authenticated users away from the auth page
+/**
+ * AuthRedirect component
+ * 
+ * This component handles redirecting authenticated users away from the auth page.
+ * If a user is already logged in (has an active session), they will be redirected to the profile page.
+ * Otherwise, the Auth component will be rendered.
+ * 
+ * @returns {JSX.Element} Auth component or redirect
+ */
 const AuthRedirect = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // Get current session on component mount
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
@@ -47,6 +58,7 @@ const AuthRedirect = () => {
 
     getSession();
 
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
@@ -57,9 +69,11 @@ const AuthRedirect = () => {
       }
     );
 
+    // Clean up subscription when component unmounts
     return () => subscription.unsubscribe();
   }, [dispatch]);
 
+  // Show loading state while checking session
   if (loading) {
     return (
       <div className="min-h-screen bg-primary flex items-center justify-center">
@@ -79,11 +93,19 @@ const AuthRedirect = () => {
   return <Auth />;
 };
 
-// App level data initializer
+/**
+ * AppDataInitializer component
+ * 
+ * This component initializes app-wide data when the user is logged in.
+ * It listens for auth state changes and triggers data loading when a user logs in.
+ * 
+ * @returns {null} This component doesn't render anything
+ */
 const AppDataInitializer = () => {
   const [userId, setUserId] = useState<string | null>(null);
   
   useEffect(() => {
+    // Get current user ID on component mount
     const getUserId = async () => {
       const { data } = await supabase.auth.getUser();
       if (data?.user) {
@@ -93,12 +115,14 @@ const AppDataInitializer = () => {
     
     getUserId();
     
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUserId(session?.user?.id || null);
       }
     );
     
+    // Clean up subscription when component unmounts
     return () => subscription.unsubscribe();
   }, []);
   
@@ -108,13 +132,28 @@ const AppDataInitializer = () => {
   return null;
 };
 
-// Wrapper to conditionally render the Navbar
+/**
+ * NavbarWrapper component
+ * 
+ * This component conditionally renders the Navbar based on the current route.
+ * The Navbar is not shown on the home page (/) as it has its own Header.
+ * 
+ * @returns {JSX.Element|null} Navbar component or null
+ */
 const NavbarWrapper = () => {
   const location = useLocation();
   // Don't show navbar on home page as it has its own Header
   return location.pathname !== '/' ? <Navbar /> : null;
 };
 
+/**
+ * Main App component
+ * 
+ * This is the root component of the application.
+ * It sets up providers, routing, and global components.
+ * 
+ * @returns {JSX.Element} The application UI
+ */
 const App = () => {
   // Create avatars bucket when the app starts
   useEffect(() => {
@@ -138,12 +177,13 @@ const App = () => {
           <AppDataInitializer />
           <NavbarWrapper />
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/beta" element={<BetaLanding />} />
             <Route path="/auth" element={<AuthRedirect />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
 
-            {/* Protected routes */}
+            {/* Protected routes - require authentication */}
             <Route path="/profile" element={
               <AuthRequired>
                 <Profile />

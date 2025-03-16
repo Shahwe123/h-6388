@@ -1,9 +1,20 @@
+
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * InputOTP UI component
+ * 
+ * A specialized input for one-time passwords (OTP) or verification codes.
+ * Provides individual boxes for each digit.
+ * 
+ * @param {React.ComponentPropsWithoutRef<typeof OTPInput>} props - Component props
+ * @param {React.Ref<React.ElementRef<typeof OTPInput>>} ref - Forwarded ref
+ * @returns {JSX.Element} The OTP input
+ */
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
   React.ComponentPropsWithoutRef<typeof OTPInput>
@@ -20,6 +31,15 @@ const InputOTP = React.forwardRef<
 ))
 InputOTP.displayName = "InputOTP"
 
+/**
+ * InputOTPGroup UI component
+ * 
+ * A group container for OTP input slots.
+ * 
+ * @param {React.ComponentPropsWithoutRef<"div">} props - Component props
+ * @param {React.Ref<HTMLDivElement>} ref - Forwarded ref
+ * @returns {JSX.Element} The OTP input group
+ */
 const InputOTPGroup = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div">
@@ -28,6 +48,15 @@ const InputOTPGroup = React.forwardRef<
 ))
 InputOTPGroup.displayName = "InputOTPGroup"
 
+/**
+ * InputOTPSlot UI component
+ * 
+ * An individual input slot for a single OTP digit.
+ * 
+ * @param {React.ComponentPropsWithoutRef<"div"> & { index: number }} props - Component props with index
+ * @param {React.Ref<HTMLDivElement>} ref - Forwarded ref
+ * @returns {JSX.Element} The OTP input slot
+ */
 const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div"> & { index: number }
@@ -56,6 +85,15 @@ const InputOTPSlot = React.forwardRef<
 })
 InputOTPSlot.displayName = "InputOTPSlot"
 
+/**
+ * InputOTPSeparator UI component
+ * 
+ * A visual separator between OTP input groups.
+ * 
+ * @param {React.ComponentPropsWithoutRef<"div">} props - Component props
+ * @param {React.Ref<HTMLDivElement>} ref - Forwarded ref
+ * @returns {JSX.Element} The OTP separator
+ */
 const InputOTPSeparator = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div">

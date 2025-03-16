@@ -1,6 +1,13 @@
 
-// Mock data for profile components
+/**
+ * Mock data for profile components
+ * Used for development and preview purposes
+ */
 
+/**
+ * Sample trophy data
+ * Represents achievements a user has earned across different games
+ */
 export const mockTrophies = [
   { id: '1', name: 'Platinum Master', type: 'platinum' as const, game: 'God of War', rarity: '0.1%', image: '/trophy1.png' },
   { id: '2', name: 'Gold Champion', type: 'gold' as const, game: 'Elden Ring', rarity: '1.2%' },
@@ -12,6 +19,10 @@ export const mockTrophies = [
   { id: '8', name: 'First Blood', type: 'bronze' as const, game: 'Fortnite', rarity: '45.2%' },
 ];
 
+/**
+ * Sample friend data for comparison features
+ * Shows how a user's achievements compare to their friends
+ */
 export const mockFriendsForComparison = [
   {
     id: 'friend-1',
@@ -39,6 +50,10 @@ export const mockFriendsForComparison = [
   }
 ];
 
+/**
+ * Sample player statistics
+ * Represents a user's gaming achievements and progress
+ */
 export const playerStats = {
   level: 42,
   xp: 4200,

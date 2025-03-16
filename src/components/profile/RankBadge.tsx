@@ -3,12 +3,27 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Medal, Zap } from 'lucide-react';
 
+/**
+ * Props for the RankBadge component
+ * @property {string} rank - The rank name to display
+ * @property {string} percentile - Optional percentile information
+ */
 type RankBadgeProps = {
   rank: 'Legendary Collector' | 'Platinum God' | 'Trophy Hunter' | 'Speedrunner Supreme' | string;
   percentile?: string;
 };
 
+/**
+ * RankBadge component
+ * 
+ * Displays a user's rank as a styled badge with an appropriate icon.
+ * Different ranks get different colors and icons.
+ * 
+ * @param {RankBadgeProps} props - Component props
+ * @returns {JSX.Element} The rank badge UI
+ */
 export const RankBadge: React.FC<RankBadgeProps> = ({ rank, percentile }) => {
+  // Determine which icon to use based on rank name
   let Icon = Crown;
   let badgeColor = 'from-neon-purple to-neon-blue';
   

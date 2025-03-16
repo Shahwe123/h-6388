@@ -2,16 +2,33 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 
+/**
+ * Props for the NavLinks component
+ * @property {Session|null} session - The current user session
+ * @property {boolean} isMobile - Whether being rendered in mobile view
+ * @property {Function} onClick - Optional click handler for mobile navigation
+ */
 type NavLinksProps = {
   session: Session | null;
   isMobile?: boolean;
   onClick?: () => void;
 };
 
+/**
+ * NavLinks component
+ * 
+ * Renders navigation links based on authentication state.
+ * Shows different links for authenticated and unauthenticated users.
+ * Handles both desktop and mobile navigation styles.
+ * 
+ * @param {NavLinksProps} props - Component props
+ * @returns {JSX.Element} Navigation links UI
+ */
 const NavLinks = ({ session, isMobile = false, onClick }: NavLinksProps) => {
   const location = useLocation();
   const { pathname } = location;
 
+  // Different navigation links for authenticated vs unauthenticated users
   const navLinks = session ? [
     { path: '/profile', label: 'Profile' },
     { path: '/friends', label: 'Friends' },

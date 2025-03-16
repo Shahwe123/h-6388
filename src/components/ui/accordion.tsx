@@ -1,11 +1,27 @@
+
 import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Accordion UI component
+ * 
+ * A vertically stacked set of interactive headings that reveal/hide sections of content.
+ * Based on Radix UI's Accordion primitive.
+ */
 const Accordion = AccordionPrimitive.Root
 
+/**
+ * AccordionItem UI component
+ * 
+ * An individual item within an accordion.
+ * 
+ * @param {React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>} props - Component props
+ * @param {React.Ref<React.ElementRef<typeof AccordionPrimitive.Item>>} ref - Forwarded ref
+ * @returns {JSX.Element} The accordion item
+ */
 const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
@@ -18,6 +34,15 @@ const AccordionItem = React.forwardRef<
 ))
 AccordionItem.displayName = "AccordionItem"
 
+/**
+ * AccordionTrigger UI component
+ * 
+ * The clickable header of an accordion item that toggles the visibility of its content.
+ * 
+ * @param {React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>} props - Component props
+ * @param {React.Ref<React.ElementRef<typeof AccordionPrimitive.Trigger>>} ref - Forwarded ref
+ * @returns {JSX.Element} The accordion trigger
+ */
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
@@ -38,6 +63,15 @@ const AccordionTrigger = React.forwardRef<
 ))
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
+/**
+ * AccordionContent UI component
+ * 
+ * The content section of an accordion item that is shown/hidden when the trigger is clicked.
+ * 
+ * @param {React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>} props - Component props
+ * @param {React.Ref<React.ElementRef<typeof AccordionPrimitive.Content>>} ref - Forwarded ref
+ * @returns {JSX.Element} The accordion content
+ */
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>

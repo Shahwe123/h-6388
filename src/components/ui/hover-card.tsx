@@ -1,12 +1,33 @@
+
 import * as React from "react"
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * HoverCard UI component
+ * 
+ * A popup card that appears when hovering over a trigger element.
+ * Based on Radix UI's HoverCard primitive.
+ */
 const HoverCard = HoverCardPrimitive.Root
 
+/**
+ * HoverCardTrigger UI component
+ * 
+ * The element that triggers the hover card to appear when hovered.
+ */
 const HoverCardTrigger = HoverCardPrimitive.Trigger
 
+/**
+ * HoverCardContent UI component
+ * 
+ * The content that appears when hovering over the trigger element.
+ * 
+ * @param {React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>} props - Component props
+ * @param {React.Ref<React.ElementRef<typeof HoverCardPrimitive.Content>>} ref - Forwarded ref
+ * @returns {JSX.Element} The hover card content
+ */
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>

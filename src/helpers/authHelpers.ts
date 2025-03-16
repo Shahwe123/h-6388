@@ -3,7 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Get the current user session from Supabase
- * @returns The current session or null if not authenticated
+ * 
+ * This helper function fetches the current authentication session
+ * from Supabase. It returns the session if the user is authenticated,
+ * or null if not logged in.
+ * 
+ * @returns {Promise<Session|null>} The current session or null if not authenticated
  */
 export const getCurrentSession = async () => {
   const { data: { session } } = await supabase.auth.getSession();
@@ -12,8 +17,12 @@ export const getCurrentSession = async () => {
 
 /**
  * Fetch user profile by user ID
- * @param userId The user ID to fetch the profile for
- * @returns The user profile data or null if not found
+ * 
+ * This helper function retrieves a user's profile data from the
+ * 'profiles' table in the database using their user ID.
+ * 
+ * @param {string} userId The user ID to fetch the profile for
+ * @returns {Promise<Object|null>} The user profile data or null if not found
  */
 export const fetchUserProfile = async (userId: string) => {
   try {
