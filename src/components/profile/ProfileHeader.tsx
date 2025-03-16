@@ -1,7 +1,7 @@
 
 import { UserCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Profile } from '@/types/profile';
+import { Profile } from '@/pages/Profile';
 import RankBadge from '@/components/profile/RankBadge';
 import LevelProgress from '@/components/profile/LevelProgress';
 import SocialShare from '@/components/profile/SocialShare';

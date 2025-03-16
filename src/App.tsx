@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,8 +10,6 @@ import { Session } from "@supabase/supabase-js";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "./redux/slices/userSlice";
 import { useInitializeData } from "./hooks/useInitializeData";
-import { AuthProvider } from "./contexts/AuthContext";
-import { UserProvider } from "./contexts/UserContext";
 import Index from "./pages/Index";
 import BetaLanding from "./pages/BetaLanding";
 import Auth from "./pages/Auth";
@@ -133,45 +132,41 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
-          <UserProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppDataInitializer />
-              <NavbarWrapper />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/beta" element={<BetaLanding />} />
-                <Route path="/auth" element={<AuthRedirect />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppDataInitializer />
+          <NavbarWrapper />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/beta" element={<BetaLanding />} />
+            <Route path="/auth" element={<AuthRedirect />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
 
-                {/* Protected routes */}
-                <Route path="/profile" element={
-                  <AuthRequired>
-                    <Profile />
-                  </AuthRequired>
-                } />
-                <Route path="/friends" element={
-                  <AuthRequired>
-                    <Friends />
-                  </AuthRequired>
-                } />
-                <Route path="/settings" element={
-                  <AuthRequired>
-                    <Settings />
-                  </AuthRequired>
-                } />
-                <Route path="/link-accounts" element={
-                  <AuthRequired>
-                    <LinkAccounts />
-                  </AuthRequired>
-                } />
-              </Routes>
-              <Footer />
-            </BrowserRouter>
-          </UserProvider>
-        </AuthProvider>
+            {/* Protected routes */}
+            <Route path="/profile" element={
+              <AuthRequired>
+                <Profile />
+              </AuthRequired>
+            } />
+            <Route path="/friends" element={
+              <AuthRequired>
+                <Friends />
+              </AuthRequired>
+            } />
+            <Route path="/settings" element={
+              <AuthRequired>
+                <Settings />
+              </AuthRequired>
+            } />
+            <Route path="/link-accounts" element={
+              <AuthRequired>
+                <LinkAccounts />
+              </AuthRequired>
+            } />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );

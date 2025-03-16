@@ -1,7 +1,8 @@
+
 import { Link as RouterLink } from 'react-router-dom';
 import { Link, Gamepad } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Profile } from '@/types/profile';
+import { Profile } from '@/pages/Profile';
 
 interface LinkedAccountsProps {
   profile: Profile;

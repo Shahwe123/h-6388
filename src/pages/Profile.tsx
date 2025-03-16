@@ -1,249 +1,220 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUser } from "@/contexts/UserContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
-import { Settings } from "lucide-react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useSearchParams } from 'react-router-dom';
+import ProfileHeader from '@/components/profile/ProfileHeader';
+import ProfileStats from '@/components/profile/ProfileStats';
+import TrophyCase from '@/components/profile/TrophyCase';
+import AchievementHighlights from '@/components/profile/AchievementHighlights';
+import GamingStats from '@/components/profile/GamingStats';
+import LinkedAccounts from '@/components/profile/LinkedAccounts';
+import FriendsComparison from '@/components/profile/FriendsComparison';
+import GameCollections from '@/components/profile/GameCollections';
+import { mockTrophies, playerStats } from '@/data/profileData';
+
+export interface Profile {
+  id: string;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  cover_url: string | null;
+  bio: string | null;
+  steam_id: string | null;
+  xbox_gamertag: string | null;
+  playstation_username: string | null;
+  is_private: boolean | null;
+}
 
 const Profile = () => {
-  const { logout } = useAuth();
-  const { user, setUser } = useUser();
-  const navigate = useNavigate();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [friendCount, setFriendCount] = useState(0);
+  const [searchParams] = useSearchParams();
+  const profileId = searchParams.get('id');
   const { toast } = useToast();
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [is_private, setIsPrivate] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const [newAvatar, setNewAvatar] = useState<File | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isFriend, setIsFriend] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setName(user.name);
-      setEmail(user.email);
-      setIsPrivate(user.is_private);
-      setAvatarUrl(user.avatar);
-    }
-  }, [user]);
-
-  const handleLogout = async () => {
-    setIsLoading(true);
-    try {
-      await logout();
-      navigate("/login");
-      toast({
-        title: "Logged out successfully.",
-      });
-    } catch (error) {
-      console.error("Logout failed:", error);
-      toast({
-        title: "Logout failed.",
-        description: "Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEditProfile = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    if (user) {
-      setName(user.name);
-      setEmail(user.email);
-      setIsPrivate(user.is_private);
-      setAvatarUrl(user.avatar);
-    }
-  };
-
-  const handleSaveProfile = async () => {
-    setIsLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
-
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("email", email);
-      formData.append("is_private", String(is_private));
-      if (newAvatar) {
-        formData.append("avatar", newAvatar);
-      } else {
-        formData.append("avatar", avatarUrl || "");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/update`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
+    const fetchUserSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setCurrentUserId(session.user.id);
+          return session.user.id;
         }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Failed to update profile, please try again."
-        );
+        return null;
+      } catch (error) {
+        console.error('Error fetching session:', error);
+        return null;
       }
+    };
 
-      const updatedUser = await response.json();
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        const userId = await fetchUserSession();
 
-      setUser({
-        ...user,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        avatar: updatedUser.avatar,
-        is_private: updatedUser.is_private,
-      });
+        const targetProfileId = profileId || userId;
 
-      toast({
-        title: "Profile updated successfully.",
-      });
-      setIsEditing(false);
-    } catch (error: any) {
-      console.error("Profile update failed:", error);
-      toast({
-        title: "Profile update failed.",
-        description: error.message || "Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        if (!targetProfileId) {
+          setLoading(false);
+          return;
+        }
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setNewAvatar(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarUrl(reader.result as string);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', targetProfileId)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        // Convert string 'true'/'false' to boolean if needed
+        if (data && data.is_private !== null) {
+          // Fix: Convert is_private to boolean if it's a string
+          if (typeof data.is_private === 'string') {
+            data.is_private = data.is_private === 'true';
+          }
+        }
+
+        setProfile(data as Profile);
+
+        const { count, error: friendError } = await supabase
+          .from('friends')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', targetProfileId);
+
+        if (friendError) {
+          throw friendError;
+        }
+
+        setFriendCount(count || 0);
+
+        if (userId && profileId && userId !== profileId) {
+          const { data: friendData, error: checkFriendError } = await supabase
+            .from('friends')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('friend_id', profileId);
+
+          if (checkFriendError) {
+            console.error('Error checking friend status:', checkFriendError);
+          } else {
+            setIsFriend(friendData && friendData.length > 0);
+          }
+        }
+      } catch (error: any) {
+        toast({
+          title: 'Error fetching profile',
+          description: error.message,
+          variant: 'destructive'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+
+    if (profileId) {
+      const friendsChannel = supabase
+        .channel(`profile-friends-${profileId}`)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'friends',
+          filter: `user_id=eq.${profileId}`
+        }, () => {
+          fetchFriendCount(profileId);
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(friendsChannel);
       };
-      reader.readAsDataURL(file);
+    }
+  }, [toast, profileId]);
+
+  const fetchFriendCount = async (userId: string) => {
+    try {
+      const { count, error } = await supabase
+        .from('friends')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setFriendCount(count || 0);
+    } catch (error) {
+      console.error('Error fetching friend count:', error);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-neon-purple border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-neutral-300">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-neutral-300 mb-4">Profile not found. Please try logging in again.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const hasLinkedAccounts = profile.steam_id || profile.xbox_gamertag || profile.playstation_username;
+  const isOwnProfile = currentUserId === profile.id;
+  const completionPercentage = Math.round((playerStats.gamesCompleted / playerStats.totalGames) * 100);
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="container py-12">
-        <Card className="max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle className="text-2xl">
-              Your Profile <Settings className="inline-block ml-2 h-5 w-5" />
-            </CardTitle>
-            <CardDescription>
-              Manage your account settings and privacy.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="flex items-center justify-center">
-              <Avatar className="h-24 w-24">
-                {avatarUrl ? (
-                  <AvatarImage src={avatarUrl} alt="Avatar" />
-                ) : (
-                  <AvatarFallback>{name?.charAt(0).toUpperCase()}</AvatarFallback>
-                )}
-              </Avatar>
-            </div>
-            {isEditing && (
-              <div>
-                <Label htmlFor="avatar">Change Avatar</Label>
-                <Input
-                  id="avatar"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="mt-2"
-                />
-              </div>
-            )}
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={!isEditing}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={!isEditing}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="is_private">Private Profile</Label>
-              <Switch
-                id="is_private"
-                checked={is_private}
-                onCheckedChange={(checked) => setIsPrivate(checked)}
-                disabled={!isEditing}
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            {!isEditing ? (
-              <>
-                <Button variant="outline" onClick={handleEditProfile}>
-                  Edit Profile
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleLogout}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Logging Out..." : "Logout"}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="secondary" onClick={handleCancelEdit}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSaveProfile} disabled={isLoading}>
-                  {isLoading ? "Saving..." : "Save"}
-                </Button>
-              </>
-            )}
-          </CardFooter>
-        </Card>
-      </main>
-      <Footer />
+    <div className="min-h-screen pt-20 pb-12 bg-primary">
+      <div className="container-padding mx-auto max-w-6xl">
+        <ProfileHeader 
+          profile={profile} 
+          playerStats={playerStats} 
+        />
+
+        <ProfileStats 
+          trophiesCount={playerStats.trophiesCount}
+          platinumCount={playerStats.platinumCount}
+          completionPercentage={completionPercentage}
+          friendCount={friendCount}
+        />
+        
+        <TrophyCase trophies={mockTrophies} />
+        
+        <AchievementHighlights />
+        
+        <GamingStats />
+        
+        <LinkedAccounts 
+          profile={profile}
+          isOwnProfile={isOwnProfile}
+          hasLinkedAccounts={hasLinkedAccounts}
+        />
+        
+        {isOwnProfile && (
+          <FriendsComparison friendCount={friendCount} />
+        )}
+        
+        <GameCollections 
+          profile={profile}
+          hasLinkedAccounts={hasLinkedAccounts}
+          isOwnProfile={isOwnProfile}
+        />
+      </div>
     </div>
   );
 };
