@@ -6,9 +6,10 @@ import { mockFriendsForComparison } from '@/data/profileData';
 
 interface FriendsComparisonProps {
   friendCount: number;
+  isOwnProfile: boolean;
 }
 
-const FriendsComparison = ({ friendCount }: FriendsComparisonProps) => {
+const FriendsComparison = ({ friendCount, isOwnProfile }: FriendsComparisonProps) => {
   return (
     <div className="glass-card rounded-xl p-6 mb-8">
       <div className="flex justify-between items-center mb-4">

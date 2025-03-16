@@ -1,21 +1,22 @@
-
 import React, { useState } from 'react';
 import { Share2, Twitter, MessageCircle, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
-type SocialShareProps = {
+export interface SocialShareProps {
   username: string;
+  onClose?: () => void;
   stats?: {
     trophies?: number;
     platinums?: number;
     rank?: string;
   };
-};
+}
 
 export const SocialShare: React.FC<SocialShareProps> = ({ 
   username,
+  onClose,
   stats = { trophies: 45, platinums: 3, rank: 'Trophy Hunter' }
 }) => {
   const [isOpen, setIsOpen] = useState(false);

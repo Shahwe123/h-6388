@@ -14,6 +14,7 @@ import FriendsComparison from '@/components/profile/FriendsComparison';
 import { useSelector } from 'react-redux';
 import SocialShare from '@/components/profile/SocialShare';
 import { useProfileData } from '@/hooks/useProfileData';
+import LinkedAccounts from '@/components/profile/LinkedAccounts';
 
 /**
  * Profile page component
@@ -27,14 +28,15 @@ const Profile = () => {
   const [profileExists, setProfileExists] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [showSocialShare, setShowSocialShare] = useState(false);
-  const currentUser = useSelector((state) => state.user?.userData);
+  const currentUser = useSelector((state: any) => state.user?.userData);
   
   const { 
-    profileData, 
-    fetchProfileData, 
+    profile, 
+    loading, 
+    friendCount,
     isOwnProfile,
-    profileUser
-  } = useProfileData(username);
+    fetchProfileData
+  } = useProfileData(username || null);
 
   useEffect(() => {
     const checkProfileExists = async () => {
@@ -66,34 +68,80 @@ const Profile = () => {
     checkProfileExists();
   }, [username, fetchProfileData]);
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return <ProfileLoading />;
   }
   
-  if (!profileExists) {
-    return <ProfileNotFound username={username} />;
+  if (!profileExists || !profile) {
+    return <ProfileNotFound username={username || 'Unknown'} />;
   }
+
+  // Determine if this profile has any linked accounts
+  const hasLinkedAccounts = !!(profile?.steam_id || profile?.playstation_username || profile?.xbox_gamertag);
+
+  // Mock stats for the profile
+  const profileStats = {
+    trophiesCount: 156,
+    platinumCount: 8,
+    completionPercentage: 72,
+    friendCount: friendCount
+  };
+
+  // Mock player stats for level progress
+  const playerStats = {
+    level: 32,
+    xp: 7845,
+    nextLevelXp: 10000,
+    rank: 'Trophy Hunter'
+  };
 
   return (
     <div className="min-h-screen bg-primary pb-16">
       <div className="max-w-7xl mx-auto container-padding">
         <ProfileHeader 
-          profile={profileData}
-          isOwnProfile={isOwnProfile === true}
+          profile={profile}
+          isOwnProfile={isOwnProfile}
           onShareClick={() => setShowSocialShare(true)}
         />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
           <div className="lg:col-span-1 space-y-6">
-            <ProfileStats profile={profileData} />
-            <LevelProgress profile={profileData} />
-            <FriendsComparison profile={profileData} isOwnProfile={isOwnProfile === true} />
+            <ProfileStats 
+              trophiesCount={profileStats.trophiesCount}
+              platinumCount={profileStats.platinumCount}
+              completionPercentage={profileStats.completionPercentage}
+              friendCount={profileStats.friendCount}
+            />
+            
+            <LevelProgress 
+              level={playerStats.level}
+              xp={playerStats.xp}
+              nextLevelXp={playerStats.nextLevelXp}
+              rank={playerStats.rank}
+            />
+            
+            <FriendsComparison 
+              friendCount={friendCount}
+              isOwnProfile={isOwnProfile} 
+            />
           </div>
           
           <div className="lg:col-span-2 space-y-8">
-            <TrophyCase trophies={profileData?.recentTrophies || []} />
-            <AchievementHighlights achievements={profileData?.achievements || []} />
-            <GameCollections games={profileData?.games || []} />
+            <LinkedAccounts 
+              profile={profile}
+              isOwnProfile={isOwnProfile}
+              hasLinkedAccounts={hasLinkedAccounts}
+            />
+            
+            <TrophyCase trophies={profile?.recentTrophies || []} />
+            
+            <AchievementHighlights achievements={profile?.achievements || []} />
+            
+            <GameCollections 
+              profile={profile}
+              isOwnProfile={isOwnProfile}
+              hasLinkedAccounts={hasLinkedAccounts}
+            />
           </div>
         </div>
       </div>

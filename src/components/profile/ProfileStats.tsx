@@ -1,12 +1,7 @@
-
 import { Trophy, Medal, BarChart3, Users } from 'lucide-react';
 
 /**
  * Props for the ProfileStats component
- * @property {number} trophiesCount - Total number of trophies
- * @property {number} platinumCount - Number of platinum trophies
- * @property {number} completionPercentage - Game completion rate percentage
- * @property {number} friendCount - Number of friends
  */
 interface ProfileStatsProps {
   trophiesCount: number;

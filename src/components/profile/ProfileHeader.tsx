@@ -1,24 +1,18 @@
 
 import { UserCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Profile } from '@/pages/Profile';
+import { Profile } from '@/types/profile';
 import RankBadge from '@/components/profile/RankBadge';
 import LevelProgress from '@/components/profile/LevelProgress';
 import SocialShare from '@/components/profile/SocialShare';
 
 /**
  * Props interface for the ProfileHeader component
- * @property {Profile} profile - The user profile data
- * @property {Object} playerStats - Stats for the player including level, XP, and rank
  */
 interface ProfileHeaderProps {
   profile: Profile;
-  playerStats: {
-    level: number;
-    xp: number;
-    nextLevelXp: number;
-    rank: string;
-  };
+  isOwnProfile: boolean;
+  onShareClick: () => void;
 }
 
 /**
@@ -34,7 +28,14 @@ interface ProfileHeaderProps {
  * @param {ProfileHeaderProps} props - Component props
  * @returns {JSX.Element} The profile header UI
  */
-const ProfileHeader = ({ profile, playerStats }: ProfileHeaderProps) => {
+const ProfileHeader = ({ profile, isOwnProfile, onShareClick }: ProfileHeaderProps) => {
+  const playerStats = {
+    level: 32,
+    xp: 7845,
+    nextLevelXp: 10000,
+    rank: 'Trophy Hunter'
+  };
+
   return (
     <div className="glass-card rounded-xl p-8 mb-8 relative overflow-hidden">
       {/* Cover Image Background */}
@@ -70,7 +71,9 @@ const ProfileHeader = ({ profile, playerStats }: ProfileHeaderProps) => {
           </div>
 
           {/* Social Share Button */}
-          <SocialShare username={profile.username} />
+          <div>
+            <SocialShare username={profile.username || ''} />
+          </div>
         </div>
 
         {/* Level Progress Bar */}

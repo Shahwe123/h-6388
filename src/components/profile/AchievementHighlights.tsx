@@ -1,7 +1,11 @@
 
 import RarityCard from '@/components/profile/RarityCard';
 
-const AchievementHighlights = () => {
+interface AchievementHighlightsProps {
+  achievements: any[];
+}
+
+const AchievementHighlights = ({ achievements }: AchievementHighlightsProps) => {
   return (
     <div className="glass-card rounded-xl p-6 mb-8">
       <h2 className="text-xl font-bold mb-4">Achievement Highlights</h2>
