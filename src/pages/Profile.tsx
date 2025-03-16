@@ -13,6 +13,11 @@ import FriendsComparison from '@/components/profile/FriendsComparison';
 import GameCollections from '@/components/profile/GameCollections';
 import { mockTrophies, playerStats } from '@/data/profileData';
 
+/**
+ * Profile interface
+ * 
+ * Defines the structure for a user profile with all relevant fields.
+ */
 export interface Profile {
   id: string;
   username: string;
@@ -26,6 +31,14 @@ export interface Profile {
   is_private: boolean | null;
 }
 
+/**
+ * Profile Page Component
+ * 
+ * Displays the user's profile with gaming statistics, achievements, connected
+ * accounts, and other gaming-related information.
+ * 
+ * @returns {JSX.Element} The Profile page UI
+ */
 const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +50,11 @@ const Profile = () => {
   const [isFriend, setIsFriend] = useState(false);
 
   useEffect(() => {
+    /**
+     * Fetch the current user's session from Supabase
+     * 
+     * @returns {Promise<string|null>} The user ID or null if not logged in
+     */
     const fetchUserSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -51,6 +69,9 @@ const Profile = () => {
       }
     };
 
+    /**
+     * Fetch profile data and friend count from the database
+     */
     const fetchProfileData = async () => {
       try {
         setLoading(true);
@@ -139,6 +160,11 @@ const Profile = () => {
     }
   }, [toast, profileId]);
 
+  /**
+   * Fetch friend count for a specific user
+   * 
+   * @param {string} userId - The user ID to fetch friends count for
+   */
   const fetchFriendCount = async (userId: string) => {
     try {
       const { count, error } = await supabase
