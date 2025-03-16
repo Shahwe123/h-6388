@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole, Gamepad, BarChart, Flame, MessageCircle } from "lucide-react";
@@ -8,7 +7,6 @@ import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayStationIcon, XboxIcon, SteamIcon } from "../components/platforms/PlatformIcons";
-
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -20,7 +18,6 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
-  
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -56,13 +53,10 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-  
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
-  
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       <Header />
       <main>
         <section className="pt-32 pb-16 container-padding bg-gradient-to-b from-black via-black to-primary text-white relative overflow-hidden">
@@ -623,27 +617,13 @@ const BetaLanding = () => {
               </Button>
             </div>
             
-            <div className="text-center text-neutral-400 text-sm">
-              <p className="mb-4">© 2023 PlatinumPath. All rights reserved.</p>
-              <div className="flex justify-center gap-4">
-                <Link to="/privacy" className="hover:text-neon-purple">Privacy Policy</Link>
-                <Link to="/terms" className="hover:text-neon-purple">Terms of Service</Link>
-                <Link to="/contact" className="hover:text-neon-purple">Contact Us</Link>
-              </div>
-            </div>
+            
           </div>
         </section>
         
       </main>
       
-      {isNewsletterOpen && (
-        <NewsletterForm 
-          isOpen={isNewsletterOpen} 
-          onClose={() => setIsNewsletterOpen(false)} 
-        />
-      )}
-    </div>
-  );
+      {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
+    </div>;
 };
-
 export default BetaLanding;
