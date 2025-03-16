@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { siteConfig } from '@/config/site';
 
 interface AuthContextType {
   user: any | null;
@@ -32,7 +33,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({
+      redirectTo: siteConfig.url
+    });
     setUser(null);
   };
 
