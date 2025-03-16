@@ -28,6 +28,9 @@ export default {
         primary: "#1A1F2C",
         secondary: "#403E43",
         accent: "#D946EF",
+        dark: {
+          blue: "#121520",  // The darker blue color from the second image
+        },
         neon: {
           pink: "#F97316",
           blue: "#0EA5E9",

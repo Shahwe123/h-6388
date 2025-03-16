@@ -478,7 +478,7 @@ const BetaLanding = () => {
           </div>
         </section>
 
-        <section id="how-it-works" className="py-16 container-padding bg-primary">
+        <section id="how-it-works" className="py-16 container-padding bg-[#121520]">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
               ⚡How It Works – Get Started in <span className="text-neon-purple">3 Simple Steps!</span>
