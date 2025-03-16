@@ -19,7 +19,7 @@ const Documentation = () => {
   ];
   
   // Mock documentation content
-  const docContent = {
+  const docContent: Record<string, Array<{ title: string; content: string }>> = {
     'Getting Started': [
       {
         title: 'What is PlatinumPath?',
