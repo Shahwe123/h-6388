@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole, Gamepad, BarChart, Flame, MessageCircle } from "lucide-react";
@@ -60,7 +61,8 @@ const BetaLanding = () => {
     setIsNewsletterOpen(true);
   };
   
-  return <div className="min-h-screen">
+  return (
+    <div className="min-h-screen">
       <Header />
       <main>
         <section className="pt-32 pb-16 container-padding bg-gradient-to-b from-black via-black to-primary text-white relative overflow-hidden">
@@ -435,7 +437,7 @@ const BetaLanding = () => {
             <div className="grid md:grid-cols-2 gap-8 mb-12">
               <div className="glass-card p-8 rounded-xl">
                 <Trophy className="w-10 h-10 text-neon-pink mb-4" />
-                <h3 className="font-bold text-lg mb-2">Early Access – Try it BEFORE the public release!</h3>
+                <h3 className="font-bold text-lg mb-2">Early Access – Try it BEFORE the public release!</h3>
                 <p className="text-neutral-300">Be the FIRST to try it before public release. Explore features months ahead of everyone else.</p>
               </div>
               
@@ -447,7 +449,7 @@ const BetaLanding = () => {
               
               <div className="glass-card p-8 rounded-xl">
                 <Shield className="w-10 h-10 text-neon-purple mb-4" />
-                <h3 className="font-bold text-lg mb-2">Exclusive Founder’s Badge – ONLY available to beta testers!</h3>
+                <h3 className="font-bold text-lg mb-2">Exclusive Founder's Badge – ONLY available to beta testers!</h3>
                 <p className="text-neutral-300">Get a permanent "PlatinumPath Founder" profile badge that shows you were here first.</p>
               </div>
               
@@ -516,9 +518,7 @@ const BetaLanding = () => {
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">3</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Start Tracking</h3>
-                <p className="text-neutral-300">Sync your trophies &amp; start flexing your achievements!
-
-              </p>
+                <p className="text-neutral-300">Sync your trophies &amp; start flexing your achievements!</p>
                 <div className="mt-4 text-center">
                   <Trophy className="w-12 h-12 text-neon-green mx-auto" />
                 </div>
@@ -578,4 +578,21 @@ const BetaLanding = () => {
                 <PlayStationIcon className="w-12 h-12 text-neon-blue" />
               </div>
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <XboxIcon className="w-12 h-12 text-
+                <XboxIcon className="w-12 h-12 text-neon-green" />
+              </div>
+              <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
+                <SteamIcon className="w-12 h-12 text-white" />
+              </div>
+            </div>
+            
+            {isNewsletterOpen && (
+              <NewsletterForm onClose={() => setIsNewsletterOpen(false)} />
+            )}
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default BetaLanding;
