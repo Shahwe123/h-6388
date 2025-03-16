@@ -578,23 +578,3 @@ const BetaLanding = () => {
               </div>
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
                 <XboxIcon className="w-12 h-12 text-neon-green" />
-              </div>
-              <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <SteamIcon className="w-12 h-12 text-white" />
-              </div>
-            </div>
-            
-            {isNewsletterOpen && (
-              <NewsletterForm 
-                isOpen={isNewsletterOpen} 
-                onClose={() => setIsNewsletterOpen(false)} 
-              />
-            )}
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-};
-
-export default BetaLanding;
