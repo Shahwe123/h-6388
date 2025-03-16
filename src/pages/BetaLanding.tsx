@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, XCircle, Trophy, Zap, Users, Shield, Clock, HelpCircle, Mail, LockKeyhole, Gamepad, BarChart, Flame, MessageCircle } from "lucide-react";
@@ -578,3 +579,71 @@ const BetaLanding = () => {
               </div>
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
                 <XboxIcon className="w-12 h-12 text-neon-green" />
+              </div>
+              <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
+                <SteamIcon className="w-12 h-12 text-white" />
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Countdown and Final CTA Section */}
+        <section className="py-16 container-padding bg-gradient-to-b from-primary to-black">
+          <div className="max-w-4xl mx-auto">
+            <div className="glass-card p-8 rounded-xl text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6">
+                <span className="text-neon-purple">Limited Beta Access</span> Closes In:
+              </h2>
+              
+              <div className="flex justify-center gap-4 mb-8">
+                <div className="bg-black/50 p-4 rounded-lg w-20">
+                  <div className="text-3xl font-mono font-bold text-neon-pink">{timeLeft.days}</div>
+                  <div className="text-xs text-neutral-400">DAYS</div>
+                </div>
+                <div className="bg-black/50 p-4 rounded-lg w-20">
+                  <div className="text-3xl font-mono font-bold text-neon-pink">{timeLeft.hours}</div>
+                  <div className="text-xs text-neutral-400">HOURS</div>
+                </div>
+                <div className="bg-black/50 p-4 rounded-lg w-20">
+                  <div className="text-3xl font-mono font-bold text-neon-pink">{timeLeft.minutes}</div>
+                  <div className="text-xs text-neutral-400">MINUTES</div>
+                </div>
+                <div className="bg-black/50 p-4 rounded-lg w-20">
+                  <div className="text-3xl font-mono font-bold text-neon-pink">{timeLeft.seconds}</div>
+                  <div className="text-xs text-neutral-400">SECONDS</div>
+                </div>
+              </div>
+              
+              <p className="text-neutral-300 mb-6">
+                We're only accepting <span className="text-neon-green font-bold">500 beta testers</span>. Don't miss your chance!
+              </p>
+              
+              <Button onClick={openNewsletterForm} variant="cta" size="lg" className="w-full md:w-auto md:px-8">
+                🔥 Secure Your Spot Now!
+              </Button>
+            </div>
+            
+            <div className="text-center text-neutral-400 text-sm">
+              <p className="mb-4">© 2023 PlatinumPath. All rights reserved.</p>
+              <div className="flex justify-center gap-4">
+                <Link to="/privacy" className="hover:text-neon-purple">Privacy Policy</Link>
+                <Link to="/terms" className="hover:text-neon-purple">Terms of Service</Link>
+                <Link to="/contact" className="hover:text-neon-purple">Contact Us</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+      </main>
+      
+      {isNewsletterOpen && (
+        <NewsletterForm 
+          isOpen={isNewsletterOpen} 
+          onClose={() => setIsNewsletterOpen(false)} 
+        />
+      )}
+    </div>
+  );
+};
+
+export default BetaLanding;
