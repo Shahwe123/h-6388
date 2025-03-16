@@ -8,6 +8,7 @@ import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayStationIcon, XboxIcon, SteamIcon } from "../components/platforms/PlatformIcons";
+import TrophyUnlockAnimation from "../components/animations/TrophyUnlockAnimation";
 
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
@@ -574,15 +575,21 @@ const BetaLanding = () => {
               </div>
             </div>
             
-            <div className="flex justify-center gap-8 mb-8">
-              <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <PlayStationIcon className="w-12 h-12 text-neon-blue" />
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-8">
+              <div className="w-64 h-64 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30 overflow-hidden">
+                <TrophyUnlockAnimation />
               </div>
-              <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <XboxIcon className="w-12 h-12 text-neon-green" />
-              </div>
-              <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
-                <SteamIcon className="w-12 h-12 text-white" />
+              
+              <div className="flex justify-center gap-4">
+                <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
+                  <PlayStationIcon className="w-12 h-12 text-neon-blue" />
+                </div>
+                <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
+                  <XboxIcon className="w-12 h-12 text-neon-green" />
+                </div>
+                <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
+                  <SteamIcon className="w-12 h-12 text-white" />
+                </div>
               </div>
             </div>
             
