@@ -37,7 +37,7 @@ const Documentation = () => {
     'Account Management': [
       {
         title: 'Changing Your Password',
-        content: 'To change your password, go to Settings > Security and click "Change Password". You'll need to enter your current password and then your new password twice to confirm.'
+        content: 'To change your password, go to Settings > Security and click "Change Password". You\'ll need to enter your current password and then your new password twice to confirm.'
       },
       {
         title: 'Updating Email Address',
@@ -51,15 +51,15 @@ const Documentation = () => {
     'Platform Integration': [
       {
         title: 'Linking PlayStation Account',
-        content: 'To link your PlayStation account, go to Settings > Linked Accounts and click "Connect" next to PlayStation. You'll be redirected to Sony's login page to authorize the connection.'
+        content: 'To link your PlayStation account, go to Settings > Linked Accounts and click "Connect" next to PlayStation. You\'ll be redirected to Sony\'s login page to authorize the connection.'
       },
       {
         title: 'Linking Xbox Account',
-        content: 'To link your Xbox account, go to Settings > Linked Accounts and click "Connect" next to Xbox. You'll be redirected to Microsoft's login page to authorize the connection.'
+        content: 'To link your Xbox account, go to Settings > Linked Accounts and click "Connect" next to Xbox. You\'ll be redirected to Microsoft\'s login page to authorize the connection.'
       },
       {
         title: 'Linking Steam Account',
-        content: 'To link your Steam account, go to Settings > Linked Accounts and click "Connect" next to Steam. You'll be redirected to Steam's login page to authorize the connection.'
+        content: 'To link your Steam account, go to Settings > Linked Accounts and click "Connect" next to Steam. You\'ll be redirected to Steam\'s login page to authorize the connection.'
       }
     ],
     'Achievement Tracking': [
@@ -107,11 +107,11 @@ const Documentation = () => {
     'Troubleshooting': [
       {
         title: 'Achievement Sync Issues',
-        content: 'If your achievements aren't syncing, ensure your gaming accounts are properly linked and try manually refreshing your profile. If issues persist, check our server status page.'
+        content: 'If your achievements aren\'t syncing, ensure your gaming accounts are properly linked and try manually refreshing your profile. If issues persist, check our server status page.'
       },
       {
         title: 'Account Linking Failures',
-        content: 'If you're having trouble linking a gaming account, try logging out and back in to both PlatinumPath and the gaming platform. Ensure you're using the correct credentials.'
+        content: 'If you\'re having trouble linking a gaming account, try logging out and back in to both PlatinumPath and the gaming platform. Ensure you\'re using the correct credentials.'
       },
       {
         title: 'Missing Achievements',
