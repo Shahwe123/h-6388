@@ -1,10 +1,12 @@
 
 import { UserCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Profile } from '@/types/profile';
 import RankBadge from '@/components/profile/RankBadge';
 import LevelProgress from '@/components/profile/LevelProgress';
 import SocialShare from '@/components/profile/SocialShare';
+import { ImagePopup } from '@/components/ui/image-popup';
 
 /**
  * Props interface for the ProfileHeader component
@@ -29,6 +31,9 @@ interface ProfileHeaderProps {
  * @returns {JSX.Element} The profile header UI
  */
 const ProfileHeader = ({ profile, isOwnProfile, onShareClick }: ProfileHeaderProps) => {
+  const [showAvatarPopup, setShowAvatarPopup] = useState(false);
+  const [showCoverPopup, setShowCoverPopup] = useState(false);
+  
   const playerStats = {
     level: 32,
     xp: 7845,
@@ -39,7 +44,10 @@ const ProfileHeader = ({ profile, isOwnProfile, onShareClick }: ProfileHeaderPro
   return (
     <div className="glass-card rounded-xl p-8 mb-8 relative overflow-hidden">
       {/* Cover Image Background */}
-      <div className="h-40 absolute top-0 left-0 right-0">
+      <div 
+        className="h-40 absolute top-0 left-0 right-0 cursor-pointer"
+        onClick={() => profile?.cover_url && setShowCoverPopup(true)}
+      >
         {profile?.cover_url ? (
           <img src={profile.cover_url} alt="Profile cover" className="w-full h-full object-cover" />
         ) : (
@@ -51,8 +59,9 @@ const ProfileHeader = ({ profile, isOwnProfile, onShareClick }: ProfileHeaderPro
         <div className="flex flex-col md:flex-row items-center gap-6">
           {/* Profile Avatar */}
           <motion.div
-            className="w-24 h-24 bg-black/50 rounded-full border-4 border-neon-purple flex items-center justify-center overflow-hidden"
+            className="w-24 h-24 bg-black/50 rounded-full border-4 border-neon-purple flex items-center justify-center overflow-hidden cursor-pointer"
             whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(139, 92, 246, 0.5)' }}
+            onClick={() => profile?.avatar_url && setShowAvatarPopup(true)}
           >
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt={profile.username} className="w-full h-full object-cover" />
@@ -86,6 +95,26 @@ const ProfileHeader = ({ profile, isOwnProfile, onShareClick }: ProfileHeaderPro
           />
         </div>
       </div>
+      
+      {/* Avatar Popup */}
+      {profile?.avatar_url && (
+        <ImagePopup
+          isOpen={showAvatarPopup}
+          onClose={() => setShowAvatarPopup(false)}
+          imageUrl={profile.avatar_url}
+          altText={`${profile.username}'s avatar`}
+        />
+      )}
+      
+      {/* Cover Image Popup */}
+      {profile?.cover_url && (
+        <ImagePopup
+          isOpen={showCoverPopup}
+          onClose={() => setShowCoverPopup(false)}
+          imageUrl={profile.cover_url}
+          altText={`${profile.username}'s cover image`}
+        />
+      )}
     </div>
   );
 };
