@@ -33,10 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const logout = async () => {
-    await supabase.auth.signOut({
-      redirectTo: siteConfig.url
-    });
+    await supabase.auth.signOut();
     setUser(null);
+    
+    // After signing out, redirect to the site URL
+    window.location.href = siteConfig.url;
   };
 
   const value = {
