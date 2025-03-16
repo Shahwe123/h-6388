@@ -2,11 +2,21 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * Interface for ProcessingIndicator props
+ */
 interface ProcessingIndicatorProps {
-  platformName: string | null;
+  platformName: string | null;  // The name of the platform being processed
 }
 
+/**
+ * ProcessingIndicator component
+ * Displays a loading indicator with text while platform data is being processed
+ * 
+ * @param platformName - The name of the platform being processed
+ */
 const ProcessingIndicator = ({ platformName }: ProcessingIndicatorProps) => {
+  // Don't render anything if there's no platform name
   if (!platformName) return null;
   
   return (

@@ -1,6 +1,11 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import storage from 'redux-persist/lib/storage';
+
+/**
+ * Initial state for the user slice
+ * Contains user authentication state and details
+ */
 const initialState = {
   user: null, // Stores user details
   isAuthenticated: false,
@@ -8,42 +13,69 @@ const initialState = {
   error: null,
 };
 
+/**
+ * User slice
+ * Manages user-related state in the Redux store
+ * Handles login, registration, logout, and profile updates
+ */
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     // 🔹 LOGIN ACTIONS
+    /**
+     * Sets loading state to true when login starts
+     */
     loginStart: (state) => {
         state.loading = true;
         state.error = null;
       },
-      loginSuccess: (state, action) => {
+    /**
+     * Updates user state when login is successful
+     */
+    loginSuccess: (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = true;
         state.loading = false;
       },
-      loginFailure: (state, action) => {
+    /**
+     * Sets error state when login fails
+     */
+    loginFailure: (state, action) => {
         state.loading = false;
         state.error = action.payload;
       },
 
-      // 🔹 REGISTRATION ACTIONS
-      registerStart: (state) => {
+    // 🔹 REGISTRATION ACTIONS
+    /**
+     * Sets loading state to true when registration starts
+     */
+    registerStart: (state) => {
         state.loading = true;
         state.error = null;
       },
-      registerSuccess: (state, action) => {
+    /**
+     * Updates user state when registration is successful
+     */
+    registerSuccess: (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = true;
         state.loading = false;
       },
-      registerFailure: (state, action) => {
+    /**
+     * Sets error state when registration fails
+     */
+    registerFailure: (state, action) => {
         state.loading = false;
         state.error = action.payload;
       },
 
-      // 🔹 LOGOUT ACTION
-      logout: (state) => {
+    // 🔹 LOGOUT ACTION
+    /**
+     * Clears user state and authentication when user logs out
+     * Also clears persisted state from storage
+     */
+    logout: (state) => {
         state.user = null;
         state.isAuthenticated = false;
         // Remove dispatch() call since it's not available in reducer
@@ -51,13 +83,17 @@ const userSlice = createSlice({
         localStorage.removeItem('persist:root')
       },
 
-      // 🔹 UPDATE USER ACTION
-      updateUser: (state, action) => {
+    // 🔹 UPDATE USER ACTION
+    /**
+     * Updates user profile information
+     */
+    updateUser: (state, action) => {
         state.user = { ...state.user, ...action.payload };
       },
   },
 });
 
+// Export action creators
 export const {
     loginStart,
     loginSuccess,
@@ -69,4 +105,5 @@ export const {
     updateUser,
   } = userSlice.actions;
 
+// Export reducer
 export default userSlice.reducer;

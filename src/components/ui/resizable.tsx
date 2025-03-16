@@ -1,8 +1,15 @@
+
 import { GripVertical } from "lucide-react"
 import * as ResizablePrimitive from "react-resizable-panels"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * ResizablePanelGroup component
+ * Container for resizable panels that can be arranged horizontally or vertically
+ * 
+ * Based on ResizablePrimitive PanelGroup
+ */
 const ResizablePanelGroup = ({
   className,
   ...props
@@ -16,8 +23,17 @@ const ResizablePanelGroup = ({
   />
 )
 
+/**
+ * ResizablePanel component
+ * Individual panel that can be resized within a ResizablePanelGroup
+ */
 const ResizablePanel = ResizablePrimitive.Panel
 
+/**
+ * ResizableHandle component
+ * Draggable handle that allows users to resize panels
+ * Can optionally include a visual grip handle
+ */
 const ResizableHandle = ({
   withHandle,
   className,

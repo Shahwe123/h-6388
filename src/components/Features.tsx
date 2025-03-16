@@ -1,5 +1,10 @@
 
 import { Trophy, BarChart, Gamepad, Zap, Target, Rocket, Shield, Crosshair } from "lucide-react";
+
+/**
+ * Array of features to display
+ * Each feature has a title, description, and icon
+ */
 const features = [{
   title: "Unified Gaming Profile",
   description: "Play anywhere, track everywhere across all major gaming platforms.",
@@ -25,13 +30,21 @@ const features = [{
   description: "Show off your milestones and achievements everywhere.",
   icon: Rocket
 }];
+
+/**
+ * Features component
+ * Displays the app's main features in a grid layout
+ */
 const Features = () => {
   return <section id="features" className="py-16 container-padding bg-primary">
       <div className="max-w-4xl mx-auto">
+        {/* Section heading */}
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
           Why Use <span className="text-neon-purple">PlatinumPath</span>?
         </h2>
         <p className="text-neutral-300 text-center mb-12 max-w-2xl mx-auto">Are you a completionist who loves unlocking trophies and achievements? PlatinumPath lets you track all your gaming milestones across PlayStation, Xbox, and Steam – all in one place!</p>
+        
+        {/* Features grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => <div key={index} className="glass-card p-8 rounded-xl hover:border-neon-purple/50 transition-colors">
               <div className="flex items-center gap-3 mb-4">

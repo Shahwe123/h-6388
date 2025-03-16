@@ -4,20 +4,37 @@ import { useToast } from '@/hooks/use-toast';
 import { Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Props for the ForgotPasswordForm component
+ */
 interface ForgotPasswordFormProps {
-  onSuccess: () => void;
+  onSuccess: () => void;  // Function to call when reset email is sent successfully
 }
 
+/**
+ * ForgotPasswordForm component
+ * Form for requesting a password reset email
+ * 
+ * @param onSuccess - Function to call when reset email is sent successfully
+ */
 const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
+  // State for the email input field
   const [email, setEmail] = useState('');
+  // State for tracking form submission
   const [loading, setLoading] = useState(false);
+  // Toast notification hook
   const { toast } = useToast();
 
+  /**
+   * Handles the forgot password form submission
+   * Sends a password reset email via Supabase
+   */
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Send password reset email through Supabase
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
@@ -26,13 +43,16 @@ const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
         throw error;
       }
 
+      // Show success toast notification
       toast({
         title: 'Reset password email sent',
         description: 'Please check your email to reset your password',
       });
       
+      // Call success callback
       onSuccess();
     } catch (error: any) {
+      // Show error toast notification
       toast({
         title: 'Error sending reset password email',
         description: error.message,

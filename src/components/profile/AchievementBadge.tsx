@@ -3,13 +3,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Award, Star, Flame } from 'lucide-react';
 
+/**
+ * Props for the AchievementBadge component
+ */
 type AchievementBadgeProps = {
-  type: 'platinum' | 'gold' | 'silver' | 'bronze' | 'ultra-rare';
-  name: string;
-  rarity?: string;
-  animate?: boolean;
+  type: 'platinum' | 'gold' | 'silver' | 'bronze' | 'ultra-rare';  // Badge type/rarity
+  name: string;           // Name of the achievement
+  rarity?: string;        // Optional rarity percentage
+  animate?: boolean;      // Whether to animate the badge
 }
 
+/**
+ * Icons for different badge types
+ */
 const badgeIcons = {
   platinum: <Trophy className="h-7 w-7 text-purple-300" />,
   gold: <Trophy className="h-6 w-6 text-yellow-400" />,
@@ -18,6 +24,9 @@ const badgeIcons = {
   'ultra-rare': <Star className="h-7 w-7 text-neon-pink" />
 };
 
+/**
+ * Background gradient colors for different badge types
+ */
 const badgeColors = {
   platinum: 'bg-gradient-to-br from-purple-500 to-purple-900',
   gold: 'bg-gradient-to-br from-yellow-300 to-yellow-600',
@@ -26,12 +35,22 @@ const badgeColors = {
   'ultra-rare': 'bg-gradient-to-br from-neon-pink to-neon-purple'
 };
 
+/**
+ * AchievementBadge component
+ * Displays a badge representing a game achievement with appropriate styling for its rarity
+ * 
+ * @param type - Badge type/rarity
+ * @param name - Name of the achievement
+ * @param rarity - Optional rarity percentage
+ * @param animate - Whether to animate the badge
+ */
 export const AchievementBadge: React.FC<AchievementBadgeProps> = ({ 
   type, 
   name, 
   rarity,
   animate = true
 }) => {
+  // Get the right icon and color based on badge type
   const icon = badgeIcons[type] || <Award className="h-6 w-6" />;
   const color = badgeColors[type] || 'bg-gradient-to-br from-gray-700 to-gray-900';
   
@@ -44,6 +63,7 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({
       <div className="bg-black/60 rounded-md p-3 flex flex-col items-center">
         <div className="relative">
           {icon}
+          {/* Special effect for ultra-rare achievements */}
           {type === 'ultra-rare' && (
             <motion.div
               className="absolute inset-0 opacity-60"
