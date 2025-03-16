@@ -1,3 +1,4 @@
+
 import { Link as RouterLink } from 'react-router-dom';
 import { Gamepad, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,9 @@ interface GameCollectionsProps {
  * @returns {JSX.Element} The game collections UI
  */
 const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameCollectionsProps) => {
+  // If no accounts are linked and not own profile, don't show this section at all
+  if (!hasLinkedAccounts && !isOwnProfile) return null;
+
   return (
     <>
       {/* Game Collections Sections - Only show platforms that are linked */}
@@ -83,22 +87,19 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
         </div>
       )}
 
-      {/* Show this section if no gaming accounts are linked */}
-      {!hasLinkedAccounts && (
+      {/* Show this section only if viewing own profile and no gaming accounts are linked */}
+      {!hasLinkedAccounts && isOwnProfile && (
         <div className="glass-card rounded-xl p-6">
           <h2 className="text-xl font-bold mb-4">Game Collections</h2>
           <div className="text-neutral-400 text-center py-8">
             <Gamepad className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p>No gaming accounts linked</p>
             <p className="text-sm mt-1">Link your gaming accounts to see your game collections</p>
-            {/* Only show Link Accounts button if viewing own profile */}
-            {isOwnProfile && (
-              <RouterLink to="/link-accounts" className="block mt-4">
-                <Button className="bg-gradient-game mt-2" size="sm">
-                  Link Accounts
-                </Button>
-              </RouterLink>
-            )}
+            <RouterLink to="/link-accounts" className="block mt-4">
+              <Button className="bg-gradient-game mt-2" size="sm">
+                Link Accounts
+              </Button>
+            </RouterLink>
           </div>
         </div>
       )}
@@ -107,4 +108,3 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
 };
 
 export default GameCollections;
-

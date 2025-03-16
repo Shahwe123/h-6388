@@ -1,3 +1,4 @@
+
 import { Link as RouterLink } from 'react-router-dom';
 import { Link, Gamepad } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,9 @@ interface LinkedAccountsProps {
 }
 
 const LinkedAccounts = ({ profile, isOwnProfile, hasLinkedAccounts }: LinkedAccountsProps) => {
+  // Only show linked accounts section if it's the user's own profile or if the other user has linked accounts
+  if (!isOwnProfile && !hasLinkedAccounts) return null;
+
   return (
     <div className="glass-card rounded-xl p-6 mb-8">
       <div className="flex justify-between items-center mb-4">
@@ -69,18 +73,18 @@ const LinkedAccounts = ({ profile, isOwnProfile, hasLinkedAccounts }: LinkedAcco
           )}
         </div>
       ) : (
-        <div className="text-neutral-400 text-center py-8">
-          <Link className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>No gaming accounts linked</p>
-          <p className="text-sm mt-1">Connect your gaming accounts to track achievements and stats</p>
-          {isOwnProfile && (
+        isOwnProfile && (
+          <div className="text-neutral-400 text-center py-8">
+            <Link className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p>No gaming accounts linked</p>
+            <p className="text-sm mt-1">Connect your gaming accounts to track achievements and stats</p>
             <RouterLink to="/link-accounts" className="block mt-4">
               <Button className="bg-gradient-game mt-2" size="sm">
                 Link Accounts
               </Button>
             </RouterLink>
-          )}
-        </div>
+          </div>
+        )
       )}
     </div>
   );

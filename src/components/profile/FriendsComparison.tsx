@@ -1,4 +1,3 @@
-
 import { Users, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import RankBadge from '@/components/profile/RankBadge';
@@ -10,6 +9,8 @@ interface FriendsComparisonProps {
 }
 
 const FriendsComparison = ({ friendCount, isOwnProfile }: FriendsComparisonProps) => {
+  if (!isOwnProfile) return null;
+  
   return (
     <div className="glass-card rounded-xl p-6 mb-8">
       <div className="flex justify-between items-center mb-4">
