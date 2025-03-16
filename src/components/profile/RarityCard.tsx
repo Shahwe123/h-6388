@@ -3,33 +3,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Clock, Flame } from 'lucide-react';
 
-/**
- * Props for the RarityCard component
- */
 type RarityCardProps = {
-  title: string;               // Title of the achievement
-  description: string;         // Description of the achievement
-  icon: 'trophy' | 'time' | 'grind';  // Type of icon to display
-  percentage?: string;         // Optional percentage or status text
+  title: string;
+  description: string;
+  icon: 'trophy' | 'time' | 'grind';
+  percentage?: string;
 }
 
-/**
- * RarityCard component
- * Displays a card for achievement rarity information
- * Used to showcase different types of notable achievements
- * 
- * @param title - Title of the achievement
- * @param description - Description of the achievement
- * @param icon - Type of icon to display
- * @param percentage - Optional percentage or status text
- */
 export const RarityCard: React.FC<RarityCardProps> = ({ 
   title,
   description,
   icon,
   percentage
 }) => {
-  // Determine which icon and color to use based on the icon type
   let IconComponent;
   let iconColor = '';
   

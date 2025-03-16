@@ -2,30 +2,22 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-// Define the shape of user data
 interface UserType {
   id: string;
-  name: string;  // Kept for compatibility
+  name: string;  // We'll still keep this field in our interface
   email: string;
   avatar: string;
   is_private: boolean;
 }
 
-// Define the shape of UserContext data
 interface UserContextType {
   user: UserType | null;
   setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
 }
 
-// Create the UserContext with undefined as initial value
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-/**
- * UserProvider component - provides user profile data context to the application
- * This is different from AuthContext as it contains more detailed user profile information
- */
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // State to hold the current user profile data
   const [user, setUser] = useState<UserType | null>(null);
 
   useEffect(() => {
@@ -34,7 +26,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: sessionData } = await supabase.auth.getSession();
       
       if (sessionData.session?.user) {
-        // Fetch user profile data from the profiles table
         const { data } = await supabase
           .from('profiles')
           .select('*')
@@ -42,7 +33,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .single();
           
         if (data) {
-          // Format the user data
           setUser({
             id: data.id,
             name: data.username || '', // Use username property instead of name
@@ -57,7 +47,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadUserData();
   }, []);
 
-  // Create context value object with user state and setter
   const value = {
     user,
     setUser,
@@ -66,10 +55,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
-/**
- * Custom hook to access the user context
- * Throws an error if used outside of UserProvider
- */
 export const useUser = () => {
   const context = useContext(UserContext);
   if (context === undefined) {

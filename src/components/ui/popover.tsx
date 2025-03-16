@@ -1,27 +1,12 @@
-
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { cn } from "@/lib/utils"
 
-/**
- * Popover component
- * The container for popover functionality
- * 
- * Based on Radix UI's Popover primitive
- */
 const Popover = PopoverPrimitive.Root
 
-/**
- * PopoverTrigger component
- * The element that triggers the popover to appear
- */
 const PopoverTrigger = PopoverPrimitive.Trigger
 
-/**
- * PopoverContent component
- * The content that appears when the trigger is clicked
- */
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>

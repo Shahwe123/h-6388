@@ -1,5 +1,7 @@
 
 import { ArrowRight, Trophy, Zap, Target } from "lucide-react";
+import WaitlistForm from "./waitlist/WaitlistForm";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -15,16 +17,19 @@ const Hero = () => {
         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">
           Track. Compete. Conquer.
         </h1>
-        <p className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">PlatinumPath is the ultimate game achievement tracker for PlayStation, Xbox &amp; Steam. Sync, compare, and complete your gaming trophies in one dashboard. Get started now</p>
+        <p className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">PlatinumPath is the ultimate game achievement tracker for PlayStation, Xbox &amp; Steam. Sync, compare, and complete your gaming trophies in one dashboard.</p>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <button className="cyber-button flex items-center justify-center gap-2">
-            Join Waitlist
-            <ArrowRight className="w-4 h-4" />
-          </button>
-          <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center gap-2">
+        <div className="flex flex-col items-center justify-center mb-12">
+          <WaitlistForm />
+        </div>
+        
+        <div className="my-8 flex justify-center">
+          <Link 
+            to="/beta" 
+            className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
+          >
             Watch Demo
-          </button>
+          </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">

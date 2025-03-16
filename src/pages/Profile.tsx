@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,14 +15,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Trophy, Medal, Target, Users } from "lucide-react";
+import { Settings } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Progress } from "@/components/ui/progress";
-import ProfileStats from "@/components/profile/ProfileStats";
-import GamingStats from "@/components/profile/GamingStats";
 
 const Profile = () => {
   const { logout } = useAuth();
@@ -39,18 +34,6 @@ const Profile = () => {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [newAvatar, setNewAvatar] = useState<File | null>(null);
 
-  // Mock player stats - in a real app, this would come from the backend
-  const playerStats = {
-    trophiesCount: 128,
-    platinumCount: 12,
-    completionPercentage: 78,
-    friendCount: 24,
-    level: 42,
-    xp: 8750,
-    nextLevelXp: 10000,
-    rank: "Master"
-  };
-
   useEffect(() => {
     if (user) {
       setName(user.name);
@@ -64,7 +47,7 @@ const Profile = () => {
     setIsLoading(true);
     try {
       await logout();
-      navigate("/auth");
+      navigate("/login");
       toast({
         title: "Logged out successfully.",
       });
@@ -168,158 +151,97 @@ const Profile = () => {
     }
   };
 
-  // Convert user data to profile format
-  const profileData = user ? {
-    id: user.id || '',
-    username: user.name || '',
-    bio: '',
-    avatar_url: user.avatar || '',
-    cover_url: '',
-    is_private: user.is_private
-  } : {
-    id: '',
-    username: '',
-    bio: '',
-    avatar_url: '',
-    cover_url: '',
-    is_private: false
-  };
-
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen">
       <Header />
-      <main className="container py-8">
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto mb-8 grid-cols-2">
-            <TabsTrigger value="overview">Profile Overview</TabsTrigger>
-            <TabsTrigger value="settings">Account Settings</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview">
-            <div className="mb-8">
-              <div className="glass-card rounded-xl p-6 mb-8">
-                <div className="flex items-center space-x-4 mb-4">
-                  <Avatar className="h-20 w-20 border-2 border-neon-purple">
-                    {avatarUrl ? (
-                      <AvatarImage src={avatarUrl} alt={name} />
-                    ) : (
-                      <AvatarFallback className="bg-black/60 text-white text-xl">
-                        {name?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <div>
-                    <h1 className="text-2xl font-bold neon-text">{name || "Username"}</h1>
-                    <p className="text-neutral-400">Level {playerStats.level} • {playerStats.rank}</p>
-                    <div className="mt-2">
-                      <Progress value={(playerStats.xp / playerStats.nextLevelXp) * 100} className="h-2" />
-                      <p className="text-xs mt-1 text-neutral-400">{playerStats.xp}/{playerStats.nextLevelXp} XP</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <ProfileStats 
-                trophiesCount={playerStats.trophiesCount}
-                platinumCount={playerStats.platinumCount}
-                completionPercentage={playerStats.completionPercentage}
-                friendCount={playerStats.friendCount}
-              />
-
-              <GamingStats />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <Card className="max-w-md mx-auto">
-              <CardHeader>
-                <CardTitle className="text-2xl">
-                  Account Settings <Settings className="inline-block ml-2 h-5 w-5" />
-                </CardTitle>
-                <CardDescription>
-                  Manage your account settings and privacy.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="flex items-center justify-center">
-                  <Avatar className="h-24 w-24">
-                    {avatarUrl ? (
-                      <AvatarImage src={avatarUrl} alt="Avatar" />
-                    ) : (
-                      <AvatarFallback>{name?.charAt(0).toUpperCase()}</AvatarFallback>
-                    )}
-                  </Avatar>
-                </div>
-                {isEditing && (
-                  <div>
-                    <Label htmlFor="avatar">Change Avatar</Label>
-                    <Input
-                      id="avatar"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="mt-2"
-                    />
-                  </div>
-                )}
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="is_private">Private Profile</Label>
-                  <Switch
-                    id="is_private"
-                    checked={is_private}
-                    onCheckedChange={(checked) => setIsPrivate(checked)}
-                    disabled={!isEditing}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                {!isEditing ? (
-                  <>
-                    <Button variant="outline" onClick={handleEditProfile}>
-                      Edit Profile
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleLogout}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Logging Out..." : "Logout"}
-                    </Button>
-                  </>
+      <main className="container py-12">
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl">
+              Your Profile <Settings className="inline-block ml-2 h-5 w-5" />
+            </CardTitle>
+            <CardDescription>
+              Manage your account settings and privacy.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="flex items-center justify-center">
+              <Avatar className="h-24 w-24">
+                {avatarUrl ? (
+                  <AvatarImage src={avatarUrl} alt="Avatar" />
                 ) : (
-                  <>
-                    <Button variant="secondary" onClick={handleCancelEdit}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleSaveProfile} disabled={isLoading}>
-                      {isLoading ? "Saving..." : "Save"}
-                    </Button>
-                  </>
+                  <AvatarFallback>{name?.charAt(0).toUpperCase()}</AvatarFallback>
                 )}
-              </CardFooter>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </Avatar>
+            </div>
+            {isEditing && (
+              <div>
+                <Label htmlFor="avatar">Change Avatar</Label>
+                <Input
+                  id="avatar"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="mt-2"
+                />
+              </div>
+            )}
+            <div className="grid gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={!isEditing}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={!isEditing}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is_private">Private Profile</Label>
+              <Switch
+                id="is_private"
+                checked={is_private}
+                onCheckedChange={(checked) => setIsPrivate(checked)}
+                disabled={!isEditing}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            {!isEditing ? (
+              <>
+                <Button variant="outline" onClick={handleEditProfile}>
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleLogout}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Logging Out..." : "Logout"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="secondary" onClick={handleCancelEdit}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveProfile} disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save"}
+                </Button>
+              </>
+            )}
+          </CardFooter>
+        </Card>
       </main>
       <Footer />
     </div>
