@@ -125,7 +125,7 @@ const BetaLanding = () => {
                   </div>
                   <div className="flex items-start gap-3">
                     <XCircle className="w-6 h-6 text-neon-pink flex-shrink-0 mt-0.5" />
-                    <p className="text-neutral-300">No way to compare trophies across PlayStation, Xbox, and Steam?</p>
+                    <p className="text-neutral-300">Looking for a gaming progress tracker that compares trophies seamlessly?</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <XCircle className="w-6 h-6 text-neon-pink flex-shrink-0 mt-0.5" />
@@ -141,15 +141,15 @@ const BetaLanding = () => {
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-6 h-6 text-neon-green flex-shrink-0 mt-0.5" />
-                    <p className="text-neutral-300">One dashboard for all achievements across all platforms</p>
+                    <p className="text-neutral-300">One comprehensive dashboard for cross-platform game tracking</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-6 h-6 text-neon-green flex-shrink-0 mt-0.5" />
-                    <p className="text-neutral-300">AI-powered tracking & personalized trophy suggestions</p>
+                    <p className="text-neutral-300">AI-powered tracking for personalized trophy suggestions using our trophy & achievement manager</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-6 h-6 text-neon-green flex-shrink-0 mt-0.5" />
-                    <p className="text-neutral-300">Compete & compare with friends across platforms</p>
+                    <p className="text-neutral-300">Track & compare game achievements with friends across multiple platforms using the best gaming achievement app!</p>
                   </div>
                 </div>
               </div>
@@ -211,9 +211,7 @@ const BetaLanding = () => {
                         <Gamepad className="w-6 h-6" />
                         Multi-Platform Tracking
                       </h3>
-                      <p className="text-neutral-300 mb-4">
-                        Sync achievements from PlayStation, Xbox, and Steam instantly in one unified dashboard.
-                      </p>
+                      <p className="text-neutral-300 mb-4">Sync achievements seamlessly using our playstation trophy tracker, xbox achievement tracker, and steam achievement tracker.</p>
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
