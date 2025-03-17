@@ -69,7 +69,7 @@ const BetaLanding = () => {
             </div>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">The Ultimate Achievement Tracker – Join the Beta Before It's Too Late!</h1>
-            <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">Tired of tracking achievements across multiple platforms? PlatinumPath syncs your trophies from PlayStation, Xbox, & Steam – all in one place. 🚀</h2>
+            <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">PlatinumPath is your go-to solution for syncing trophies from PlayStation, Xbox, and Steam effortlessly using our game achievement tracker. This is the best gaming achievement app that brings gaming stats in one location. </h2>
             
             <div className="flex justify-center mb-6">
               <div className="bg-black/30 backdrop-blur-md rounded-lg p-3 flex gap-6 border border-neon-purple/20">
