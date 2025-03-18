@@ -379,7 +379,7 @@ const BetaLanding = () => {
                         <MessageCircle className="w-6 h-6" />
                         Exclusive Beta Feedback Channel
                       </h3>
-                      <p className="text-neutral-300 mb-4">
+                      <p className="text-neutral-300 mb-4 text-left">
                         Help shape the future of PlatinumPath with direct access to our development team.
                       </p>
                       <ul className="space-y-2">
