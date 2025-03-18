@@ -22,8 +22,20 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({ trophies }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 6;
   
-  const pageCount = Math.ceil(trophies.length / itemsPerPage);
-  const displayedTrophies = trophies.slice(
+  // If no trophies provided, show mock data
+  const mockTrophies: Trophy[] = [
+    { id: '1', name: 'Platinum Master', type: 'platinum', game: 'Ghost of Tsushima', rarity: '0.8%' },
+    { id: '2', name: 'Golden Victory', type: 'gold', game: 'Elden Ring', rarity: '5.2%' },
+    { id: '3', name: 'Silver Lining', type: 'silver', game: 'Spider-Man', rarity: '12.6%' },
+    { id: '4', name: 'Bronze Beginner', type: 'bronze', game: 'God of War', rarity: '45.3%' },
+    { id: '5', name: 'Ultra Rare Find', type: 'ultra-rare', game: 'Bloodborne', rarity: '0.1%' },
+    { id: '6', name: 'Legendary Champion', type: 'platinum', game: 'Sekiro', rarity: '1.3%' },
+  ];
+  
+  const displayTrophies = trophies.length > 0 ? trophies : mockTrophies;
+  
+  const pageCount = Math.ceil(displayTrophies.length / itemsPerPage);
+  const displayedTrophies = displayTrophies.slice(
     currentPage * itemsPerPage, 
     (currentPage + 1) * itemsPerPage
   );
@@ -41,10 +53,10 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({ trophies }) => {
   };
   
   return (
-    <div className="bg-black/30 rounded-xl p-4 mb-6">
+    <div className="bg-black/40 rounded-xl p-4 mb-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Trophy Showcase</h2>
-        <div className="flex space-x-1 bg-black/30 p-1 rounded-md">
+        <h3 className="text-lg font-bold text-neon-purple">Trophy Showcase</h3>
+        <div className="flex space-x-1 bg-black/40 p-1 rounded-md">
           <button 
             onClick={() => setCurrentView('grid')}
             className={`p-1 rounded ${currentView === 'grid' ? 'bg-neon-purple/30' : ''}`}
@@ -60,74 +72,79 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({ trophies }) => {
         </div>
       </div>
       
-      {trophies.length === 0 ? (
-        <div className="text-center py-12">
-          <Trophy className="h-16 w-16 mx-auto mb-4 text-neutral-600" />
-          <p className="text-neutral-400">No trophies to display yet.</p>
-          <p className="text-sm text-neutral-500 mt-2">Connect your gaming accounts to track achievements</p>
+      {currentView === 'grid' ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+          {displayedTrophies.map(trophy => (
+            <motion.div
+              key={trophy.id}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AchievementBadge
+                type={trophy.type}
+                name={trophy.name}
+                rarity={trophy.rarity}
+              />
+            </motion.div>
+          ))}
         </div>
       ) : (
-        <>
-          {currentView === 'grid' ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-              {displayedTrophies.map(trophy => (
-                <AchievementBadge
-                  key={trophy.id}
-                  type={trophy.type}
-                  name={trophy.name}
-                  rarity={trophy.rarity}
+        <div className="space-y-2">
+          {displayedTrophies.map(trophy => (
+            <motion.div 
+              key={trophy.id} 
+              className="bg-black/50 p-2 rounded-md flex items-center border border-neon-purple/20"
+              whileHover={{ 
+                backgroundColor: 'rgba(139, 92, 246, 0.2)', 
+                borderColor: 'rgba(139, 92, 246, 0.5)' 
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="w-12 h-12 flex-shrink-0">
+                <AchievementBadge 
+                  type={trophy.type} 
+                  name="" 
+                  animate={false} 
                 />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {displayedTrophies.map(trophy => (
-                <div key={trophy.id} className="bg-black/30 p-2 rounded-md flex items-center">
-                  <div className="w-12 h-12 flex-shrink-0">
-                    <AchievementBadge 
-                      type={trophy.type} 
-                      name="" 
-                      animate={false} 
-                    />
-                  </div>
-                  <div className="ml-3">
-                    <p className="font-medium text-sm">{trophy.name}</p>
-                    <p className="text-xs text-neutral-500">{trophy.game}</p>
-                  </div>
-                  {trophy.rarity && (
-                    <p className="ml-auto text-xs text-neutral-400">{trophy.rarity}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {pageCount > 1 && (
-            <div className="flex justify-between mt-4">
-              <button 
-                onClick={handlePrevPage}
-                disabled={currentPage === 0}
-                className="flex items-center space-x-1 text-sm disabled:opacity-50"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                <span>Previous</span>
-              </button>
-              
-              <div className="text-xs text-neutral-400">
-                Page {currentPage + 1} of {pageCount}
               </div>
-              
-              <button 
-                onClick={handleNextPage}
-                disabled={currentPage === pageCount - 1}
-                className="flex items-center space-x-1 text-sm disabled:opacity-50"
-              >
-                <span>Next</span>
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-        </>
+              <div className="ml-3">
+                <p className="font-medium text-white">{trophy.name}</p>
+                <p className="text-xs text-neutral-400">{trophy.game}</p>
+              </div>
+              {trophy.rarity && (
+                <div className="ml-auto bg-black/50 px-2 py-1 rounded text-xs">
+                  <span className="text-neon-purple font-mono">{trophy.rarity}</span>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      )}
+      
+      {pageCount > 1 && (
+        <div className="flex justify-between mt-4 text-neon-purple">
+          <button 
+            onClick={handlePrevPage}
+            disabled={currentPage === 0}
+            className="flex items-center space-x-1 text-sm disabled:opacity-50 transition-colors hover:text-white"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span>Previous</span>
+          </button>
+          
+          <div className="text-xs text-neutral-400 bg-black/30 px-2 py-1 rounded-md">
+            Page {currentPage + 1} of {pageCount}
+          </div>
+          
+          <button 
+            onClick={handleNextPage}
+            disabled={currentPage === pageCount - 1}
+            className="flex items-center space-x-1 text-sm disabled:opacity-50 transition-colors hover:text-white"
+          >
+            <span>Next</span>
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       )}
     </div>
   );

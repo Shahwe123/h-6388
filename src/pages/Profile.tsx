@@ -15,18 +15,18 @@ import { useSelector } from 'react-redux';
 import SocialShare from '@/components/profile/SocialShare';
 import { useProfileData } from '@/hooks/useProfileData';
 import LinkedAccounts from '@/components/profile/LinkedAccounts';
+import AchievementStats from '@/components/profile/AchievementStats';
+import RecentActivityChart from '@/components/profile/RecentActivityChart';
 
 /**
  * Profile page component
  * 
  * This component displays a user's gaming profile including achievements,
- * trophies, game collection, and social features
+ * trophies, game collection, and social features in a futuristic UI
  */
 const Profile = () => {
   const { username } = useParams();
   const navigate = useNavigate();
-  const [profileExists, setProfileExists] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
   const [showSocialShare, setShowSocialShare] = useState(false);
   const currentUser = useSelector((state: any) => state.user?.userData);
   
@@ -38,14 +38,8 @@ const Profile = () => {
     fetchProfileData
   } = useProfileData(username || null);
 
-  useEffect(() => {
-    // Profile existence check is now handled by useProfileData hook
-    // Just manage the main loading state here
-    setIsLoading(profileLoading);
-  }, [profileLoading]);
-
   // If loading or profile doesn't exist, show appropriate UI
-  if (isLoading) {
+  if (profileLoading) {
     return <ProfileLoading />;
   }
   
@@ -75,51 +69,94 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-primary pb-16">
       <div className="max-w-7xl mx-auto container-padding">
-        <ProfileHeader 
-          profile={profile}
-          isOwnProfile={isOwnProfile}
-          onShareClick={() => setShowSocialShare(true)}
-        />
+        {/* Header Section with user avatar and info */}
+        <div className="glass-card rounded-xl border border-neon-purple/30 backdrop-blur-md overflow-hidden mb-6">
+          <ProfileHeader 
+            profile={profile}
+            isOwnProfile={isOwnProfile}
+            onShareClick={() => setShowSocialShare(true)}
+          />
+        </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-          <div className="lg:col-span-1 space-y-6">
-            <ProfileStats 
-              trophiesCount={profileStats.trophiesCount}
-              platinumCount={profileStats.platinumCount}
-              completionPercentage={profileStats.completionPercentage}
-              friendCount={profileStats.friendCount}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Left Column - User Stats and Platform Icons */}
+          <div className="space-y-4">
+            <div className="glass-card rounded-xl border border-neon-purple/30 p-4">
+              <h2 className="text-xl font-bold mb-4 tracking-wider uppercase text-white/90 border-b border-neon-purple/20 pb-2">
+                USER STATS
+              </h2>
+              <ProfileStats 
+                trophiesCount={profileStats.trophiesCount}
+                platinumCount={profileStats.platinumCount}
+                completionPercentage={profileStats.completionPercentage}
+                friendCount={profileStats.friendCount}
+              />
+            </div>
             
-            <LevelProgress 
-              level={playerStats.level}
-              xp={playerStats.xp}
-              nextLevelXp={playerStats.nextLevelXp}
-              rank={playerStats.rank}
-            />
-            
-            <FriendsComparison 
-              friendCount={friendCount}
-              isOwnProfile={isOwnProfile} 
-            />
+            <div className="glass-card rounded-xl border border-neon-purple/30 p-4">
+              <h2 className="text-xl font-bold mb-4 tracking-wider uppercase text-white/90 border-b border-neon-purple/20 pb-2">
+                LINKED PLATFORMS
+              </h2>
+              <LinkedAccounts 
+                profile={profile}
+                isOwnProfile={isOwnProfile}
+                hasLinkedAccounts={hasLinkedAccounts}
+              />
+            </div>
           </div>
           
-          <div className="lg:col-span-2 space-y-8">
-            <LinkedAccounts 
-              profile={profile}
-              isOwnProfile={isOwnProfile}
-              hasLinkedAccounts={hasLinkedAccounts}
-            />
+          {/* Middle Column - Trophy Case and Achievement Highlights */}
+          <div className="space-y-4 md:col-span-2">
+            <div className="glass-card rounded-xl border border-neon-purple/30 p-4">
+              <h2 className="text-xl font-bold mb-4 tracking-wider uppercase text-white/90 border-b border-neon-purple/20 pb-2">
+                ACHIEVEMENT TRACKER
+              </h2>
+              <div className="mb-4">
+                <LevelProgress 
+                  level={playerStats.level}
+                  xp={playerStats.xp}
+                  nextLevelXp={playerStats.nextLevelXp}
+                  rank={playerStats.rank}
+                />
+              </div>
+              <TrophyCase trophies={profile?.recentTrophies || []} />
+            </div>
             
-            <TrophyCase trophies={profile?.recentTrophies || []} />
+            <div className="glass-card rounded-xl border border-neon-purple/30 p-4">
+              <h2 className="text-xl font-bold mb-4 tracking-wider uppercase text-white/90 border-b border-neon-purple/20 pb-2">
+                RECENT ACHIEVEMENTS
+              </h2>
+              <RecentActivityChart />
+            </div>
             
-            <AchievementHighlights achievements={profile?.achievements || []} />
-            
-            <GameCollections 
-              profile={profile}
-              isOwnProfile={isOwnProfile}
-              hasLinkedAccounts={hasLinkedAccounts}
-            />
+            <div className="glass-card rounded-xl border border-neon-purple/30 p-4">
+              <h2 className="text-xl font-bold mb-4 tracking-wider uppercase text-white/90 border-b border-neon-purple/20 pb-2">
+                PLATFORM ACHIEVEMENTS
+              </h2>
+              <AchievementStats profile={profile} />
+            </div>
           </div>
+        </div>
+        
+        <div className="mt-6 glass-card rounded-xl border border-neon-purple/30 p-4">
+          <h2 className="text-xl font-bold mb-4 tracking-wider uppercase text-white/90 border-b border-neon-purple/20 pb-2">
+            GAME COLLECTIONS
+          </h2>
+          <GameCollections 
+            profile={profile}
+            isOwnProfile={isOwnProfile}
+            hasLinkedAccounts={hasLinkedAccounts}
+          />
+        </div>
+        
+        <div className="mt-6 glass-card rounded-xl border border-neon-purple/30 p-4">
+          <h2 className="text-xl font-bold mb-4 tracking-wider uppercase text-white/90 border-b border-neon-purple/20 pb-2">
+            FRIENDS COMPARISON
+          </h2>
+          <FriendsComparison 
+            friendCount={friendCount}
+            isOwnProfile={isOwnProfile} 
+          />
         </div>
       </div>
       
