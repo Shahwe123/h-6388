@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -113,6 +112,7 @@ const AppRoutes = () => {
       {/* Footer pages */}
       <Route path="/about" element={<About />} />
       <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:id" element={<BlogPost />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/guides" element={<Guides />} />

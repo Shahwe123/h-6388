@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from "../components/SEO";
+import { blogPosts } from '../data/blogPosts';
 import { 
   Pagination, 
   PaginationContent, 
@@ -15,27 +16,12 @@ const Blog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 6;
 
-  // Real blog post data
-  const blogPosts = [
-    {
-      id: 1,
-      title: "🏆 Why We Built PlatinumPath: A Better Way to Track Game Achievements",
-      excerpt: "PlatinumPath is the next-generation game achievement tracker that enhances how you track PlayStation, Xbox, and Steam trophies. Find out how we improve on existing trackers.",
-      image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      date: "June 5, 2024",
-      author: "PlatinumPath Team",
-      category: "Product"
-    }
-  ];
-
-  // Calculate page counts
   const totalPages = Math.ceil(blogPosts.length / postsPerPage);
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = blogPosts.slice(indexOfFirstPost, indexOfLastPost);
 
-  // Handle page changes
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
@@ -72,14 +58,14 @@ const Blog = () => {
                   <div className="p-6">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs bg-neon-purple/20 text-neon-purple px-2 py-1 rounded">
-                        {post.category}
+                        Product
                       </span>
                       <span className="text-neutral-500 text-sm">{post.date}</span>
                     </div>
                     <h2 className="text-xl font-bold mb-2">{post.title}</h2>
                     <p className="text-neutral-400 mb-4 text-sm">{post.excerpt}</p>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-neutral-500">By {post.author}</span>
+                      <span className="text-sm text-neutral-500">By PlatinumPath Team</span>
                       <Link to={`/blog/${post.id}`} className="text-neon-purple hover:text-neon-blue transition-colors text-sm font-medium">
                         Read More →
                       </Link>
