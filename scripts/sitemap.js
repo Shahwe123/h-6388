@@ -1,4 +1,4 @@
-const fs = require("fs");
+// const fs = require("fs");
 
 const domain = "https://platinumpath.net"; // Your website URL
 
@@ -34,6 +34,6 @@ ${pages
   .join("\n")}
 </urlset>`;
 
-fs.writeFileSync("public/sitemap.xml", sitemap);
-
+// fs.writeFileSync("public/sitemap.xml", sitemap);
+console.log(sitemap);
 console.log("✅ Sitemap generated successfully!");

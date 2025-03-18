@@ -12,7 +12,8 @@
     "test": "npx vitest run",
     "test:ui": "npx vitest --ui",
     "test:watch": "npx vitest",
-    "test:coverage": "npx vitest run --coverage"
+    "test:coverage": "npx vitest run --coverage",
+    "generate:sitemap": "node scripts/sitemap.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
