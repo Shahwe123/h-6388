@@ -345,7 +345,7 @@ const BetaLanding = () => {
                         <Shield className="w-6 h-6" />
                         Privacy First
                       </h3>
-                      <p className="text-neutral-300 mb-4">
+                      <p className="text-neutral-300 mb-4 text-left">
                         We ONLY track public achievements—your data is 100% secure and protected.
                       </p>
                       <ul className="space-y-2">
