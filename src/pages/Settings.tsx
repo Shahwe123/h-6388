@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Shield, Bell, Gamepad, Palette, CreditCard } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -64,29 +63,38 @@ const Settings = () => {
                   <h2 className="text-2xl font-bold mb-4">Profile Settings</h2>
                   <div className="space-y-4">
                     <div>
-                      <label className="block mb-2 text-sm font-medium">
+                      <label className="block mb-2 text-sm font-medium text-right">
                         Username
                       </label>
-                      <Input defaultValue="GamerTag123" className="bg-black/30 border-neutral-700" />
+                      <input 
+                        defaultValue="GamerTag123" 
+                        className="w-full px-4 py-2 rounded bg-black/70 border border-neutral-700 text-white"
+                      />
                     </div>
                     <div>
-                      <label className="block mb-2 text-sm font-medium">
+                      <label className="block mb-2 text-sm font-medium text-right">
                         Display Name
                       </label>
-                      <Input defaultValue="John Doe" className="bg-black/30 border-neutral-700" />
+                      <input 
+                        defaultValue="John Doe" 
+                        className="w-full px-4 py-2 rounded bg-black/70 border border-neutral-700 text-white"
+                      />
                     </div>
                     <div>
-                      <label className="block mb-2 text-sm font-medium">
+                      <label className="block mb-2 text-sm font-medium text-right">
                         Email
                       </label>
-                      <Input defaultValue="john@example.com" className="bg-black/30 border-neutral-700" />
+                      <input 
+                        defaultValue="john@example.com" 
+                        className="w-full px-4 py-2 rounded bg-black/70 border border-neutral-700 text-white"
+                      />
                     </div>
                     <div>
-                      <label className="block mb-2 text-sm font-medium">
+                      <label className="block mb-2 text-sm font-medium text-right">
                         Bio
                       </label>
                       <textarea 
-                        className="w-full rounded-md bg-black/30 border-neutral-700 p-3"
+                        className="w-full rounded bg-black/70 border border-neutral-700 p-3 text-white"
                         rows={4}
                         defaultValue="Trophy hunter and achievement collector. I love completing games 100%!"
                       />
@@ -102,19 +110,28 @@ const Settings = () => {
                       <label className="block mb-2 text-sm font-medium">
                         Current Password
                       </label>
-                      <Input type="password" className="bg-black/30 border-neutral-700" />
+                      <input 
+                        type="password" 
+                        className="w-full px-4 py-2 rounded bg-black/70 border border-neutral-700 text-white" 
+                      />
                     </div>
                     <div>
                       <label className="block mb-2 text-sm font-medium">
                         New Password
                       </label>
-                      <Input type="password" className="bg-black/30 border-neutral-700" />
+                      <input 
+                        type="password" 
+                        className="w-full px-4 py-2 rounded bg-black/70 border border-neutral-700 text-white" 
+                      />
                     </div>
                     <div>
                       <label className="block mb-2 text-sm font-medium">
                         Confirm New Password
                       </label>
-                      <Input type="password" className="bg-black/30 border-neutral-700" />
+                      <input 
+                        type="password" 
+                        className="w-full px-4 py-2 rounded bg-black/70 border border-neutral-700 text-white"
+                      />
                     </div>
                     <div className="flex items-center justify-between p-4 bg-black/20 rounded-lg">
                       <div>

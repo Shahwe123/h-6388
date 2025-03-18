@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import SEO from "../components/SEO";
@@ -69,13 +68,13 @@ const BetaLanding = () => {
             </ul>
             
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-              <Input
+              <input
                 type="email"
                 placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-black/30 border-neutral-700 flex-grow"
+                className="w-full px-4 py-2 rounded bg-black/70 border border-neutral-700 text-white"
               />
               <Button 
                 type="submit" 
