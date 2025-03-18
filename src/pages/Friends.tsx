@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from 'react';
+import SEO from "../components/SEO";
 import { useToast } from '@/hooks/use-toast';
 import { Users, UserPlus, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ const Friends = () => {
   // Use Redux for friends data
   const { friends, loading: friendsLoading } = useSelector((state: any) => state.friends);
   const reduxUserData = useSelector((state: any) => state.user);
-  //TODO: find out how friends data is being populated
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -27,7 +27,6 @@ const Friends = () => {
         if (reduxUserData.user.session) {
           setAuthSession(reduxUserData.user.session);
           setUserId(reduxUserData.user.session.user.id);
-
 
           setUsername(reduxUserData.user.user.user_metadata.username);
         } else {
@@ -59,6 +58,11 @@ const Friends = () => {
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
+      <SEO 
+        title="Connect with Gamer Friends" 
+        description="Add friends, compare achievements, and climb the gaming leaderboards together."
+      />
+      
       <div className="container-padding mx-auto max-w-6xl">
         <div className="glass-card rounded-xl p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">

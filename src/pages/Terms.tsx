@@ -1,9 +1,15 @@
 
 import React from 'react';
+import SEO from "../components/SEO";
 
 const Terms = () => {
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
+      <SEO 
+        title="Terms & Conditions" 
+        description="Read the terms and conditions for using PlatinumPath's game achievement tracking services."
+      />
+      
       <div className="max-w-4xl mx-auto container-padding">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">Terms of Service</h1>
         

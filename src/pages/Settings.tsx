@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SEO from "../components/SEO";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, UserCircle, ImageIcon, Lock, Unlock } from 'lucide-react';
@@ -295,6 +296,11 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
+      <SEO 
+        title="Account Settings" 
+        description="Manage your PlatinumPath settings, preferences, and linked accounts."
+      />
+      
       <div className="container-padding mx-auto max-w-3xl">
         <div className="glass-card rounded-xl p-8">
           <h1 className="text-2xl font-bold mb-8">Account Settings</h1>
