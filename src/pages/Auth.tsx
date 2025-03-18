@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import SEO from "../components/SEO";
 
 // Import components
 import LoginForm from '@/components/auth/LoginForm';
@@ -15,6 +16,10 @@ const Auth = () => {
 
   return (
     <div className="w-full min-h-screen bg-primary flex items-center justify-center p-4">
+      <SEO 
+        title="Login or Sign Up" 
+        description="Sign in to PlatinumPath to track your gaming achievements across platforms. Create an account now!"
+      />
       <div className="glass-card w-full max-w-md p-8 rounded-lg">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold mb-2">GameHub</h1>

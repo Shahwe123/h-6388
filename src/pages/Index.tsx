@@ -7,6 +7,7 @@ import Testimonials from "../components/Testimonials";
 import Blog from "../components/Blog";
 import Footer from "../components/Footer";
 import Problems from "../components/Problems";
+import SEO from "../components/SEO";
 
 /**
  * Index/Home page component
@@ -29,6 +30,10 @@ import Problems from "../components/Problems";
 const Index = () => {
   return (
     <div className="min-h-screen">
+      <SEO 
+        title="Best Game Achievement Tracker" 
+        description="Track all your gaming trophies across PlayStation, Xbox, and Steam in one place."
+      />
       <Header />
       <main>
         <Hero />
