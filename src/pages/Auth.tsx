@@ -20,14 +20,14 @@ const Auth = () => {
           <h1 className="text-3xl font-bold mb-2">GameHub</h1>
           <p className="text-neutral-400">
             {mode === 'login'
-              ? 'Sign in to your account'
+              ? 'Sign in to your account (Developer Only)'
               : mode === 'register'
               ? 'Create an account (Developer Only)'
               : 'Reset your password'}
           </p>
-          {mode === 'register' && (
+          {(mode === 'register' || mode === 'login') && (
             <p className="text-xs text-neutral-400 mt-1">
-              Registration is currently restricted to developers only
+              Access is currently restricted to developers only
             </p>
           )}
         </div>
