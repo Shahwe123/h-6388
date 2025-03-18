@@ -22,9 +22,14 @@ const Auth = () => {
             {mode === 'login'
               ? 'Sign in to your account'
               : mode === 'register'
-              ? 'Create an account'
+              ? 'Create an account (Developer Only)'
               : 'Reset your password'}
           </p>
+          {mode === 'register' && (
+            <p className="text-xs text-neutral-400 mt-1">
+              Registration is currently restricted to developers only
+            </p>
+          )}
         </div>
 
         {mode === 'login' && <LoginForm />}
