@@ -32,7 +32,16 @@ const Profile = () => {
   const [showSocialShare, setShowSocialShare] = useState(false);
   const currentUser = useSelector((state: any) => state.user?.userData);
   
-  // Define the profileStats object based on available data
+  // First, fetch profile data
+  const { 
+    profile, 
+    loading: profileLoading, 
+    friendCount,
+    isOwnProfile,
+    fetchProfileData
+  } = useProfileData(username || null);
+  
+  // Now define the derived variables after we have profile and friendCount
   const profileStats = {
     trophiesCount: profile?.recentTrophies?.length || 0,
     platinumCount: profile?.recentTrophies?.filter(t => t.type === 'platinum')?.length || 0,
@@ -42,14 +51,6 @@ const Profile = () => {
   
   // Define whether the user has linked accounts
   const hasLinkedAccounts = !!(profile?.steam_id || profile?.playstation_username || profile?.xbox_gamertag);
-  
-  const { 
-    profile, 
-    loading: profileLoading, 
-    friendCount,
-    isOwnProfile,
-    fetchProfileData
-  } = useProfileData(username || null);
 
   return (
     <div className="min-h-screen bg-primary pb-16">
