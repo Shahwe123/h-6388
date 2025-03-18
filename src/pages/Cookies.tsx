@@ -1,9 +1,15 @@
 
 import React from 'react';
+import SEO from "../components/SEO";
 
 const Cookies = () => {
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
+      <SEO 
+        title="Cookie Policy" 
+        description="Learn about how PlatinumPath uses cookies to enhance your gaming experience."
+      />
+      
       <div className="max-w-4xl mx-auto container-padding">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">Cookie Policy</h1>
         

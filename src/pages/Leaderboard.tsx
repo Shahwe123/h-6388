@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import SEO from "../components/SEO";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Users, Gamepad } from 'lucide-react';
 import RankBadge from '@/components/profile/RankBadge';
@@ -156,6 +157,11 @@ const LeaderboardTable: React.FC<{ entries: LeaderboardEntry[] }> = ({ entries }
 const Leaderboard = () => {
   return (
     <div className="container-padding max-w-6xl mx-auto pt-24 pb-16">
+      <SEO 
+        title="Gaming Leaderboards" 
+        description="See where you rank among gamers worldwide. Compete and climb the PlatinumPath leaderboards."
+      />
+      
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-3">Achievement Leaderboards</h1>
         <p className="text-neutral-400">

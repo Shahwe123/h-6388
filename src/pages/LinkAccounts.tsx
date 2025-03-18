@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from 'react';
+import SEO from "../components/SEO";
 import { useToast } from '@/hooks/use-toast';
 import { Gamepad } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
@@ -212,6 +212,11 @@ const LinkAccounts = () => {
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
+      <SEO 
+        title="Link Your Gaming Accounts" 
+        description="Connect your PlayStation, Xbox, and Steam accounts to track achievements seamlessly."
+      />
+      
       <div className="container-padding mx-auto max-w-3xl">
         <div className="glass-card rounded-xl p-8 mb-8">
           <div className="flex items-center gap-3 mb-6">
