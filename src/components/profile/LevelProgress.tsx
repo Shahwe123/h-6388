@@ -1,74 +1,83 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Progress } from '@/components/ui/progress';
-import { Timer, Award } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
-interface LevelProgressProps {
+/**
+ * Props for the LevelProgress component
+ * @property {number} level - Current player level
+ * @property {number} xp - Current XP amount
+ * @property {number} nextLevelXp - XP required for the next level
+ * @property {string} rank - Optional player rank
+ */
+type LevelProgressProps = {
   level: number;
   xp: number;
   nextLevelXp: number;
-  rank: string;
+  rank?: string;
 }
 
-const LevelProgress: React.FC<LevelProgressProps> = ({ level, xp, nextLevelXp, rank }) => {
-  const progressPercentage = (xp / nextLevelXp) * 100;
+/**
+ * LevelProgress component
+ * 
+ * Displays a user's current level, XP progress, and rank.
+ * Includes a progress bar showing progress towards the next level.
+ * 
+ * @param {LevelProgressProps} props - Component props
+ * @returns {JSX.Element} The level progress UI
+ */
+export const LevelProgress: React.FC<LevelProgressProps> = ({ 
+  level, 
+  xp, 
+  nextLevelXp,
+  rank 
+}) => {
+  // Calculate progress percentage (capped at 100%)
+  const progress = Math.min(100, Math.round((xp / nextLevelXp) * 100));
   
   return (
-    <div className="bg-black/50 rounded-xl p-4 border border-neon-purple/30">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-2">
-        <div className="flex items-center gap-3">
+    <div className="w-full bg-black/30 rounded-xl p-4 mb-4">
+      <div className="flex items-center justify-between">
+        {/* Level badge and info */}
+        <div className="flex items-center">
           <motion.div 
-            className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink border-4 border-black/70"
-            animate={{ 
-              boxShadow: ['0 0 10px #8B5CF6', '0 0 20px #8B5CF6', '0 0 10px #8B5CF6'] 
-            }}
-            transition={{ 
-              duration: 2, 
-              repeat: Infinity, 
-              repeatType: "reverse"
-            }}
+            className="h-14 w-14 rounded-full bg-gradient-game flex items-center justify-center text-white font-bold text-xl relative"
+            whileHover={{ scale: 1.05 }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
-            <span className="text-xl font-bold">{level}</span>
+            {level}
+            <span className="absolute -top-1 -right-1 bg-black/60 rounded-full p-1">
+              <ArrowUp className="h-3 w-3 text-neon-blue" />
+            </span>
           </motion.div>
-          <div className="text-left">
-            <h3 className="text-xl font-bold">{rank}</h3>
-            <div className="flex items-center gap-1 text-xs text-neutral-300">
-              <Timer className="h-3 w-3" />
-              <span>53:29 hrs played</span>
-            </div>
+          <div className="ml-3">
+            <h3 className="font-bold text-white">Level {level}</h3>
+            <p className="text-xs text-neutral-400">
+              {rank ? rank : 'Trophy Hunter'}
+            </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-2 mt-2 sm:mt-0">
-          <Award className="h-5 w-5 text-neon-purple" />
-          <span className="text-sm font-mono">
-            <span className="text-neon-pink">{xp}</span>
-            <span className="text-neutral-400"> / </span>
-            <span className="text-neutral-300">{nextLevelXp}</span>
-            <span className="text-xs text-neutral-400 ml-1">XP</span>
-          </span>
+        {/* XP counter */}
+        <div className="text-right">
+          <p className="text-sm font-medium">
+            <span className="text-neon-blue">{xp}</span>
+            <span className="text-neutral-500">/{nextLevelXp} XP</span>
+          </p>
+          <p className="text-xs text-neutral-400">Next level in {nextLevelXp - xp} XP</p>
         </div>
       </div>
       
-      <div className="relative pt-1">
-        <Progress 
-          value={progressPercentage} 
-          className="h-3 bg-black/50 border border-neon-purple/20"
+      {/* Progress bar */}
+      <div className="mt-3 bg-black/50 h-2 rounded-full overflow-hidden">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-neon-blue to-neon-purple"
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         />
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            .radix-progress-indicator {
-              background: linear-gradient(90deg, #8B5CF6, #F97316) !important;
-              box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-            }
-          `
-        }} />
-        
-        <div className="flex justify-between text-xs text-neutral-400 mt-1">
-          <span>Current Level</span>
-          <span>Next Level</span>
-        </div>
       </div>
     </div>
   );
