@@ -375,7 +375,7 @@ const BetaLanding = () => {
                 <TabsContent value="feedback" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
-                      <h3 className="text-2xl font-bold text-neon-purple mb-4 flex items-center gap-2">
+                      <h3 className="text-2xl font-bold text-neon-purple mb-4 flex items-center gap-2 text-left">
                         <MessageCircle className="w-6 h-6" />
                         Exclusive Beta Feedback Channel
                       </h3>
