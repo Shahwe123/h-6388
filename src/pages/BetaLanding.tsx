@@ -7,6 +7,8 @@ import NewsletterForm from "@/components/NewsletterForm";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayStationIcon, XboxIcon, SteamIcon } from "../components/platforms/PlatformIcons";
+import SEO from "../components/SEO";
+
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -18,6 +20,7 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
+  
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -53,10 +56,16 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+  
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
+
   return <div className="min-h-screen">
+      <SEO 
+        title="Join PlatinumPath Beta" 
+        description="Be among the first to try PlatinumPath! Sign up for early beta access and track your trophies effortlessly."
+      />
       <Header />
       <main>
         <section className="pt-32 pb-16 container-padding bg-gradient-to-b from-black via-black to-primary text-white relative overflow-hidden">

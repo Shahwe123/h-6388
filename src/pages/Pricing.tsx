@@ -1,9 +1,14 @@
 
 import React from 'react';
+import SEO from "../components/SEO";
 
 const Pricing = () => {
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
+      <SEO 
+        title="PlatinumPath Pricing" 
+        description="View our free and premium plans for tracking gaming achievements. Choose the best option for you."
+      />
       <div className="max-w-4xl mx-auto container-padding">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">Pricing</h1>
         <div className="glass-card rounded-xl p-8 mb-8">

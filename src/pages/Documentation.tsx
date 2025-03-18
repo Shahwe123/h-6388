@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import SEO from "../components/SEO";
 
 const Documentation = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -143,6 +144,10 @@ const Documentation = () => {
   
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
+      <SEO 
+        title="PlatinumPath Documentation" 
+        description="Explore our API and integration documentation for game achievement tracking."
+      />
       <div className="max-w-6xl mx-auto container-padding">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Documentation</h1>

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import SEO from "../components/SEO";
 
 const Guides = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,6 +84,10 @@ const Guides = () => {
   
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
+      <SEO 
+        title="Game Achievement Guides" 
+        description="Unlock every trophy with our expert game achievement guides and walkthroughs."
+      />
       <div className="max-w-6xl mx-auto container-padding">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Guides & Tutorials</h1>
