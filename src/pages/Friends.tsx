@@ -8,7 +8,6 @@ import UserSearch from '@/components/friends/UserSearch';
 import FriendActivity from '@/components/friends/FriendActivity';
 import { useSelector } from 'react-redux';
 import { supabase } from '@/integrations/supabase/client';
-import SEO from "../components/SEO";
 
 const Friends = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -60,11 +59,6 @@ const Friends = () => {
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
-      <SEO 
-        title="Connect with Gamer Friends" 
-        description="Add friends, compare achievements, and climb the gaming leaderboards together."
-        url="/friends"
-      />
       <div className="container-padding mx-auto max-w-6xl">
         <div className="glass-card rounded-xl p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">

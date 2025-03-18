@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, useLocation } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
 import AppRoutes from "./routes/AppRoutes";
 import { AppDataInitializer } from "./components/app/AppDataInitializer";
 import { ScrollToTop } from "./components/app/ScrollToTop";
@@ -39,19 +38,17 @@ const ConditionalFooter = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppDataInitializer />
-            <ScrollToTop />
-            <NavbarWrapper />
-            <AppRoutes />
-            <ConditionalFooter />
-          </BrowserRouter>
-        </TooltipProvider>
-      </HelmetProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppDataInitializer />
+          <ScrollToTop />
+          <NavbarWrapper />
+          <AppRoutes />
+          <ConditionalFooter />
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 };

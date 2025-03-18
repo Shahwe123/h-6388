@@ -1,15 +1,9 @@
 
 import React from 'react';
-import SEO from "../components/SEO";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
-      <SEO 
-        title="Privacy Policy" 
-        description="Learn how we protect your data and ensure a secure gaming achievement tracking experience."
-        url="/privacy"
-      />
       <div className="max-w-4xl mx-auto container-padding">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">Privacy Policy</h1>
         

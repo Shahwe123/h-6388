@@ -15,7 +15,6 @@ import { useSelector } from 'react-redux';
 import SocialShare from '@/components/profile/SocialShare';
 import { useProfileData } from '@/hooks/useProfileData';
 import LinkedAccounts from '@/components/profile/LinkedAccounts';
-import SEO from "../components/SEO";
 
 /**
  * Profile page component
@@ -75,11 +74,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-primary pb-16">
-      <SEO 
-        title="Your Gaming Profile" 
-        description="Customize your gaming profile, showcase your trophies, and connect with other gamers."
-        url={`/profile/${username}`}
-      />
       <div className="max-w-7xl mx-auto container-padding">
         <ProfileHeader 
           profile={profile}

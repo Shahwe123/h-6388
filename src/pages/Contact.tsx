@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import SEO from "../components/SEO";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -45,11 +44,6 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
-      <SEO 
-        title="Contact Us" 
-        description="Get in touch with the PlatinumPath team for support, partnerships, or general inquiries."
-        url="/contact"
-      />
       <div className="max-w-4xl mx-auto container-padding">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">Contact Us</h1>
         

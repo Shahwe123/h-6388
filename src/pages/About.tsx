@@ -1,16 +1,10 @@
 
 import React from 'react';
 import { Trophy, Users, Shield, Gamepad } from 'lucide-react';
-import SEO from "../components/SEO";
 
 const About = () => {
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
-      <SEO 
-        title="About PlatinumPath" 
-        description="Learn about PlatinumPath, the ultimate game achievement tracker for PlayStation, Xbox, and Steam gamers."
-        url="/about"
-      />
       <div className="max-w-4xl mx-auto container-padding">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">About PlatinumPath</h1>
         
