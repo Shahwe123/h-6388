@@ -243,7 +243,7 @@ const BetaLanding = () => {
                         <Zap className="w-6 h-6" />
                         AI-Powered Insights
                       </h3>
-                      <p className="text-neutral-300 mb-4">
+                      <p className="text-neutral-300 mb-4 text-left">
                         Get smart recommendations on what trophies to chase next based on your gaming habits.
                       </p>
                       <ul className="space-y-2">
@@ -277,7 +277,7 @@ const BetaLanding = () => {
                         <BarChart className="w-6 h-6" />
                         Personal Achievement Dashboard
                       </h3>
-                      <p className="text-neutral-300 mb-4">
+                      <p className="text-neutral-300 mb-4 text-left">
                         View all your stats & progress in one place with beautiful visualizations.
                       </p>
                       <ul className="space-y-2">
