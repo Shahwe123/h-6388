@@ -24,9 +24,6 @@ const Header = () => {
           <a href="#how-it-works" className="text-neutral-300 hover:text-neon-pink transition-colors">
             How It Works
           </a>
-          <Link to="/original" className="text-neutral-300 hover:text-neon-pink transition-colors">
-            Original
-          </Link>
           <Link to="/auth" className="cyber-button flex items-center gap-2">
             Get Started
           </Link>
@@ -52,9 +49,6 @@ const Header = () => {
             <a href="#how-it-works" className="text-neutral-300 hover:text-neon-pink transition-colors">
               How It Works
             </a>
-            <Link to="/original" className="text-neutral-300 hover:text-neon-pink transition-colors">
-              Original
-            </Link>
             <Link to="/auth" className="cyber-button flex items-center justify-center gap-2">
               Get Started
             </Link>
