@@ -211,7 +211,7 @@ const BetaLanding = () => {
                         <Gamepad className="w-6 h-6" />
                         Multi-Platform Tracking
                       </h3>
-                      <p className="text-neutral-300 mb-4">Sync achievements seamlessly using our playstation trophy tracker, xbox achievement tracker, and steam achievement tracker.</p>
+                      <p className="text-neutral-300 mb-4 text-left">Sync achievements seamlessly using our playstation trophy tracker, xbox achievement tracker, and steam achievement tracker.</p>
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
