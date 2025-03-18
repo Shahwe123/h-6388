@@ -311,7 +311,7 @@ const BetaLanding = () => {
                         <Flame className="w-6 h-6" />
                         Competitive Leaderboards
                       </h3>
-                      <p className="text-neutral-300 mb-4">
+                      <p className="text-neutral-300 mb-4 text-left">
                         Compare your trophies against friends & the community across all platforms.
                       </p>
                       <ul className="space-y-2">
