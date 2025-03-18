@@ -1,9 +1,17 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Gamepad } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGamesStart, fetchGamesSuccess, fetchGamesFailure } from '../redux/slices/gamesSlice.js';
 import SEO from "../components/SEO";
+import { supabase } from '@/integrations/supabase/client';
+import { getCurrentSession, fetchUserProfile } from '@/helpers/authHelpers';
+import { fetchSteamData, fetchXboxData } from '@/helpers/platformHelpers';
+import ProcessingIndicator from '@/components/platforms/ProcessingIndicator';
+import PlatformCard from '@/components/platforms/PlatformCard';
+import PlatformModal from '@/components/platforms/PlatformModal';
+import { SteamIcon, XboxIcon, PlayStationIcon } from '@/components/platforms/PlatformIcons';
 
 interface RootState {
   games: {
