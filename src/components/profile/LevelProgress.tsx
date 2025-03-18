@@ -56,12 +56,14 @@ const LevelProgress: React.FC<LevelProgressProps> = ({ level, xp, nextLevelXp, r
           value={progressPercentage} 
           className="h-3 bg-black/50 border border-neon-purple/20"
         />
-        <style jsx global>{`
-          .radix-progress-indicator {
-            background: linear-gradient(90deg, #8B5CF6, #F97316) !important;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-          }
-        `}</style>
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .radix-progress-indicator {
+              background: linear-gradient(90deg, #8B5CF6, #F97316) !important;
+              box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+            }
+          `
+        }} />
         
         <div className="flex justify-between text-xs text-neutral-400 mt-1">
           <span>Current Level</span>

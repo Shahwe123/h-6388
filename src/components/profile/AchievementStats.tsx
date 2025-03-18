@@ -3,7 +3,7 @@ import React from 'react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Profile } from '@/types/profile';
-import { Steam, Gamepad2, GameController } from 'lucide-react';
+import { Gamepad, Gamepad2, Stamp } from 'lucide-react';
 
 interface AchievementStatsProps {
   profile: Profile;
@@ -28,13 +28,13 @@ const AchievementStats: React.FC<AchievementStatsProps> = ({ profile }) => {
       name: 'Xbox',
       value: 143,
       fill: '#10B981',
-      icon: <GameController className="h-6 w-6 text-white" />
+      icon: <Gamepad className="h-6 w-6 text-white" />
     },
     {
       name: 'Steam',
       value: 214,
       fill: '#0EA5E9',
-      icon: <Steam className="h-6 w-6 text-white" />
+      icon: <Stamp className="h-6 w-6 text-white" />
     }
   ];
 
