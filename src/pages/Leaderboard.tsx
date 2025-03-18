@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Users, Gamepad } from 'lucide-react';
 import RankBadge from '@/components/profile/RankBadge';
+import SEO from "../components/SEO";
 
 type LeaderboardEntry = {
   id: string;
@@ -15,7 +15,6 @@ type LeaderboardEntry = {
 };
 
 const GlobalLeaderboard: React.FC = () => {
-  // Placeholder data for global leaderboard
   const globalEntries: LeaderboardEntry[] = [
     { id: '1', rank: 1, username: 'TrophyMaster', score: 9850, achievementsCount: 423, rankTitle: 'Legendary Collector', percentile: 'Top 0.1%' },
     { id: '2', rank: 2, username: 'GameWizard', score: 9340, achievementsCount: 389, rankTitle: 'Platinum God', percentile: 'Top 0.5%' },
@@ -39,7 +38,6 @@ const GlobalLeaderboard: React.FC = () => {
 };
 
 const FriendsLeaderboard: React.FC = () => {
-  // Placeholder data for friends leaderboard
   const friendsEntries: LeaderboardEntry[] = [
     { id: '1', rank: 1, username: 'BestFriend01', score: 7650, achievementsCount: 210, rankTitle: 'Trophy Hunter', percentile: 'Top 5%' },
     { id: '2', rank: 2, username: 'GamingBuddy', score: 6430, achievementsCount: 189, rankTitle: 'Trophy Hunter', percentile: 'Top 12%' },
@@ -62,7 +60,6 @@ type PlatformType = 'PlayStation' | 'Xbox' | 'Steam';
 const PlatformLeaderboard: React.FC = () => {
   const [platform, setPlatform] = useState<PlatformType>('PlayStation');
   
-  // Placeholder data for platform leaderboards
   const platformData: Record<PlatformType, LeaderboardEntry[]> = {
     'PlayStation': [
       { id: '1', rank: 1, username: 'PSN_Master', score: 9250, achievementsCount: 410, rankTitle: 'Platinum God', percentile: 'Top 0.3%' },
@@ -156,6 +153,11 @@ const LeaderboardTable: React.FC<{ entries: LeaderboardEntry[] }> = ({ entries }
 const Leaderboard = () => {
   return (
     <div className="container-padding max-w-6xl mx-auto pt-24 pb-16">
+      <SEO 
+        title="Gaming Leaderboards" 
+        description="See where you rank among gamers worldwide. Compete and climb the PlatinumPath leaderboards."
+        url="/leaderboard"
+      />
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-3">Achievement Leaderboards</h1>
         <p className="text-neutral-400">

@@ -1,22 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Gamepad } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGamesStart, fetchGamesSuccess, fetchGamesFailure } from '../redux/slices/gamesSlice.js';
-
-// Import helper functions
-import { getCurrentSession, fetchUserProfile } from '@/helpers/authHelpers';
-import { fetchSteamData, fetchXboxData } from '@/helpers/platformHelpers';
-
-// Import components
-import PlatformCard from '@/components/platforms/PlatformCard';
-import PlatformModal from '@/components/platforms/PlatformModal';
-import ProcessingIndicator from '@/components/platforms/ProcessingIndicator';
-import { SteamIcon, XboxIcon, PlayStationIcon } from '@/components/platforms/PlatformIcons';
-
-// Import the supabase client
-import { supabase } from '@/integrations/supabase/client';
+import SEO from "../components/SEO";
 
 interface RootState {
   games: {
@@ -212,6 +199,11 @@ const LinkAccounts = () => {
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
+      <SEO 
+        title="Link Your Gaming Accounts" 
+        description="Connect your PlayStation, Xbox, and Steam accounts to track achievements seamlessly."
+        url="/link-accounts"
+      />
       <div className="container-padding mx-auto max-w-3xl">
         <div className="glass-card rounded-xl p-8 mb-8">
           <div className="flex items-center gap-3 mb-6">
