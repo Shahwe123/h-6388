@@ -15,17 +15,17 @@ const Header = () => {
         </Link>
         
         <div className="hidden md:flex items-center gap-8">
-          <a href="#problem" className="text-neutral-300 hover:text-neon-pink transition-colors">
+          <a href="#problem-solution" className="text-neutral-300 hover:text-neon-pink transition-colors">
             The Problem
           </a>
-          <a href="#solution" className="text-neutral-300 hover:text-neon-pink transition-colors">
-            The Solution
-          </a>
-          <a href="#features" className="text-neutral-300 hover:text-neon-pink transition-colors">
+          <a href="#beta-features" className="text-neutral-300 hover:text-neon-pink transition-colors">
             Features
           </a>
-          <Link to="/beta" className="text-neutral-300 hover:text-neon-pink transition-colors">
-            Beta
+          <a href="#how-it-works" className="text-neutral-300 hover:text-neon-pink transition-colors">
+            How It Works
+          </a>
+          <Link to="/original" className="text-neutral-300 hover:text-neon-pink transition-colors">
+            Original
           </Link>
           <Link to="/auth" className="cyber-button flex items-center gap-2">
             Get Started
@@ -43,17 +43,17 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-black border-b border-neon-purple/10">
           <div className="container-padding py-4 flex flex-col gap-4">
-            <a href="#problem" className="text-neutral-300 hover:text-neon-pink transition-colors">
+            <a href="#problem-solution" className="text-neutral-300 hover:text-neon-pink transition-colors">
               The Problem
             </a>
-            <a href="#solution" className="text-neutral-300 hover:text-neon-pink transition-colors">
-              The Solution
-            </a>
-            <a href="#features" className="text-neutral-300 hover:text-neon-pink transition-colors">
+            <a href="#beta-features" className="text-neutral-300 hover:text-neon-pink transition-colors">
               Features
             </a>
-            <Link to="/beta" className="text-neutral-300 hover:text-neon-pink transition-colors">
-              Beta
+            <a href="#how-it-works" className="text-neutral-300 hover:text-neon-pink transition-colors">
+              How It Works
+            </a>
+            <Link to="/original" className="text-neutral-300 hover:text-neon-pink transition-colors">
+              Original
             </Link>
             <Link to="/auth" className="cyber-button flex items-center justify-center gap-2">
               Get Started

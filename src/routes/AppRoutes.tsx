@@ -104,7 +104,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<Index />} />
+      <Route path="/" element={<BetaLanding />} />
+      <Route path="/original" element={<Index />} />
       <Route path="/beta" element={<BetaLanding />} />
       <Route path="/auth" element={<AuthRedirect />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
