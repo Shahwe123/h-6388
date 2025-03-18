@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import SEO from "../components/SEO";
 import { useParams, useNavigate } from 'react-router-dom';
@@ -17,6 +18,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import LinkedAccounts from '@/components/profile/LinkedAccounts';
 import AchievementStats from '@/components/profile/AchievementStats';
 import RecentActivityChart from '@/components/profile/RecentActivityChart';
+import { playerStats } from '@/data/profileData'; // Import playerStats from profileData
 
 /**
  * Profile page component
@@ -29,6 +31,17 @@ const Profile = () => {
   const navigate = useNavigate();
   const [showSocialShare, setShowSocialShare] = useState(false);
   const currentUser = useSelector((state: any) => state.user?.userData);
+  
+  // Define the profileStats object based on available data
+  const profileStats = {
+    trophiesCount: profile?.recentTrophies?.length || 0,
+    platinumCount: profile?.recentTrophies?.filter(t => t.type === 'platinum')?.length || 0,
+    completionPercentage: 35, // Example default value
+    friendCount: friendCount || 0
+  };
+  
+  // Define whether the user has linked accounts
+  const hasLinkedAccounts = !!(profile?.steam_id || profile?.playstation_username || profile?.xbox_gamertag);
   
   const { 
     profile, 
