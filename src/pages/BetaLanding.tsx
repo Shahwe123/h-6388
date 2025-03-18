@@ -207,7 +207,7 @@ const BetaLanding = () => {
                 <TabsContent value="tracking" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
-                      <h3 className="text-2xl font-bold text-neon-purple mb-4 flex items-center gap-2">
+                      <h3 className="text-2xl font-bold text-neon-purple mb-4 flex items-center gap-2 text-left">
                         <Gamepad className="w-6 h-6" />
                         Multi-Platform Tracking
                       </h3>
@@ -215,7 +215,7 @@ const BetaLanding = () => {
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
-                          <span className="text-neutral-300">Real-time syncing across all platforms</span>
+                          <span className="text-neutral-300 text-left">Real-time syncing across all platforms</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
@@ -249,7 +249,7 @@ const BetaLanding = () => {
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
-                          <span className="text-neutral-300">Personalized trophy recommendations</span>
+                          <span className="text-neutral-300 text-left">Personalized trophy recommendations</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
@@ -273,7 +273,7 @@ const BetaLanding = () => {
                 <TabsContent value="dashboard" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
-                      <h3 className="text-2xl font-bold text-neon-purple mb-4 flex items-center gap-2">
+                      <h3 className="text-2xl font-bold text-neon-purple mb-4 flex items-center gap-2 text-left">
                         <BarChart className="w-6 h-6" />
                         Personal Achievement Dashboard
                       </h3>
@@ -317,7 +317,7 @@ const BetaLanding = () => {
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
-                          <span className="text-neutral-300">Global and friend-only leaderboards</span>
+                          <span className="text-neutral-300 text-left">Global and friend-only leaderboards</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
