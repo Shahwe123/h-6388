@@ -351,7 +351,7 @@ const BetaLanding = () => {
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
-                          <span className="text-neutral-300">No personal information collected</span>
+                          <span className="text-neutral-300 text-left">No personal information collected</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-neon-green flex-shrink-0 mt-0.5" />
