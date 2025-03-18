@@ -1,71 +1,56 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Pricing from "./pages/Pricing";
-import Contact from "./pages/Contact";
-import Support from "./pages/Support";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Cookies from "./pages/Cookies";
-import Documentation from "./pages/Documentation";
-import Blog from "./pages/Blog";
-import Auth from "./pages/Auth";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import LinkAccounts from "./pages/LinkAccounts";
-import Leaderboard from "./pages/Leaderboard";
-import Friends from "./pages/Friends";
-import BetaLanding from "./pages/BetaLanding";
-import Guides from "./pages/Guides";
-import { Provider } from 'react-redux';
-import store from './redux/store';
-import { useEffect } from 'react';
-import { supabase } from './integrations/supabase/client';
-import { fetchUserData } from './redux/slices/userSlice';
 
-function App() {
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, useLocation } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
+import { AppDataInitializer } from "./components/app/AppDataInitializer";
+import { ScrollToTop } from "./components/app/ScrollToTop";
+import { NavbarWrapper } from "./components/app/NavbarWrapper";
+import Footer from "./components/Footer";
 
-      store.dispatch(fetchUserData(session))
+import './App.css';
+import './index.css';
 
-      supabase.auth.onAuthStateChange((_event, session) => {
-        store.dispatch(fetchUserData(session))
-      })
-    }
+// Initialize React Query client
+const queryClient = new QueryClient();
 
-    getSession();
-  }, [])
+/**
+ * ConditionalFooter component
+ * Only renders the Footer component when not on the homepage (which already has a footer)
+ */
+const ConditionalFooter = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  
+  return !isHomePage ? <Footer /> : null;
+};
+
+/**
+ * Main App component
+ * 
+ * This is the root component of the application.
+ * It sets up providers, routing, and global components.
+ * 
+ * @returns {JSX.Element} The application UI
+ */
+const App = () => {
   return (
-    <HelmetProvider>
-      <Provider store={store}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/support" element={<Support />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/cookies" element={<Cookies />} />
-            <Route path="/documentation" element={<Documentation />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/profile/:username" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/link-accounts" element={<LinkAccounts />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/friends" element={<Friends />} />
-            <Route path="/beta" element={<BetaLanding />} />
-            <Route path="/guides" element={<Guides />} />
-          </Routes>
-        </Router>
-      </Provider>
-    </HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppDataInitializer />
+          <ScrollToTop />
+          <NavbarWrapper />
+          <AppRoutes />
+          <ConditionalFooter />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
-}
+};
 
 export default App;

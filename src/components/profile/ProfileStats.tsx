@@ -1,6 +1,4 @@
-
 import { Trophy, Medal, BarChart3, Users } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 /**
  * Props for the ProfileStats component
@@ -28,58 +26,34 @@ const ProfileStats = ({
   friendCount 
 }: ProfileStatsProps) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 mb-8">
       {/* Trophies stat */}
-      <motion.div 
-        className="bg-black/40 p-3 rounded-lg text-center border border-neon-purple/20 hover:border-neon-purple/50 transition-colors"
-        whileHover={{ y: -5, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-300 flex items-center justify-center mx-auto mb-2">
-          <Trophy className="w-5 h-5 text-black" />
-        </div>
-        <div className="text-xl font-bold text-white">{trophiesCount}</div>
-        <div className="text-xs text-neutral-400 uppercase tracking-wider">Trophies</div>
-      </motion.div>
+      <div className="bg-black/30 p-4 rounded-lg text-center">
+        <Trophy className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+        <div className="text-xl font-bold">{trophiesCount}</div>
+        <div className="text-sm text-neutral-400">Trophies</div>
+      </div>
 
       {/* Platinums stat */}
-      <motion.div 
-        className="bg-black/40 p-3 rounded-lg text-center border border-neon-purple/20 hover:border-neon-purple/50 transition-colors"
-        whileHover={{ y: -5, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-blue to-blue-300 flex items-center justify-center mx-auto mb-2">
-          <Medal className="w-5 h-5 text-black" />
-        </div>
-        <div className="text-xl font-bold text-white">{platinumCount}</div>
-        <div className="text-xs text-neutral-400 uppercase tracking-wider">Platinums</div>
-      </motion.div>
+      <div className="bg-black/30 p-4 rounded-lg text-center">
+        <Medal className="w-6 h-6 text-neon-blue mx-auto mb-2" />
+        <div className="text-xl font-bold">{platinumCount}</div>
+        <div className="text-sm text-neutral-400">Platinums</div>
+      </div>
 
       {/* Completion Rate stat */}
-      <motion.div 
-        className="bg-black/40 p-3 rounded-lg text-center border border-neon-purple/20 hover:border-neon-purple/50 transition-colors"
-        whileHover={{ y: -5, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-purple-300 flex items-center justify-center mx-auto mb-2">
-          <BarChart3 className="w-5 h-5 text-black" />
-        </div>
-        <div className="text-xl font-bold text-white">{completionPercentage}%</div>
-        <div className="text-xs text-neutral-400 uppercase tracking-wider">Completion</div>
-      </motion.div>
+      <div className="bg-black/30 p-4 rounded-lg text-center">
+        <BarChart3 className="w-6 h-6 text-neon-purple mx-auto mb-2" />
+        <div className="text-xl font-bold">{completionPercentage}%</div>
+        <div className="text-sm text-neutral-400">Completion Rate</div>
+      </div>
 
       {/* Friends stat */}
-      <motion.div 
-        className="bg-black/40 p-3 rounded-lg text-center border border-neon-purple/20 hover:border-neon-purple/50 transition-colors"
-        whileHover={{ y: -5, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)' }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-green to-green-300 flex items-center justify-center mx-auto mb-2">
-          <Users className="w-5 h-5 text-black" />
-        </div>
-        <div className="text-xl font-bold text-white">{friendCount}</div>
-        <div className="text-xs text-neutral-400 uppercase tracking-wider">Friends</div>
-      </motion.div>
+      <div className="bg-black/30 p-4 rounded-lg text-center">
+        <Users className="w-6 h-6 text-green-500 mx-auto mb-2" />
+        <div className="text-xl font-bold">{friendCount}</div>
+        <div className="text-sm text-neutral-400">Friends</div>
+      </div>
     </div>
   );
 };

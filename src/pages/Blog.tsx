@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import SEO from "../components/SEO";
 
 const Blog = () => {
   // Mock blog posts data
@@ -64,11 +63,6 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
-      <SEO 
-        title="Gaming Achievement Blog" 
-        description="Read the latest guides, tips, and news on gaming achievements, trophies, and leaderboards."
-      />
-      
       <div className="max-w-6xl mx-auto container-padding">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
