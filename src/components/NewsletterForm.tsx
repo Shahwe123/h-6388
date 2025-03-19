@@ -31,17 +31,17 @@ const NewsletterForm = ({ isOpen, onClose }: NewsletterFormProps) => {
     setIsSubmitting(true);
 
     try {
-      // Call the Supabase Edge Function for Mailchimp subscription
-      const { data, error } = await supabase.functions.invoke('mailchimp-subscribe', {
-        body: { email }
-      });
+      // Insert the email into the waitlist table
+      // We're using the raw Supabase client without relying on specific types
+      const { error } = await supabase
+        .from("waitlist")
+        .insert([{ email }]);
 
       if (error) throw error;
 
-      // Show success message
       toast({
         title: "Success!",
-        description: data?.message || "You've been added to our waitlist. Stay tuned for updates!",
+        description: "You've been added to our waitlist. Stay tuned for updates!",
       });
       
       setEmail("");
