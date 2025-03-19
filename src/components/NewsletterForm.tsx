@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -5,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { createEmailPreferencesUrl } from "@/utils/emailUtils";
 import { 
   Dialog, 
   DialogContent, 
@@ -77,6 +79,25 @@ const NewsletterForm = ({ isOpen, onClose }: NewsletterFormProps) => {
 
       if (error) throw error;
 
+      // Generate email preferences URL for the welcome email
+      let preferencesUrl;
+      try {
+        preferencesUrl = await createEmailPreferencesUrl(email);
+      } catch (error) {
+        console.error("Error creating preferences URL:", error);
+        // Continue even if we can't create the preferences URL
+      }
+
+      // Send welcome email
+      try {
+        await supabase.functions.invoke("send-welcome-email", {
+          body: { email, name: name || null, preferencesUrl }
+        });
+      } catch (emailError) {
+        console.error("Error sending welcome email:", emailError);
+        // Don't throw error here, as we still want to show success toast
+      }
+      
       toast({
         title: "Success!",
         description: "You've been added to our waitlist. Stay tuned for updates!",
