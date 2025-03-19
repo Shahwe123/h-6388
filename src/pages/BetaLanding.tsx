@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayStationIcon, XboxIcon, SteamIcon } from "../components/platforms/PlatformIcons";
 import SEO from "../components/SEO";
+
 const BetaLanding = () => {
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
@@ -19,6 +20,7 @@ const BetaLanding = () => {
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -54,9 +56,11 @@ const BetaLanding = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   const openNewsletterForm = () => {
     setIsNewsletterOpen(true);
   };
+
   return <div className="min-h-screen">
       <SEO title="Join PlatinumPath Beta" description="Be among the first to try PlatinumPath! Sign up for early beta access and track your trophies effortlessly." />
       <Header />
@@ -169,7 +173,7 @@ const BetaLanding = () => {
         <section id="beta-features" className="py-16 container-padding bg-gradient-to-b from-dark-blue via-black to-black">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
-              What's <span className="text-neon-purple">Inside the Beta?</span>
+              Inside PlatinumPath's <span className="text-neon-purple">Exclusive Beta</span>
             </h2>
             <p className="text-neutral-300 text-center mb-12 max-w-2xl mx-auto">
               Be Among the First to Test These Powerful Features!
@@ -681,4 +685,5 @@ const BetaLanding = () => {
       {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
     </div>;
 };
+
 export default BetaLanding;
