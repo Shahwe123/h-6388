@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -73,8 +72,7 @@ const NewsletterForm = ({ isOpen, onClose }: NewsletterFormProps) => {
           consent_given: consent,
           consent_timestamp: subscriptionDate,
           email_preferences: preferences,
-          subscription_source: "beta_waitlist_form",
-          ip_address: null // We don't collect IP for privacy reasons
+          subscription_source: "beta_waitlist_form"
         }]);
 
       if (error) throw error;
@@ -259,7 +257,6 @@ const NewsletterForm = ({ isOpen, onClose }: NewsletterFormProps) => {
   );
 };
 
-// Unsubscribe Dialog Component
 export const UnsubscribeDialog = ({ 
   isOpen, 
   onClose, 
