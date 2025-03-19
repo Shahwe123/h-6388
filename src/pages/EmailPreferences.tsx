@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
+import { Json } from "@/integrations/supabase/types";
 
 // Define the preferences type to match our expected structure
 interface EmailPreferences {
@@ -147,9 +148,17 @@ const EmailPreferences = () => {
     setIsSubmitting(true);
     
     try {
+      // Convert preferences to JSON compatible format
+      const jsonPreferences = {
+        productUpdates: preferences.productUpdates,
+        newFeatures: preferences.newFeatures,
+        communityEvents: preferences.communityEvents,
+        tips: preferences.tips
+      } as Json;
+      
       const { error } = await supabase
         .from("waitlist")
-        .update({ email_preferences: preferences })
+        .update({ email_preferences: jsonPreferences })
         .eq("email", email);
         
       if (error) throw error;
