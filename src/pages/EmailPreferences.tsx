@@ -8,6 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 
+// Define the preferences type to match our expected structure
+interface EmailPreferences {
+  productUpdates: boolean;
+  newFeatures: boolean;
+  communityEvents: boolean;
+  tips: boolean;
+}
+
+// Default preferences if none are found
+const defaultPreferences: EmailPreferences = {
+  productUpdates: true,
+  newFeatures: true,
+  communityEvents: false,
+  tips: false
+};
+
 const EmailPreferences = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
@@ -18,12 +34,7 @@ const EmailPreferences = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [unsubscribeReason, setUnsubscribeReason] = useState("");
-  const [preferences, setPreferences] = useState({
-    productUpdates: true,
-    newFeatures: true,
-    communityEvents: false,
-    tips: false
-  });
+  const [preferences, setPreferences] = useState<EmailPreferences>(defaultPreferences);
   
   const { toast } = useToast();
   
@@ -58,7 +69,18 @@ const EmailPreferences = () => {
             .single();
             
           if (userData?.email_preferences) {
-            setPreferences(userData.email_preferences);
+            // Safely parse the preferences, ensuring they match our expected structure
+            const userPrefs = userData.email_preferences as Record<string, boolean>;
+            
+            // Create a new preferences object with defaults for any missing values
+            const parsedPreferences: EmailPreferences = {
+              productUpdates: typeof userPrefs.productUpdates === 'boolean' ? userPrefs.productUpdates : defaultPreferences.productUpdates,
+              newFeatures: typeof userPrefs.newFeatures === 'boolean' ? userPrefs.newFeatures : defaultPreferences.newFeatures,
+              communityEvents: typeof userPrefs.communityEvents === 'boolean' ? userPrefs.communityEvents : defaultPreferences.communityEvents,
+              tips: typeof userPrefs.tips === 'boolean' ? userPrefs.tips : defaultPreferences.tips
+            };
+            
+            setPreferences(parsedPreferences);
           }
           
           // Mark token as used
