@@ -426,7 +426,7 @@ const BetaLanding = () => {
         <section id="beta-perks" className="py-16 container-padding bg-gradient-to-b from-black via-black to-dark-blue">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-white">
-              Why Join the <span className="text-neon-purple">PlatinumPath Beta</span>?
+              Why Choose <span className="text-neon-purple">PlatinumPath's Game Achievement Tracker</span>?
             </h2>
             <p className="text-neutral-300 text-center mb-12 max-w-2xl mx-auto">
               Beta testers get exclusive perks that won't be available after full launch!
