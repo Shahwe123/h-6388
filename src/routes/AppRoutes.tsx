@@ -15,6 +15,7 @@ import LinkAccounts from "@/pages/LinkAccounts";
 import Friends from "@/pages/Friends";
 import Leaderboard from "@/pages/Leaderboard";
 import AuthRequired from "@/components/AuthRequired";
+import EmailPreferences from "@/pages/EmailPreferences";
 
 // Footer pages
 import About from "@/pages/About";
@@ -109,6 +110,7 @@ const AppRoutes = () => {
       <Route path="/beta" element={<BetaLanding />} />
       <Route path="/auth" element={<AuthRedirect />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
+      <Route path="/email-preferences" element={<EmailPreferences />} />
 
       {/* Footer pages */}
       <Route path="/about" element={<About />} />
