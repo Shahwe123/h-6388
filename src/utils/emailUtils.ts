@@ -127,3 +127,11 @@ export const processUnsubscribe = async (
     return false;
   }
 };
+
+/**
+ * Get sender email for newsletters
+ * @returns {string} The sender email address
+ */
+export const getNewsletterSenderEmail = (): string => {
+  return "info@updates.platinumpath.net";
+};

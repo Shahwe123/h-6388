@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createEmailPreferencesUrl } from "@/utils/emailUtils";
+import { createEmailPreferencesUrl, getNewsletterSenderEmail } from "@/utils/emailUtils";
 import { 
   Dialog, 
   DialogContent, 
@@ -88,10 +87,18 @@ const NewsletterForm = ({ isOpen, onClose }: NewsletterFormProps) => {
         // Continue even if we can't create the preferences URL
       }
 
+      // Get the sender email from the utility function
+      const senderEmail = getNewsletterSenderEmail();
+
       // Send welcome email
       try {
         await supabase.functions.invoke("send-welcome-email", {
-          body: { email, name: name || null, preferencesUrl }
+          body: { 
+            email, 
+            name: name || null, 
+            preferencesUrl,
+            senderEmail 
+          }
         });
       } catch (emailError) {
         console.error("Error sending welcome email:", emailError);
