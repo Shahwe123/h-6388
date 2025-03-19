@@ -56,6 +56,39 @@ export type Database = {
           },
         ]
       }
+      email_tokens: {
+        Row: {
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          token: string
+          type: string
+          used: boolean | null
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          token: string
+          type: string
+          used?: boolean | null
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          type?: string
+          used?: boolean | null
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       friends: {
         Row: {
           created_at: string
@@ -188,6 +221,27 @@ export type Database = {
         }
         Relationships: []
       }
+      unsubscribe_feedback: {
+        Row: {
+          email: string
+          id: string
+          reason: string | null
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          reason?: string | null
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          reason?: string | null
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: number
@@ -294,19 +348,34 @@ export type Database = {
       }
       waitlist: {
         Row: {
+          consent_given: boolean | null
+          consent_timestamp: string | null
           created_at: string
           email: string
+          email_preferences: Json | null
           id: string
+          name: string | null
+          subscription_source: string | null
         }
         Insert: {
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
           created_at?: string
           email: string
+          email_preferences?: Json | null
           id?: string
+          name?: string | null
+          subscription_source?: string | null
         }
         Update: {
+          consent_given?: boolean | null
+          consent_timestamp?: string | null
           created_at?: string
           email?: string
+          email_preferences?: Json | null
           id?: string
+          name?: string | null
+          subscription_source?: string | null
         }
         Relationships: []
       }
