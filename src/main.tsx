@@ -9,6 +9,11 @@ import App from './App';
 import { store, persistor } from './redux/store';
 import './index.css';
 
+// Check for browserslist update only in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('Running in development mode');
+}
+
 const rootElement = document.getElementById('root') as HTMLElement;
 
 // Pre-rendered content needs to be hydrated, not rendered

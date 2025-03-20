@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -32,6 +31,26 @@ export default defineConfig(({ mode }) => {
     },
     // Make sure static assets in public folder are served
     publicDir: 'public',
+    build: {
+      // Improved browser compatibility
+      target: 'es2015',
+      outDir: 'dist',
+      sourcemap: mode !== 'production',
+      // Ensure proper chunks for better performance
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+            ui: [
+              '@radix-ui/react-dialog',
+              '@radix-ui/react-dropdown-menu',
+              '@radix-ui/react-toast',
+              // Other UI libraries
+            ],
+          },
+        },
+      },
+    },
   };
 });
 
