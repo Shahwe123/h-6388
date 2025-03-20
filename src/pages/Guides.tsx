@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import SEO from "../components/SEO";
+import { Helmet } from 'react-helmet-async';
 
 const Guides = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,7 +15,8 @@ const Guides = () => {
       category: "Beginners",
       readTime: "5 min read",
       image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Learn how to set up your PlatinumPath account and start tracking your gaming achievements."
+      description: "Learn how to set up your PlatinumPath account and start tracking your gaming achievements.",
+      url: "/guides/getting-started"
     },
     {
       id: 2,
@@ -22,7 +24,8 @@ const Guides = () => {
       category: "Account Management",
       readTime: "8 min read",
       image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Step-by-step guide to connecting your PlayStation, Xbox, and Steam accounts to PlatinumPath."
+      description: "Step-by-step guide to connecting your PlayStation, Xbox, and Steam accounts to PlatinumPath.",
+      url: "/guides/linking-accounts"
     },
     {
       id: 3,
@@ -30,7 +33,8 @@ const Guides = () => {
       category: "Features",
       readTime: "6 min read",
       image: "https://images.unsplash.com/photo-1614294149010-950b698f72c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Understand how to view, filter, and sort your achievements across different gaming platforms."
+      description: "Understand how to view, filter, and sort your achievements across different gaming platforms.",
+      url: "/guides/achievement-tracking"
     },
     {
       id: 4,
@@ -38,7 +42,8 @@ const Guides = () => {
       category: "Social",
       readTime: "7 min read",
       image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Learn how to add friends, compare achievements, and participate in friendly competitions."
+      description: "Learn how to add friends, compare achievements, and participate in friendly competitions.",
+      url: "/guides/competing-with-friends"
     },
     {
       id: 5,
@@ -46,7 +51,8 @@ const Guides = () => {
       category: "Advanced",
       readTime: "10 min read",
       image: "https://images.unsplash.com/photo-1616627547584-bf28cee262db?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Deep dive into achievement rarity, percentiles, and what makes certain trophies more valuable."
+      description: "Deep dive into achievement rarity, percentiles, and what makes certain trophies more valuable.",
+      url: "/guides/achievement-rarity"
     },
     {
       id: 6,
@@ -54,7 +60,8 @@ const Guides = () => {
       category: "Customization",
       readTime: "4 min read",
       image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Customize your profile badge to show off your greatest gaming accomplishments."
+      description: "Customize your profile badge to show off your greatest gaming accomplishments.",
+      url: "/guides/profile-badge"
     },
     {
       id: 7,
@@ -62,7 +69,8 @@ const Guides = () => {
       category: "Features",
       readTime: "6 min read",
       image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Everything you need to know about global and friends leaderboards on PlatinumPath."
+      description: "Everything you need to know about global and friends leaderboards on PlatinumPath.",
+      url: "/guides/leaderboards"
     },
     {
       id: 8,
@@ -70,7 +78,8 @@ const Guides = () => {
       category: "Support",
       readTime: "9 min read",
       image: "https://images.unsplash.com/photo-1559336197-ded8aaa244bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      description: "Common problems when linking gaming accounts and how to solve them."
+      description: "Common problems when linking gaming accounts and how to solve them.",
+      url: "/guides/troubleshooting"
     }
   ];
   
@@ -82,12 +91,34 @@ const Guides = () => {
   
   const categories = ["All", "Beginners", "Account Management", "Features", "Social", "Advanced", "Customization", "Support"];
   
+  // Create structured data for the guides
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": guides.map(guide => ({
+      "@type": "Question",
+      "name": guide.title,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": guide.description
+      }
+    }))
+  };
+  
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
       <SEO 
         title="Game Achievement Guides" 
         description="Unlock every trophy with our expert game achievement guides and walkthroughs."
       />
+      
+      {/* Add structured data for better SEO */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+      
       <div className="max-w-6xl mx-auto container-padding">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Guides & Tutorials</h1>
@@ -138,9 +169,9 @@ const Guides = () => {
                 </div>
                 <h2 className="text-xl font-bold mb-2">{guide.title}</h2>
                 <p className="text-neutral-400 mb-4 text-sm">{guide.description}</p>
-                <button className="text-neon-purple hover:text-neon-blue transition-colors text-sm font-medium">
+                <a href={guide.url} className="text-neon-purple hover:text-neon-blue transition-colors text-sm font-medium">
                   Read Guide →
-                </button>
+                </a>
               </div>
             </div>
           ))}

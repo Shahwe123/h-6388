@@ -2,10 +2,71 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import SEO from "../components/SEO";
+import { Helmet } from 'react-helmet-async';
 
 const Blog = () => {
-  // Empty blog posts array
-  const blogPosts = [];
+  // Sample blog posts - we'll create a few to demonstrate structured data
+  const blogPosts = [
+    {
+      id: 1,
+      title: "Getting Started with Achievement Hunting",
+      excerpt: "Learn how to begin your journey to 100% completion and platinum trophies.",
+      author: "Trophy Hunter",
+      date: "2023-07-15",
+      category: "Guides",
+      image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      url: "/blog/getting-started-with-achievement-hunting"
+    },
+    {
+      id: 2,
+      title: "Top 10 Easiest Platinum Trophies",
+      excerpt: "Looking for some quick wins? These games offer the easiest platinum trophies.",
+      author: "Platinum Pro",
+      date: "2023-08-22",
+      category: "Lists",
+      image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      url: "/blog/top-10-easiest-platinum-trophies"
+    },
+    {
+      id: 3,
+      title: "The Psychology of Achievement Hunting",
+      excerpt: "Why do we feel compelled to collect every trophy? The science behind achievement hunting.",
+      author: "Dr. Gamer",
+      date: "2023-09-10",
+      category: "Psychology",
+      image: "https://images.unsplash.com/photo-1551817958-d9d86fb29431?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      url: "/blog/psychology-of-achievement-hunting"
+    }
+  ];
+
+  // Create structured data for the blog posts
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "headline": "PlatinumPath Blog",
+    "description": "Latest news, guides, and insights for achievement hunters",
+    "url": "https://platinumpath.net/blog",
+    "publisher": {
+      "@type": "Organization",
+      "name": "PlatinumPath",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://platinumpath.net/logo.png"
+      }
+    },
+    "blogPost": blogPosts.map(post => ({
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "description": post.excerpt,
+      "author": {
+        "@type": "Person",
+        "name": post.author
+      },
+      "datePublished": post.date,
+      "image": post.image,
+      "url": `https://platinumpath.net${post.url}`
+    }))
+  };
 
   return (
     <div className="min-h-screen bg-primary pt-24 pb-16">
@@ -13,6 +74,14 @@ const Blog = () => {
         title="Gaming Achievement Blog" 
         description="Read the latest guides, tips, and news on gaming achievements, trophies, and leaderboards."
       />
+      
+      {/* Add structured data for better SEO */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+      
       <div className="max-w-6xl mx-auto container-padding">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
@@ -49,7 +118,7 @@ const Blog = () => {
                   <p className="text-neutral-400 mb-4 text-sm">{post.excerpt}</p>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-neutral-500">By {post.author}</span>
-                    <Link to={`/blog/${post.id}`} className="text-neon-purple hover:text-neon-blue transition-colors text-sm font-medium">
+                    <Link to={post.url} className="text-neon-purple hover:text-neon-blue transition-colors text-sm font-medium">
                       Read More →
                     </Link>
                   </div>
