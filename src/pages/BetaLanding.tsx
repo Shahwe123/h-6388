@@ -62,21 +62,21 @@ const BetaLanding = () => {
   };
 
   return <div className="min-h-screen">
-      <SEO title="Join PlatinumPath Beta" description="Be among the first to try PlatinumPath! Sign up for early beta access and track your trophies effortlessly." />
+      <SEO title="Join PlatinumPath Game Achievement Tracker Beta" description="Be among the first to try PlatinumPath Game Achievement Tracker! Sign up for early beta access to out trophy achievement Manager." />
       <Header />
       <main>
         <section className="pt-32 pb-16 container-padding bg-gradient-to-b from-black via-black to-primary text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-40 bg-hero-pattern bg-cover bg-center"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-primary"></div>
-          
+
           <div className="max-w-4xl mx-auto text-center relative z-10">
             <div className="inline-block px-4 py-1 rounded-full bg-neon-purple/20 border border-neon-purple/40 mb-4">
               <p className="text-sm font-medium text-neon-purple animate-pulse">🔥 LIMITED BETA ACCESS NOW AVAILABLE! 🔥</p>
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance leading-tight neon-text">The Ultimate Game Achievement Tracker – Join the Beta Before It's Too Late!</h1>
             <h2 className="text-lg md:text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">PlatinumPath is your go-to solution for syncing trophies from PlayStation, Xbox, and Steam effortlessly using our game achievement tracker. This is the best gaming achievement app that brings gaming stats in one location. </h2>
-            
+
             <div className="flex justify-center mb-6">
               <div className="bg-black/30 backdrop-blur-md rounded-lg p-3 flex gap-6 border border-neon-purple/20">
                 <div className="flex items-center gap-2">
@@ -93,14 +93,14 @@ const BetaLanding = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-center mb-8 max-w-lg mx-auto">
               <Button onClick={openNewsletterForm} variant="cta" size="xl" className="animate-pulse-slow shadow-[0_0_15px_rgba(217,70,239,0.5)] text-base md:text-xl uppercase tracking-wide w-full max-w-full text-center">
                 <span className="text-center px-2">CLAIM YOUR BETA SPOT</span>
                 <ArrowRight className="w-5 h-5 ml-2 flex-shrink-0" />
               </Button>
             </div>
-            
+
             <div className="mt-8 relative">
               <div className="w-full h-64 md:h-80 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30 overflow-hidden">
                 <div className="text-center">
@@ -118,7 +118,7 @@ const BetaLanding = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
               The <span className="text-neon-purple">Problem</span> & Our <span className="text-neon-purple">Solution</span>
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-8 mb-12">
               <div className="glass-card p-8 rounded-xl">
                 <h3 className="font-bold text-xl mb-6 text-white flex items-center gap-2">
@@ -139,7 +139,7 @@ const BetaLanding = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="glass-card p-8 rounded-xl">
                 <h3 className="font-bold text-xl mb-6 text-white flex items-center gap-2">
                   <span className="text-neon-purple">PlatinumPath Solution</span>
@@ -160,7 +160,7 @@ const BetaLanding = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="text-center">
               <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Solve This Problem Now – Join the Beta!
@@ -178,7 +178,7 @@ const BetaLanding = () => {
             <p className="text-neutral-300 text-center mb-12 max-w-2xl mx-auto">
               Be Among the First to Test These Powerful Features!
             </p>
-            
+
             <Tabs defaultValue="tracking" className="w-full">
               <div className="flex justify-center mb-8">
                 <TabsList className="bg-black/40 backdrop-blur-md border border-neon-purple/20 h-auto p-1 flex-wrap">
@@ -208,14 +208,14 @@ const BetaLanding = () => {
                   </TabsTrigger>
                 </TabsList>
               </div>
-              
+
               <div className="glass-card p-6 rounded-xl mb-8">
                 <TabsContent value="tracking" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
                       <h3 className="text-2xl font-bold text-neon-purple mb-4 flex items-center gap-2 text-left">
                         <Gamepad className="w-6 h-6" />
-                        Multi-Platform Tracking
+                        Multi-Platform Gaming Progress Tracker Capabilities
                       </h3>
                       <p className="text-neutral-300 mb-4 text-left">Sync achievements seamlessly using our playstation trophy tracker, xbox achievement tracker, and steam achievement tracker.</p>
                       <ul className="space-y-2">
@@ -241,7 +241,7 @@ const BetaLanding = () => {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="ai" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
@@ -275,7 +275,7 @@ const BetaLanding = () => {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="dashboard" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
@@ -309,7 +309,7 @@ const BetaLanding = () => {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="leaderboards" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
@@ -343,7 +343,7 @@ const BetaLanding = () => {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="privacy" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
@@ -377,7 +377,7 @@ const BetaLanding = () => {
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="feedback" className="animate-fade-in">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
@@ -412,7 +412,7 @@ const BetaLanding = () => {
                   </div>
                 </TabsContent>
               </div>
-              
+
               <div className="text-center">
                 <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                   Try All These Features – Join the Beta Now!
@@ -431,33 +431,33 @@ const BetaLanding = () => {
             <p className="text-neutral-300 text-center mb-12 max-w-2xl mx-auto">
               Beta testers get exclusive perks that won't be available after full launch!
             </p>
-            
+
             <div className="grid md:grid-cols-2 gap-8 mb-12">
               <div className="glass-card p-8 rounded-xl">
                 <Trophy className="w-10 h-10 text-neon-pink mb-4" />
-                <h3 className="font-bold text-lg mb-2">Early Access – Try it BEFORE the public release!</h3>
+                <h3 className="font-bold text-lg mb-2">Gain Early Access to Our Trophy & Achievement Manager</h3>
                 <p className="text-neutral-300">Be the FIRST to try it before public release. Explore features months ahead of everyone else.</p>
               </div>
-              
+
               <div className="glass-card p-8 rounded-xl">
                 <Zap className="w-10 h-10 text-neon-blue mb-4" />
-                <h3 className="font-bold text-lg mb-2">Influence the App – Your feedback SHAPES the final product</h3>
+                <h3 className="font-bold text-lg mb-2">Influence Gaming with Our Progress Tracker Insights</h3>
                 <p className="text-neutral-300">Your feedback shapes the final product. Tell us what you want, and we'll build it!</p>
               </div>
-              
+
               <div className="glass-card p-8 rounded-xl">
                 <Shield className="w-10 h-10 text-neon-purple mb-4" />
                 <h3 className="font-bold text-lg mb-2">Exclusive Founder's Badge – ONLY available to beta testers!</h3>
                 <p className="text-neutral-300">Get a permanent "PlatinumPath Founder" profile badge that shows you were here first.</p>
               </div>
-              
+
               <div className="glass-card p-8 rounded-xl">
                 <Users className="w-10 h-10 text-neon-green mb-4" />
                 <h3 className="font-bold text-lg mb-2">Unlock VIP Rewards – Get premium perks when we launch.</h3>
                 <p className="text-neutral-300">Beta testers get premium perks and benefits when we officially launch.</p>
               </div>
             </div>
-            
+
             <div className="mb-12 flex justify-center">
               <div className="w-64 h-64 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
                 <div className="text-center">
@@ -467,7 +467,7 @@ const BetaLanding = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="text-center">
               <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Get Exclusive Perks – Join the Beta!
@@ -485,7 +485,7 @@ const BetaLanding = () => {
             <p className="text-neutral-300 text-center mb-12 max-w-2xl mx-auto">
               Getting started is super simple – just follow these easy steps:
             </p>
-            
+
             <div className="flex flex-col md:flex-row gap-6 mb-12">
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">1</div>
@@ -495,11 +495,11 @@ const BetaLanding = () => {
                   <Mail className="w-12 h-12 text-neon-pink mx-auto" />
                 </div>
               </div>
-              
+
               <div className="hidden md:block w-8 self-center">
                 <ArrowRight className="w-8 h-8 text-neon-purple" />
               </div>
-              
+
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">2</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Get Your Invite</h3>
@@ -508,11 +508,11 @@ const BetaLanding = () => {
                   <Mail className="w-12 h-12 text-neon-blue mx-auto" />
                 </div>
               </div>
-              
+
               <div className="hidden md:block w-8 self-center">
                 <ArrowRight className="w-8 h-8 text-neon-purple" />
               </div>
-              
+
               <div className="glass-card p-8 rounded-xl flex-1 relative">
                 <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-neon-purple flex items-center justify-center text-black font-bold text-xl">3</div>
                 <h3 className="font-bold text-lg mb-4 pt-2">Start Tracking</h3>
@@ -522,7 +522,7 @@ const BetaLanding = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="text-center">
               <button onClick={openNewsletterForm} className="cyber-button flex items-center justify-center gap-2 mx-auto">
                 Easy to Join – Get Started Now!
@@ -537,7 +537,7 @@ const BetaLanding = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">
               <span className="text-neon-purple">Gamers</span> Are Hyped for PlatinumPath!
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-8 mb-12">
               <div className="glass-card p-8 rounded-xl">
                 <p className="text-neutral-300 mb-4 italic">
@@ -545,7 +545,7 @@ const BetaLanding = () => {
                 </p>
                 <p className="text-neon-pink font-medium">– Beta Tester #1</p>
               </div>
-              
+
               <div className="glass-card p-8 rounded-xl">
                 <p className="text-neutral-300 mb-4 italic">
                   "This AI-powered tracking feature is genius. It found achievements I didn't even know existed!"
@@ -553,7 +553,7 @@ const BetaLanding = () => {
                 <p className="text-neon-pink font-medium">– Early Preview User</p>
               </div>
             </div>
-            
+
             <div className="glass-card p-8 rounded-xl mb-12">
               <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
                 <LockKeyhole className="w-6 h-6 text-neon-purple" />
@@ -570,7 +570,7 @@ const BetaLanding = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-center gap-8 mb-8">
               <div className="w-20 h-20 bg-black/50 flex items-center justify-center rounded-lg border border-neon-purple/30">
                 <PlayStationIcon className="w-12 h-12 text-neon-blue" />
@@ -584,14 +584,14 @@ const BetaLanding = () => {
             </div>
           </div>
         </section>
-        
+
         <section className="py-16 container-padding bg-gradient-to-b from-primary to-black">
           <div className="max-w-4xl mx-auto">
             <div className="glass-card p-8 rounded-xl text-center mb-12">
               <h2 className="text-2xl md:text-3xl font-bold mb-6">
                 <span className="text-neon-purple">Limited Beta Access</span> Closes In:
               </h2>
-              
+
               <div className="flex justify-center gap-4 mb-8">
                 <div className="bg-black/50 p-4 rounded-lg w-20">
                   <div className="text-3xl font-mono font-bold text-neon-pink">{timeLeft.days}</div>
@@ -610,18 +610,18 @@ const BetaLanding = () => {
                   <div className="text-xs text-neutral-400">SECONDS</div>
                 </div>
               </div>
-              
+
               <p className="text-neutral-300 mb-6">
                 We're only accepting <span className="text-neon-green font-bold">500 beta testers</span>. Don't miss your chance!
               </p>
-              
+
               <Button onClick={openNewsletterForm} variant="cta" size="lg" className="w-full md:w-auto md:px-8">
                 🔥 Secure Your Spot Now!
               </Button>
             </div>
           </div>
         </section>
-        
+
         <footer className="py-12 container-padding bg-black border-t border-neon-purple/20 text-white">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
@@ -633,7 +633,7 @@ const BetaLanding = () => {
                   <li><a href="#beta-features" className="text-neutral-300 hover:text-white transition-colors">Features</a></li>
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="text-neon-purple font-semibold mb-4">Help</h3>
                 <ul className="space-y-2">
@@ -642,7 +642,7 @@ const BetaLanding = () => {
                   <li><Link to="/contact" className="text-neutral-300 hover:text-white transition-colors">Contact Us</Link></li>
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="text-neon-purple font-semibold mb-4">Company</h3>
                 <ul className="space-y-2">
@@ -651,7 +651,7 @@ const BetaLanding = () => {
                   <li><Link to="/privacy" className="text-neutral-300 hover:text-white transition-colors">Privacy Policy</Link></li>
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="text-neon-purple font-semibold mb-4">Connect</h3>
                 <ul className="space-y-2">
@@ -661,17 +661,17 @@ const BetaLanding = () => {
                 </ul>
               </div>
             </div>
-            
+
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-neutral-800">
               <div className="flex items-center gap-2">
                 <Gamepad className="w-5 h-5 text-neon-purple" />
                 <span className="font-bold text-white">PlatinumPath</span>
               </div>
-              
+
               <p className="text-neutral-400 text-sm text-center">
                 &copy; {new Date().getFullYear()} PlatinumPath. All rights reserved.
               </p>
-              
+
               <div className="flex items-center gap-6">
                 <Link to="/terms" className="text-neutral-400 text-sm hover:text-white transition-colors">Terms</Link>
                 <Link to="/privacy" className="text-neutral-400 text-sm hover:text-white transition-colors">Privacy</Link>
@@ -681,7 +681,7 @@ const BetaLanding = () => {
           </div>
         </footer>
       </main>
-      
+
       {isNewsletterOpen && <NewsletterForm isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />}
     </div>;
 };
