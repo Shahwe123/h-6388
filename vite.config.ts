@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -50,6 +51,15 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      // Ignore browserslist warnings during build
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      },
+    },
+    optimizeDeps: {
+      // Ensure dependencies are properly optimized
+      include: ['react-redux', 'redux-persist'],
+      exclude: [],
     },
   };
 });

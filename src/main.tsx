@@ -11,7 +11,17 @@ import './index.css';
 
 // Check for browserslist update only in development
 if (process.env.NODE_ENV === 'development') {
-  console.log('Running in development mode');
+  try {
+    // Dynamic import to prevent build errors
+    import('update-browserslist-db').then(({ default: updateBrowsersList }) => {
+      updateBrowsersList();
+      console.log('Browserslist database updated successfully');
+    }).catch(() => {
+      console.log('Skipping browserslist update');
+    });
+  } catch (e) {
+    console.log('Skipping browserslist update');
+  }
 }
 
 const rootElement = document.getElementById('root') as HTMLElement;
