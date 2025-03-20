@@ -34,9 +34,7 @@ if (rootElement.hasChildNodes()) {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <BrowserRouter>
-            <HelmetProvider>
-              <App />
-            </HelmetProvider>
+            <App />
           </BrowserRouter>
         </PersistGate>
       </Provider>
@@ -50,9 +48,7 @@ if (rootElement.hasChildNodes()) {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <BrowserRouter>
-            <HelmetProvider>
-              <App />
-            </HelmetProvider>
+            <App />
           </BrowserRouter>
         </PersistGate>
       </Provider>
