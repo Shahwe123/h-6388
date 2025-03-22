@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet-async';
@@ -10,6 +11,7 @@ import StatCharts from '@/components/profile/StatCharts';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import WishlistBacklogWidget from '@/components/wishlist/WishlistBacklogWidget';
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -182,6 +184,9 @@ const Dashboard = () => {
                 </Card>
               </TabsContent>
             </Tabs>
+            
+            {/* Add the Wishlist & Backlog Widget */}
+            <WishlistBacklogWidget />
           </div>
           
           <div className="space-y-6">
