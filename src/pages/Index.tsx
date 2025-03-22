@@ -1,5 +1,5 @@
 
-import BetaLanding from "./BetaLanding";
+import BetaLanding from "./beta/BetaLanding";
 import SEO from "../components/SEO";
 
 /**
