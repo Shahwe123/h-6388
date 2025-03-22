@@ -20,16 +20,14 @@ const Friends = () => {
   // Use Redux for friends data
   const { friends, loading: friendsLoading } = useSelector((state: any) => state.friends);
   const reduxUserData = useSelector((state: any) => state.user);
+  
   //TODO: find out how friends data is being populated
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-
         if (reduxUserData.user.session) {
           setAuthSession(reduxUserData.user.session);
           setUserId(reduxUserData.user.session.user.id);
-
-
           setUsername(reduxUserData.user.user.user_metadata.username);
         } else {
           console.log("No session found");
@@ -57,6 +55,13 @@ const Friends = () => {
       </div>
     );
   }
+
+  // Create a current user object that can be passed to components
+  const currentUser = userId ? {
+    id: userId,
+    username: username,
+    session: authSession
+  } : null;
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
@@ -89,7 +94,11 @@ const Friends = () => {
           </div>
 
           <div className="bg-black/20 rounded-lg p-4">
-            <FriendsList friends={friends} />
+            <FriendsList 
+              friends={friends} 
+              currentUser={currentUser}
+              loading={friendsLoading}
+            />
           </div>
         </div>
 
