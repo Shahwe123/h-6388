@@ -69,7 +69,7 @@
   
   /* Page content container with proper spacing for fixed navbar */
   .page-container {
-    @apply pt-24 pb-12 min-h-screen;
+    @apply pt-28 pb-12 min-h-screen;
   }
 }
 

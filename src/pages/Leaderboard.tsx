@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Users, Gamepad } from 'lucide-react';
@@ -152,7 +153,7 @@ const LeaderboardTable: React.FC<{ entries: LeaderboardEntry[] }> = ({ entries }
 
 const Leaderboard = () => {
   return (
-    <div className="container-padding max-w-6xl mx-auto pt-24 pb-16">
+    <div className="container-padding max-w-6xl mx-auto pt-28 pb-16"> {/* Increased padding-top from pt-24 to pt-28 */}
       <SEO 
         title="Gaming Leaderboards" 
         description="See where you rank among gamers worldwide. Compete and climb the PlatinumPath leaderboards."
