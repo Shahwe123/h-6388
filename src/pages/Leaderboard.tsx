@@ -152,48 +152,46 @@ const LeaderboardTable: React.FC<{ entries: LeaderboardEntry[] }> = ({ entries }
 
 const Leaderboard = () => {
   return (
-    <div className="page-container bg-primary">
+    <div className="container-padding max-w-6xl mx-auto pt-24 pb-16">
       <SEO 
         title="Gaming Leaderboards" 
         description="See where you rank among gamers worldwide. Compete and climb the PlatinumPath leaderboards."
       />
-      <div className="max-w-6xl mx-auto container-padding">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Achievement Leaderboards</h1>
-          <p className="text-neutral-400 mt-1">
-            Compare your gaming achievements and see how you stack up against others. Will you rise to the top?
-          </p>
-        </div>
-
-        <Tabs defaultValue="global" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="global" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              <span>Global</span>
-            </TabsTrigger>
-            <TabsTrigger value="friends" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span>Friends</span>
-            </TabsTrigger>
-            <TabsTrigger value="platform" className="flex items-center gap-2">
-              <Gamepad className="h-4 w-4" />
-              <span>Platform</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="global" className="space-y-4">
-            <GlobalLeaderboard />
-          </TabsContent>
-          
-          <TabsContent value="friends" className="space-y-4">
-            <FriendsLeaderboard />
-          </TabsContent>
-          
-          <TabsContent value="platform" className="space-y-4">
-            <PlatformLeaderboard />
-          </TabsContent>
-        </Tabs>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-3">Achievement Leaderboards</h1>
+        <p className="text-neutral-400">
+          Compare your gaming achievements and see how you stack up against others. Will you rise to the top?
+        </p>
       </div>
+
+      <Tabs defaultValue="global" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsTrigger value="global" className="flex items-center gap-2">
+            <Trophy className="h-4 w-4" />
+            <span>Global</span>
+          </TabsTrigger>
+          <TabsTrigger value="friends" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span>Friends</span>
+          </TabsTrigger>
+          <TabsTrigger value="platform" className="flex items-center gap-2">
+            <Gamepad className="h-4 w-4" />
+            <span>Platform</span>
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="global" className="space-y-4">
+          <GlobalLeaderboard />
+        </TabsContent>
+        
+        <TabsContent value="friends" className="space-y-4">
+          <FriendsLeaderboard />
+        </TabsContent>
+        
+        <TabsContent value="platform" className="space-y-4">
+          <PlatformLeaderboard />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
