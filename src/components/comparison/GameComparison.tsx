@@ -1,6 +1,6 @@
 
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Clock, Award } from 'lucide-react';
+import { Trophy, Clock } from 'lucide-react';
 
 interface GameComparisonProps {
   game: any;
@@ -18,17 +18,6 @@ const GameComparison = ({ game, userData, friendData }: GameComparisonProps) => 
                          
   const completionLeader = game.userCompletion > game.friendCompletion ? 'user' : 
                           game.userCompletion < game.friendCompletion ? 'friend' : 'tie';
-  
-  // Use normalized scores when available
-  const userNormalizedScore = game.userNormalizedScore || game.userTrophies;
-  const friendNormalizedScore = game.friendNormalizedScore || game.friendTrophies;
-  const normalizedLeader = userNormalizedScore > friendNormalizedScore ? 'user' :
-                          userNormalizedScore < friendNormalizedScore ? 'friend' : 'tie';
-  
-  // Determine if we should show normalized comparison
-  const showNormalizedComparison = game.userNormalizedScore !== undefined && 
-                                   game.friendNormalizedScore !== undefined &&
-                                   game.platform !== game.friendPlatform;
   
   return (
     <div className="bg-black/30 rounded-lg p-4">
@@ -67,41 +56,6 @@ const GameComparison = ({ game, userData, friendData }: GameComparisonProps) => 
             </div>
           </div>
         </div>
-        
-        {/* Normalized score comparison - only show when platforms differ */}
-        {showNormalizedComparison && (
-          <div className="flex items-center">
-            <Award className="h-5 w-5 text-purple-400 mr-2" />
-            <span className="text-sm mr-3">Normalized:</span>
-            
-            <div className="flex-1 grid grid-cols-5 gap-2 items-center">
-              <div className={`text-right font-bold ${normalizedLeader === 'user' ? 'text-green-500' : ''}`}>
-                {Math.round(userNormalizedScore)}
-              </div>
-              
-              <div className="col-span-3">
-                <div className="flex items-center justify-between text-xs text-neutral-400 mb-1">
-                  <span>{game.platform}</span>
-                  <span>{game.friendPlatform}</span>
-                </div>
-                <div className="flex h-2 rounded-full overflow-hidden bg-black/40">
-                  <div 
-                    className="bg-neon-pink"
-                    style={{ width: `${(userNormalizedScore / (userNormalizedScore + friendNormalizedScore)) * 100}%` }}
-                  ></div>
-                  <div 
-                    className="bg-neon-green"
-                    style={{ width: `${(friendNormalizedScore / (userNormalizedScore + friendNormalizedScore)) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div className={`text-left font-bold ${normalizedLeader === 'friend' ? 'text-green-500' : ''}`}>
-                {Math.round(friendNormalizedScore)}
-              </div>
-            </div>
-          </div>
-        )}
         
         {/* Playtime comparison */}
         <div className="flex items-center">
