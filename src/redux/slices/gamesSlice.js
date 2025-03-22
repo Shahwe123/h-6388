@@ -1,5 +1,6 @@
 
 import { createSlice } from "@reduxjs/toolkit";
+import { calculateNormalizedScore } from "../types/game";
 
 const initialState = {
   games: [], // List of games user has played
@@ -26,7 +27,36 @@ const gamesSlice = createSlice({
       state.error = null;
     },
     fetchGamesSuccess: (state, action) => {
-      state.games = action.payload;
+      // Process games to add normalized scores
+      const games = action.payload.map(game => {
+        if (game.trophies && game.trophies.length > 0) {
+          // Set platform-specific weights based on trophy counts
+          if (!game.platformAchievementWeight) {
+            // Determine weight based on platform and trophy count
+            switch (game.platform?.toLowerCase()) {
+              case 'playstation':
+                game.platformAchievementWeight = 1.0;
+                break;
+              case 'xbox':
+                game.platformAchievementWeight = 1.2;
+                break;
+              case 'steam':
+                // Steam often has many more achievements
+                game.platformAchievementWeight = game.trophies.length > 100 ? 2.0 : 
+                                               game.trophies.length > 50 ? 1.5 : 1.2;
+                break;
+              default:
+                game.platformAchievementWeight = 1.0;
+            }
+          }
+          
+          // Calculate normalized score
+          game.normalizedScore = calculateNormalizedScore(game);
+        }
+        return game;
+      });
+      
+      state.games = games;
       state.loading = false;
     },
     fetchGamesFailure: (state, action) => {
