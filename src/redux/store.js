@@ -14,33 +14,26 @@ const appReducer = combineReducers({
     games: gamesReducer,
     friends: friendsReducer,
     notifications: notificationsReducer,
-  });
+});
 
 const persistConfig = {
     key: "root",
     storage,
-  };
+};
 
-  // Create a persisted reducer
+// Create a persisted reducer
 const persistedReducer = persistReducer(persistConfig, appReducer);
+
 export const rootReducer = (state, action) => {
     if (action.type === 'RESET_STATE') {
       return appReducer(undefined, action);  // Reset state to initial values
     }
     return appReducer(state, action);
-  };
-// const store = configureStore({
-//   reducer: {
-    // user: userReducer,
-    // games: gamesReducer,
-    // friends: friendsReducer,
-    // notifications: notificationsReducer,
-//   },
-// });
+};
+
 // Configure store with persisted reducer
-const store = configureStore({
+export const store = configureStore({
     reducer: persistedReducer,
-    });
+});
 
 export const persistor = persistStore(store);
-export default store;

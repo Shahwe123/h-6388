@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +15,7 @@ import { useSelector } from 'react-redux';
 import SocialShare from '@/components/profile/SocialShare';
 import { useProfileData } from '@/hooks/useProfileData';
 import LinkedAccounts from '@/components/profile/LinkedAccounts';
+import BadgeCollection from '@/components/profile/BadgeCollection';
 import SEO from "../components/SEO";
 
 /**
@@ -102,6 +104,8 @@ const Profile = () => {
               nextLevelXp={playerStats.nextLevelXp}
               rank={playerStats.rank}
             />
+            
+            <BadgeCollection userId={profile.id} />
             
             <FriendsComparison 
               friendCount={friendCount}

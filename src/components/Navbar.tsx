@@ -35,7 +35,7 @@ const Navbar = () => {
         <NavbarBrand session={session} />
 
         <div className="hidden md:flex items-center gap-6">
-          <NavLinks session={session} />
+          <NavLinks />
 
           {session && (
             <>
@@ -67,13 +67,13 @@ const Navbar = () => {
       </div>
 
       <MobileMenu
-        session={session}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         onSignOut={handleSignOut}
         notifications={notifications}
         hasUnreadNotifications={hasUnreadNotifications}
         onNotificationsRead={markNotificationsAsRead}
+        session={session}
       />
     </nav>
   );

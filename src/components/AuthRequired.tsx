@@ -1,6 +1,6 @@
 
 import { ReactNode, useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 
@@ -28,7 +28,15 @@ const AuthRequired = ({ children }: AuthRequiredProps) => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check if user is authenticated when component mounts
+    // Set up auth state change listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, currentSession) => {
+        setSession(currentSession);
+        setLoading(false);
+      }
+    );
+
+    // Then check for existing session
     const getSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
@@ -41,13 +49,6 @@ const AuthRequired = ({ children }: AuthRequiredProps) => {
     };
 
     getSession();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-      }
-    );
 
     // Clean up subscription when component unmounts
     return () => subscription.unsubscribe();

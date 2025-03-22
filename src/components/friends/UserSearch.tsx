@@ -13,12 +13,22 @@ interface Profile {
 }
 
 interface UserSearchProps {
-  userId: string | null;
-  username: string | null;
-  onClose: () => void;
+  userId?: string | null;
+  username?: string | null;
+  onClose?: () => void;
+  currentUser?: any;
+  onAddFriend?: (friendId: string) => Promise<void>;
+  existingFriends?: string[];
 }
 
-const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: UserSearchProps) => {
+const UserSearch = ({ 
+  userId: propsUserId, 
+  username: propsUsername, 
+  onClose, 
+  currentUser,
+  onAddFriend,
+  existingFriends = []
+}: UserSearchProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
   const [searching, setSearching] = useState(false);
@@ -67,6 +77,10 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   }, [propsUserId, propsUsername, reduxUserData, currentSession, friends]);
 
   const isExistingFriend = (userId: string) => {
+    if (existingFriends && existingFriends.length > 0) {
+      return existingFriends.includes(userId);
+    }
+    
     if (!friends || !Array.isArray(friends)) {
       console.log("Friends list is not available or not an array");
       return false;
@@ -131,6 +145,11 @@ const UserSearch = ({ userId: propsUserId, username: propsUsername, onClose }: U
   };
   
   const sendFriendRequest = async (recipientId: string, recipientUsername: string) => {
+    if (onAddFriend) {
+      await onAddFriend(recipientId);
+      return;
+    }
+    
     console.log("Sending friend request to:", { recipientId, recipientUsername });
     
     if (isExistingFriend(recipientId)) {

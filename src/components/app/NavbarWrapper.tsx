@@ -12,6 +12,8 @@ import Navbar from "@/components/Navbar";
  */
 export const NavbarWrapper = () => {
   const location = useLocation();
-  // Don't show navbar on home page as it has its own Header
-  return location.pathname !== '/' ? <Navbar /> : null;
+  const isHomePage = location.pathname === '/';
+  
+  // Only hide the navbar on the home page
+  return (!isHomePage) ? <Navbar /> : null;
 };

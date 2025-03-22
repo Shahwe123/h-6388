@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Users, UserPlus, Gamepad2 } from 'lucide-react';
@@ -17,19 +16,15 @@ const Friends = () => {
   const [authSession, setAuthSession] = useState<any>(null);
   const { toast } = useToast();
 
-  // Use Redux for friends data
   const { friends, loading: friendsLoading } = useSelector((state: any) => state.friends);
   const reduxUserData = useSelector((state: any) => state.user);
-  //TODO: find out how friends data is being populated
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-
         if (reduxUserData.user.session) {
           setAuthSession(reduxUserData.user.session);
           setUserId(reduxUserData.user.session.user.id);
-
-
           setUsername(reduxUserData.user.user.user_metadata.username);
         } else {
           console.log("No session found");
@@ -49,7 +44,7 @@ const Friends = () => {
 
   if (friendsLoading) {
     return (
-      <div className="min-h-screen pt-20 bg-primary flex items-center justify-center">
+      <div className="page-container bg-primary flex items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="w-12 h-12 border-4 border-neon-purple border-t-transparent rounded-full animate-spin mb-4"></div>
           <p className="text-neutral-300">Loading friends...</p>
@@ -58,8 +53,14 @@ const Friends = () => {
     );
   }
 
+  const currentUser = userId ? {
+    id: userId,
+    username: username,
+    session: authSession
+  } : null;
+
   return (
-    <div className="min-h-screen pt-20 pb-12 bg-primary">
+    <div className="page-container bg-primary">
       <SEO 
         title="Connect with Gamer Friends" 
         description="Add friends, compare achievements, and climb the gaming leaderboards together."
@@ -89,7 +90,11 @@ const Friends = () => {
           </div>
 
           <div className="bg-black/20 rounded-lg p-4">
-            <FriendsList friends={friends} />
+            <FriendsList 
+              friends={friends} 
+              currentUser={currentUser}
+              loading={friendsLoading}
+            />
           </div>
         </div>
 

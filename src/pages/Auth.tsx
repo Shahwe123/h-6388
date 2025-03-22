@@ -1,8 +1,9 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import SEO from "../components/SEO";
+import { supabase } from '@/integrations/supabase/client';
 
 // Import components
 import LoginForm from '@/components/auth/LoginForm';
@@ -13,14 +14,41 @@ type AuthMode = 'login' | 'register' | 'forgotPassword' | null;
 
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('login');
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      
+      if (data.session) {
+        // User is already signed in, redirect to dashboard
+        navigate('/dashboard');
+      }
+      setLoading(false);
+    };
+
+    checkSession();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen bg-primary flex items-center justify-center p-4">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-neon-purple border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-neutral-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full min-h-screen bg-primary flex items-center justify-center p-4">
+    <div className="w-full min-h-screen bg-primary flex items-center justify-center p-4 pt-24 md:pt-32">
       <SEO 
         title="Login or Sign Up" 
         description="Sign in to PlatinumPath to track your gaming achievements across platforms. Create an account now!"
       />
-      <div className="glass-card w-full max-w-md p-8 rounded-lg">
+      <div className="glass-card w-full max-w-md p-8 rounded-lg my-10">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold mb-2">GameHub</h1>
           <p className="text-neutral-400">
