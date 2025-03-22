@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -29,7 +30,7 @@ import Leaderboard from '@/pages/Leaderboard';
 import NotFound from '@/pages/NotFound';
 
 // Components
-import PrivateRoute from '@/components/AuthRequired';
+import AuthRequired from '@/components/AuthRequired';
 import { useToast } from '@/hooks/use-toast';
 import LegacyWall from '@/components/legacy/LegacyWall';
 
@@ -68,7 +69,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/leaderboard" element={<Leaderboard />} />
 
       {/* Private routes */}
-      <Route element={<PrivateRoute />}>
+      <Route element={<AuthRequired><Outlet /></AuthRequired>}>
         {/* Authenticated Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />

@@ -1,6 +1,15 @@
+
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, User, Gamepad, Users, BarChart, MessageSquare, Trophy } from 'lucide-react';
+
+/**
+ * Props for the NavLinks component
+ */
+interface NavLinksProps {
+  isMobile?: boolean;
+  onClick?: () => void;
+}
 
 /**
  * Navigation links component
@@ -9,7 +18,7 @@ import { Home, User, Gamepad, Users, BarChart, MessageSquare, Trophy } from 'luc
  * 
  * @returns {JSX.Element} The NavLinks UI
  */
-const NavLinks = () => {
+const NavLinks: React.FC<NavLinksProps> = ({ isMobile, onClick }) => {
   const mainLinks = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/profile', label: 'Profile', icon: User },
@@ -26,6 +35,7 @@ const NavLinks = () => {
         <NavLink
           key={link.path}
           to={link.path}
+          onClick={onClick}
           className={({ isActive }) =>
             `text-neutral-300 hover:text-white transition-colors duration-200 flex items-center gap-2 py-2 px-4 rounded-md
             ${isActive ? 'bg-neon-purple/20 text-white' : ''}`
