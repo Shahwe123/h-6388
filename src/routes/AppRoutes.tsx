@@ -31,8 +31,9 @@ import NotFound from '@/pages/NotFound';
 // Components
 import PrivateRoute from '@/components/AuthRequired';
 import { useToast } from '@/hooks/use-toast';
+import LegacyWall from '@/components/legacy/LegacyWall';
 
-const AppRoutes = () => {
+const AppRoutes: React.FC = () => {
   const navigate = useNavigate();
   const currentUser = useSelector((state: any) => state.user?.userData);
   const { toast } = useToast();
@@ -67,73 +68,21 @@ const AppRoutes = () => {
       <Route path="/leaderboard" element={<Leaderboard />} />
 
       {/* Private routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <PrivateRoute>
-            <Dashboard />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <PrivateRoute>
-            <Profile />
-          </PrivateRoute>
-        }
-      />
-      {/* Fix the profile route to properly handle usernames with special characters */}
-      <Route path="/profile/:username" element={<Profile />} />
-      <Route
-        path="/friends"
-        element={
-          <PrivateRoute>
-            <Friends />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/friends/compare/:friendId"
-        element={
-          <PrivateRoute>
-            <FriendComparison />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/games"
-        element={
-          <PrivateRoute>
-            <Games />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/games/:gameId"
-        element={
-          <PrivateRoute>
-            <GameDetail />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <PrivateRoute>
-            <Settings />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/link-accounts"
-        element={
-          <PrivateRoute>
-            <LinkAccounts />
-          </PrivateRoute>
-        }
-      />
-      
+      <Route element={<PrivateRoute />}>
+        {/* Authenticated Routes */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:username" element={<Profile />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/games/:id" element={<GameDetail />} />
+        <Route path="/legacy-wall" element={<LegacyWall />} />
+        <Route path="/friends" element={<Friends />} />
+        <Route path="/friend/:friendId" element={<FriendComparison />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/link-accounts" element={<LinkAccounts />} />
+      </Route>
+
       {/* Catch-all for unknown routes */}
       <Route path="*" element={<NotFound />} />
     </Routes>

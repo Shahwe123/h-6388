@@ -20,6 +20,9 @@ export interface Game {
   totalPlaytime?: number;
   trophyCounts?: TrophyCounts;
   trophies?: GameTrophy[];
+  yearEarned?: number; // Year when the first trophy was earned
+  rarityScore?: number; // Average rarity of all trophies
+  milestoneInfo?: MilestoneInfo; // Additional information for milestone trophies
 }
 
 /**
@@ -48,14 +51,40 @@ export interface GameTrophy {
   achieved: boolean;
   achievedDate?: string;
   isPinned?: boolean;
+  isLegacy?: boolean; // Flag for legacy/memorable trophies
+  isFirstOfType?: boolean; // First platinum, first gold, etc.
+  isHistorical?: boolean; // Trophy with historical significance
 }
 
 /**
  * Type representing a filter for trophy display
  */
-export type TrophyFilter = 'all' | 'platinum' | 'gold' | 'silver' | 'bronze' | 'achieved' | 'unearned';
+export type TrophyFilter = 'all' | 'platinum' | 'gold' | 'silver' | 'bronze' | 'achieved' | 'unearned' | 'legacy' | 'milestones';
 
 /**
  * Type representing a sort option for trophy display
  */
-export type TrophySort = 'default' | 'name' | 'rarity' | 'achieved' | 'type';
+export type TrophySort = 'default' | 'name' | 'rarity' | 'achieved' | 'type' | 'date';
+
+/**
+ * Information for milestone trophies
+ */
+export interface MilestoneInfo {
+  isFirstPlatinum?: boolean;
+  isRarest?: boolean;
+  isFastestCompletion?: boolean;
+  completionTime?: number; // In hours
+  personalNote?: string;
+}
+
+/**
+ * Filter options for the Legacy Wall
+ */
+export interface LegacyWallFilter {
+  year?: number | 'all';
+  platform?: string | 'all';
+  genre?: string | 'all';
+  type?: TrophyFilter;
+  rarity?: 'common' | 'rare' | 'ultra-rare' | 'all';
+  milestones?: boolean;
+}
