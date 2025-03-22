@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -226,14 +227,14 @@ const Games = () => {
       </Helmet>
       
       <div className="max-w-7xl mx-auto container-padding">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">
+            {isOwnProfile ? 'Your Games' : `${profile.username}'s Games`}
+          </h1>
+          <p className="text-zinc-400 mt-1">{filteredGames.length} games in collection</p>
+        </div>
+        
         <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">
-              {isOwnProfile ? 'Your Games' : `${profile.username}'s Games`}
-            </h1>
-            <p className="text-zinc-400 mt-1">{filteredGames.length} games in collection</p>
-          </div>
-          
           <div className="flex gap-2">
             <Button 
               variant="outline" 
