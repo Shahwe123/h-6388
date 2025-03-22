@@ -25,13 +25,31 @@ const FriendComparison = () => {
   
   useEffect(() => {
     const fetchComparisonData = async () => {
-      if (!currentUser?.id || !friendId) {
-        navigate('/dashboard');
-        return;
-      }
-      
       try {
         setLoading(true);
+
+        // Check if we have necessary data to proceed
+        if (!currentUser?.id) {
+          console.error("User data is missing");
+          toast({
+            title: "Authentication required",
+            description: "Please sign in to view comparisons",
+            variant: "destructive"
+          });
+          navigate('/auth');
+          return;
+        }
+
+        if (!friendId) {
+          console.error("Friend ID is missing");
+          toast({
+            title: "Missing information",
+            description: "Could not find the friend to compare with",
+            variant: "destructive"
+          });
+          navigate('/friends');
+          return;
+        }
         
         // Fetch friend's profile
         const { data: friendProfile, error: friendError } = await supabase
@@ -40,7 +58,16 @@ const FriendComparison = () => {
           .eq('id', friendId)
           .single();
           
-        if (friendError) throw friendError;
+        if (friendError) {
+          console.error("Error fetching friend profile:", friendError);
+          toast({
+            title: "Friend not found",
+            description: "Could not find the friend's profile",
+            variant: "destructive"
+          });
+          navigate('/friends');
+          return;
+        }
         
         // Fetch current user's profile
         const { data: userProfile, error: userError } = await supabase
@@ -49,7 +76,15 @@ const FriendComparison = () => {
           .eq('id', currentUser.id)
           .single();
           
-        if (userError) throw userError;
+        if (userError) {
+          console.error("Error fetching user profile:", userError);
+          toast({
+            title: "Error loading your profile",
+            description: userError.message,
+            variant: "destructive"
+          });
+          return;
+        }
         
         // Mock data for comparison stats (in a real app, fetch this from database)
         const mockUserStats = {
@@ -137,7 +172,6 @@ const FriendComparison = () => {
           description: error.message,
           variant: "destructive"
         });
-        navigate('/dashboard');
       } finally {
         setLoading(false);
       }
@@ -146,8 +180,22 @@ const FriendComparison = () => {
     fetchComparisonData();
   }, [currentUser, friendId, navigate, toast]);
   
-  if (loading || !userData || !friendData) {
+  if (loading) {
     return <Loading />;
+  }
+
+  if (!userData || !friendData) {
+    return (
+      <div className="min-h-screen bg-primary flex flex-col items-center justify-center">
+        <div className="glass-card p-8 rounded-xl max-w-md mx-auto text-center">
+          <h2 className="text-xl font-bold mb-4">Could not load comparison</h2>
+          <p className="mb-6">There was an issue loading the comparison data. Please try again later.</p>
+          <Button onClick={() => navigate('/friends')}>
+            Back to Friends
+          </Button>
+        </div>
+      </div>
+    );
   }
   
   return (

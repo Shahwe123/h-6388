@@ -16,6 +16,8 @@ const FriendsComparison = ({ friendCount, isOwnProfile }: FriendsComparisonProps
   if (!isOwnProfile) return null;
   
   const handleCompareClick = (friendId: string) => {
+    // Make sure we're navigating to the correct path
+    console.log(`Navigating to comparison with friend: ${friendId}`);
     navigate(`/friends/compare/${friendId}`);
   };
   

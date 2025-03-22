@@ -93,6 +93,13 @@ const FriendsList = ({ friends, currentUser, loading }: FriendsListProps) => {
     navigate(`/profile/${encodeURIComponent(username.trim())}`);
   };
 
+  // Function to navigate to comparison page
+  const navigateToComparison = (friendId: string) => {
+    if (!friendId) return;
+    console.log(`Navigating to comparison with friend: ${friendId}`);
+    navigate(`/friends/compare/${friendId}`);
+  };
+
   return (
     <div className="glass-card rounded-xl">
       <div className="p-4 border-b border-zinc-800">
@@ -154,7 +161,7 @@ const FriendsList = ({ friends, currentUser, loading }: FriendsListProps) => {
                     variant="outline" 
                     size="sm"
                     className="text-xs"
-                    onClick={() => navigate(`/friends/compare/${friendItem.friend.id}`)}
+                    onClick={() => navigateToComparison(friendItem.friend.id)}
                   >
                     <BarChart3 className="h-3.5 w-3.5 mr-1" />
                     Compare
