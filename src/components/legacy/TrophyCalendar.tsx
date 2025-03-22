@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, getDay } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Game, GameTrophy } from '@/types/game';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import TrophyCard from './TrophyCard';
+import { useToast } from '@/hooks/use-toast';
 
 interface TrophyCalendarProps {
   trophies: { trophy: GameTrophy; game: Game }[];
@@ -16,6 +16,7 @@ const TrophyCalendar: React.FC<TrophyCalendarProps> = ({ trophies }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const { toast } = useToast();
 
   // Group trophies by date
   const trophiesByDate = React.useMemo(() => {
@@ -69,6 +70,28 @@ const TrophyCalendar: React.FC<TrophyCalendarProps> = ({ trophies }) => {
     const nextMonth = new Date(currentMonth);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     setCurrentMonth(nextMonth);
+  };
+
+  // Event handlers for TrophyCard
+  const handleTrophyClick = (trophy: GameTrophy, game: Game) => {
+    toast({
+      title: trophy.name,
+      description: `From ${game.name}`,
+    });
+  };
+
+  const handleShareTrophy = (trophy: GameTrophy, game: Game) => {
+    toast({
+      title: "Sharing Trophy",
+      description: `Sharing ${trophy.name} from ${game.name}`,
+    });
+  };
+
+  const handlePinTrophy = (trophy: GameTrophy, game: Game) => {
+    toast({
+      title: trophy.isPinned ? "Trophy Unpinned" : "Trophy Pinned",
+      description: `${trophy.name} from ${game.name} has been ${trophy.isPinned ? 'removed from' : 'added to'} your pinned trophies`,
+    });
   };
 
   // Custom day renderer for the Calendar component
@@ -147,12 +170,10 @@ const TrophyCalendar: React.FC<TrophyCalendarProps> = ({ trophies }) => {
         </div>
 
         <div className="grid grid-cols-7 gap-1">
-          {/* Empty cells for days before the start of the month */}
           {Array.from({ length: getDay(startOfMonth(currentMonth)) }).map((_, index) => (
             <div key={`empty-start-${index}`} className="h-20 bg-black/10 rounded-md"></div>
           ))}
 
-          {/* Calendar days */}
           {daysWithCounts.map(({ date, count }) => {
             const isSelected = selectedDate && isSameDay(date, selectedDate);
             const isToday = isSameDay(date, new Date());
@@ -177,7 +198,6 @@ const TrophyCalendar: React.FC<TrophyCalendarProps> = ({ trophies }) => {
                   )}
                 </div>
 
-                {/* Trophy indicators */}
                 {count > 0 && (
                   <div className="mt-1 flex flex-wrap gap-1">
                     {count <= 3 ? (
@@ -193,7 +213,6 @@ const TrophyCalendar: React.FC<TrophyCalendarProps> = ({ trophies }) => {
             );
           })}
 
-          {/* Empty cells for days after the end of the month */}
           {Array.from({ length: 6 - getDay(endOfMonth(currentMonth)) }).map((_, index) => (
             <div key={`empty-end-${index}`} className="h-20 bg-black/10 rounded-md"></div>
           ))}
@@ -221,6 +240,9 @@ const TrophyCalendar: React.FC<TrophyCalendarProps> = ({ trophies }) => {
                 key={`${trophy.id}-${game.id}`}
                 trophy={trophy}
                 game={game}
+                onClick={() => handleTrophyClick(trophy, game)}
+                onShare={() => handleShareTrophy(trophy, game)}
+                onPin={() => handlePinTrophy(trophy, game)}
               />
             ))}
           </div>
