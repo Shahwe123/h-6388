@@ -8,21 +8,41 @@ export interface Game {
   platform: string;
   image: string;
   completion: number;
-  trophyCount?: number;
-  lastPlayed?: string;
-  coverImage?: string;
-  bannerImage?: string;
   description?: string;
   releaseDate?: string;
   developer?: string;
   publisher?: string;
   genres?: string[];
   totalPlaytime?: number;
+  lastPlayed?: string;
+  coverImage?: string;
+  bannerImage?: string;
+  trophyCount?: number;
   trophyCounts?: TrophyCounts;
   trophies?: GameTrophy[];
   yearEarned?: number; // Year when the first trophy was earned
   rarityScore?: number; // Average rarity of all trophies
   milestoneInfo?: MilestoneInfo; // Additional information for milestone trophies
+}
+
+/**
+ * Platform interface representing a gaming platform (Steam, Xbox, PlayStation)
+ */
+export interface Platform {
+  id: number;
+  name: string;
+}
+
+/**
+ * GamePlatform interface representing a game available on a specific platform
+ */
+export interface GamePlatform {
+  id: number;
+  gameId: number;
+  platformId: number;
+  platformSpecificId?: string;
+  game?: Game;
+  platform?: Platform;
 }
 
 /**
@@ -54,6 +74,7 @@ export interface GameTrophy {
   isLegacy?: boolean; // Flag for legacy/memorable trophies
   isFirstOfType?: boolean; // First platinum, first gold, etc.
   isHistorical?: boolean; // Trophy with historical significance
+  gamePlatformId?: number; // Reference to the game-platform combination
 }
 
 /**

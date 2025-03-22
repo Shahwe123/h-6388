@@ -13,6 +13,50 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          game_platform_id: number | null
+          icon_url: string | null
+          id: number
+          locked_icon_url: string | null
+          name: string
+          platform_api_name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          game_platform_id?: number | null
+          icon_url?: string | null
+          id?: number
+          locked_icon_url?: string | null
+          name: string
+          platform_api_name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          game_platform_id?: number | null
+          icon_url?: string | null
+          id?: number
+          locked_icon_url?: string | null
+          name?: string
+          platform_api_name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_new_game_platform_id_fkey"
+            columns: ["game_platform_id"]
+            isOneToOne: false
+            referencedRelation: "game_platforms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      achievements_old: {
+        Row: {
+          created_at: string | null
+          description: string | null
           game_id: number
           icon_url: string | null
           id: number
@@ -46,85 +90,7 @@ export type Database = {
           platform_api_name?: string
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "achievements_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      comment_reports: {
-        Row: {
-          comment_id: string
-          created_at: string
-          id: string
-          reason: string
-          resolved: boolean
-          resolved_at: string | null
-          resolved_by: string | null
-          user_id: string
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string
-          id?: string
-          reason: string
-          resolved?: boolean
-          resolved_at?: string | null
-          resolved_by?: string | null
-          user_id: string
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string
-          id?: string
-          reason?: string
-          resolved?: boolean
-          resolved_at?: string | null
-          resolved_by?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comment_reports_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "thread_comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      comment_upvotes: {
-        Row: {
-          comment_id: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comment_upvotes_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "thread_comments"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       email_tokens: {
         Row: {
@@ -159,92 +125,6 @@ export type Database = {
         }
         Relationships: []
       }
-      forum_categories: {
-        Row: {
-          created_at: string
-          description: string
-          id: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description: string
-          id?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string
-          id?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      forum_threads: {
-        Row: {
-          attachments: string[] | null
-          author_id: string
-          category_id: string
-          content: string
-          created_at: string
-          game_name: string | null
-          id: string
-          is_edited: boolean
-          last_activity: string
-          status: Database["public"]["Enums"]["thread_status"]
-          tags: Database["public"]["Enums"]["forum_tag_type"][]
-          title: string
-          updated_at: string
-          upvotes: number
-          view_count: number
-        }
-        Insert: {
-          attachments?: string[] | null
-          author_id: string
-          category_id: string
-          content: string
-          created_at?: string
-          game_name?: string | null
-          id?: string
-          is_edited?: boolean
-          last_activity?: string
-          status?: Database["public"]["Enums"]["thread_status"]
-          tags: Database["public"]["Enums"]["forum_tag_type"][]
-          title: string
-          updated_at?: string
-          upvotes?: number
-          view_count?: number
-        }
-        Update: {
-          attachments?: string[] | null
-          author_id?: string
-          category_id?: string
-          content?: string
-          created_at?: string
-          game_name?: string | null
-          id?: string
-          is_edited?: boolean
-          last_activity?: string
-          status?: Database["public"]["Enums"]["thread_status"]
-          tags?: Database["public"]["Enums"]["forum_tag_type"][]
-          title?: string
-          updated_at?: string
-          upvotes?: number
-          view_count?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "forum_threads_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "forum_categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       friends: {
         Row: {
           created_at: string
@@ -266,9 +146,46 @@ export type Database = {
         }
         Relationships: []
       }
+      game_platforms: {
+        Row: {
+          game_id: number | null
+          id: number
+          platform_id: number | null
+          platform_specific_id: string | null
+        }
+        Insert: {
+          game_id?: number | null
+          id?: number
+          platform_id?: number | null
+          platform_specific_id?: string | null
+        }
+        Update: {
+          game_id?: number | null
+          id?: number
+          platform_id?: number | null
+          platform_specific_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_platforms_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_platforms_platform_id_fkey"
+            columns: ["platform_id"]
+            isOneToOne: false
+            referencedRelation: "platforms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           created_at: string | null
+          description: string | null
           icon_url: string | null
           id: number
           name: string
@@ -279,6 +196,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          description?: string | null
           icon_url?: string | null
           id?: number
           name: string
@@ -289,6 +207,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          description?: string | null
           icon_url?: string | null
           id?: number
           name?: string
@@ -329,6 +248,21 @@ export type Database = {
           sender_id?: string | null
           sender_username?: string | null
           type?: string
+        }
+        Relationships: []
+      }
+      platforms: {
+        Row: {
+          id: number
+          name: string
+        }
+        Insert: {
+          id?: number
+          name: string
+        }
+        Update: {
+          id?: number
+          name?: string
         }
         Relationships: []
       }
@@ -377,162 +311,6 @@ export type Database = {
         }
         Relationships: []
       }
-      thread_bookmarks: {
-        Row: {
-          created_at: string
-          id: string
-          thread_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          thread_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          thread_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "thread_bookmarks_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "forum_threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      thread_comments: {
-        Row: {
-          attachments: string[] | null
-          author_id: string
-          content: string
-          created_at: string
-          id: string
-          is_edited: boolean
-          is_reported: boolean
-          parent_comment_id: string | null
-          thread_id: string
-          updated_at: string
-          upvotes: number
-        }
-        Insert: {
-          attachments?: string[] | null
-          author_id: string
-          content: string
-          created_at?: string
-          id?: string
-          is_edited?: boolean
-          is_reported?: boolean
-          parent_comment_id?: string | null
-          thread_id: string
-          updated_at?: string
-          upvotes?: number
-        }
-        Update: {
-          attachments?: string[] | null
-          author_id?: string
-          content?: string
-          created_at?: string
-          id?: string
-          is_edited?: boolean
-          is_reported?: boolean
-          parent_comment_id?: string | null
-          thread_id?: string
-          updated_at?: string
-          upvotes?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "thread_comments_parent_comment_id_fkey"
-            columns: ["parent_comment_id"]
-            isOneToOne: false
-            referencedRelation: "thread_comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "thread_comments_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "forum_threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      thread_reports: {
-        Row: {
-          created_at: string
-          id: string
-          reason: string
-          resolved: boolean
-          resolved_at: string | null
-          resolved_by: string | null
-          thread_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          reason: string
-          resolved?: boolean
-          resolved_at?: string | null
-          resolved_by?: string | null
-          thread_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          reason?: string
-          resolved?: boolean
-          resolved_at?: string | null
-          resolved_by?: string | null
-          thread_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "thread_reports_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "forum_threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      thread_upvotes: {
-        Row: {
-          created_at: string
-          id: string
-          thread_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          thread_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          thread_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "thread_upvotes_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "forum_threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       unsubscribe_feedback: {
         Row: {
           email: string
@@ -555,6 +333,35 @@ export type Database = {
         Relationships: []
       }
       user_achievements: {
+        Row: {
+          achievement_id: number
+          unlock_time: string | null
+          unlocked: boolean
+          user_id: string
+        }
+        Insert: {
+          achievement_id: number
+          unlock_time?: string | null
+          unlocked?: boolean
+          user_id: string
+        }
+        Update: {
+          achievement_id?: number
+          unlock_time?: string | null
+          unlocked?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_new_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_achievements_old: {
         Row: {
           achievement_id: number
           created_at: string | null
@@ -582,38 +389,33 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_achievements_achievement_id_fkey"
-            columns: ["achievement_id"]
-            isOneToOne: false
-            referencedRelation: "achievements"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_games: {
         Row: {
           game_id: number
+          game_platform_id: number | null
           platform_name: string
           user_id: string
         }
         Insert: {
           game_id: number
+          game_platform_id?: number | null
           platform_name: string
           user_id: string
         }
         Update: {
           game_id?: number
+          game_platform_id?: number | null
           platform_name?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_games_game_id_fkey"
-            columns: ["game_id"]
+            foreignKeyName: "user_games_game_platform_id_fkey"
+            columns: ["game_platform_id"]
             isOneToOne: false
-            referencedRelation: "games"
+            referencedRelation: "game_platforms"
             referencedColumns: ["id"]
           },
           {
