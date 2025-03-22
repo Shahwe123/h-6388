@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, User, Gamepad, Users, BarChart, MessageSquare, Trophy } from 'lucide-react';
+import { Home, User, Gamepad, Users, BarChart, Trophy } from 'lucide-react';
 
 /**
  * Props for the NavLinks component
@@ -23,10 +23,9 @@ const NavLinks: React.FC<NavLinksProps> = ({ isMobile, onClick }) => {
     { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/profile', label: 'Profile', icon: User },
     { path: '/games', label: 'Games', icon: Gamepad },
-    { path: '/legacy-wall', label: 'Trophy Museum', icon: Trophy },
+    { path: '/legacy-wall', label: 'Museum', icon: Trophy },
     { path: '/friends', label: 'Friends', icon: Users },
-    { path: '/leaderboard', label: 'Leaderboard', icon: BarChart },
-    { path: '/forum', label: 'Forum', icon: MessageSquare }
+    { path: '/leaderboard', label: 'Leaderboard', icon: BarChart }
   ];
 
   return (

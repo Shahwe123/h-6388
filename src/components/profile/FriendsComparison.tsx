@@ -16,9 +16,9 @@ const FriendsComparison = ({ friendCount, isOwnProfile }: FriendsComparisonProps
   if (!isOwnProfile) return null;
   
   const handleCompareClick = (friendId: string) => {
-    // Make sure we're navigating to the correct path
+    // Update the navigation path to match the route in AppRoutes.tsx
     console.log(`Navigating to comparison with friend: ${friendId}`);
-    navigate(`/friends/compare/${friendId}`);
+    navigate(`/friend/${friendId}`);
   };
   
   return (

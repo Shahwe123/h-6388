@@ -93,11 +93,11 @@ const FriendsList = ({ friends, currentUser, loading }: FriendsListProps) => {
     navigate(`/profile/${encodeURIComponent(username.trim())}`);
   };
 
-  // Function to navigate to comparison page
+  // Function to navigate to comparison page - updated to match route in AppRoutes.tsx
   const navigateToComparison = (friendId: string) => {
     if (!friendId) return;
     console.log(`Navigating to comparison with friend: ${friendId}`);
-    navigate(`/friends/compare/${friendId}`);
+    navigate(`/friend/${friendId}`);
   };
 
   return (
