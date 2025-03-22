@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
@@ -14,7 +13,10 @@ import {
   Search, 
   ChevronRight,
   Bookmark,
-  Flag
+  Flag,
+  LayoutGrid,
+  ListTodo,
+  Heart
 } from 'lucide-react';
 import { Game, GameTrophy, LegacyWallFilter, TrophyFilter } from '@/types/game';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,9 +29,10 @@ import TrophyCard from './TrophyCard';
 import MilestoneCard from './MilestoneCard';
 import YearTimeline from './YearTimeline';
 import FilterPanel from './FilterPanel';
+import TrophyCalendar from './TrophyCalendar';
+import WishlistManager from './WishlistManager';
 import SEO from "@/components/SEO";
 
-// Mock data until we have real data
 const mockYears = [2018, 2019, 2020, 2021, 2022, 2023, 2024];
 const mockPlatforms = ['PlayStation', 'Steam', 'Xbox'];
 const mockGenres = ['Action', 'RPG', 'Sports', 'Adventure', 'Shooter', 'Platformer'];
@@ -42,7 +45,7 @@ const LegacyWall: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTrophy, setSelectedTrophy] = useState<GameTrophy | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [activeView, setActiveView] = useState<'grid' | 'timeline'>('grid');
+  const [activeView, setActiveView] = useState<'grid' | 'timeline' | 'calendar'>('grid');
   const [filters, setFilters] = useState<LegacyWallFilter>({
     year: 'all',
     platform: 'all',
@@ -52,7 +55,6 @@ const LegacyWall: React.FC = () => {
     milestones: false
   });
   
-  // Derive all trophies from games
   const allTrophies = React.useMemo(() => {
     const trophies: { trophy: GameTrophy; game: Game }[] = [];
     games.forEach((game: Game) => {
@@ -67,16 +69,13 @@ const LegacyWall: React.FC = () => {
     return trophies;
   }, [games]);
   
-  // Filtered trophies based on current filters
   const filteredTrophies = React.useMemo(() => {
     return allTrophies.filter(({ trophy, game }) => {
-      // Apply search term
       if (searchTerm && !trophy.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
           !game.name.toLowerCase().includes(searchTerm.toLowerCase())) {
         return false;
       }
       
-      // Apply year filter
       if (filters.year !== 'all') {
         const trophyYear = trophy.achievedDate 
           ? new Date(trophy.achievedDate).getFullYear() 
@@ -84,24 +83,20 @@ const LegacyWall: React.FC = () => {
         if (trophyYear !== filters.year) return false;
       }
       
-      // Apply platform filter
       if (filters.platform !== 'all' && game.platform !== filters.platform) {
         return false;
       }
       
-      // Apply genre filter
       if (filters.genre !== 'all' && !game.genres?.includes(filters.genre as string)) {
         return false;
       }
       
-      // Apply trophy type filter
       if (filters.type !== 'all') {
         if (filters.type === 'legacy' && !trophy.isLegacy) return false;
         if (filters.type === 'milestones' && !trophy.isFirstOfType && !game.milestoneInfo) return false;
         if (['platinum', 'gold', 'silver', 'bronze'].includes(filters.type) && trophy.type !== filters.type) return false;
       }
       
-      // Apply rarity filter
       if (filters.rarity !== 'all') {
         if (filters.rarity === 'common' && trophy.rarityPercentage > 20) return false;
         if (filters.rarity === 'rare' && (trophy.rarityPercentage > 10 || trophy.rarityPercentage <= 5)) return false;
@@ -112,7 +107,6 @@ const LegacyWall: React.FC = () => {
     });
   }, [allTrophies, searchTerm, filters]);
   
-  // Group trophies by year for timeline view
   const trophiesByYear = React.useMemo(() => {
     const grouped: Record<number, { trophy: GameTrophy; game: Game }[]> = {};
     
@@ -131,14 +125,12 @@ const LegacyWall: React.FC = () => {
     return grouped;
   }, [filteredTrophies]);
   
-  // Milestone trophies
   const milestoneTrophies = React.useMemo(() => {
     return filteredTrophies.filter(({ trophy, game }) => 
       trophy.isFirstOfType || trophy.isLegacy || game.milestoneInfo
     );
   }, [filteredTrophies]);
   
-  // Stats for the trophy collection
   const stats = React.useMemo(() => {
     const totalTrophies = allTrophies.length;
     const platinumCount = allTrophies.filter(({ trophy }) => trophy.type === 'platinum').length;
@@ -146,7 +138,6 @@ const LegacyWall: React.FC = () => {
     const silverCount = allTrophies.filter(({ trophy }) => trophy.type === 'silver').length;
     const bronzeCount = allTrophies.filter(({ trophy }) => trophy.type === 'bronze').length;
     
-    // Find the rarest trophy
     let rarestTrophy = allTrophies.length > 0 ? allTrophies[0] : null;
     allTrophies.forEach(item => {
       if (item.trophy.rarityPercentage < (rarestTrophy?.trophy.rarityPercentage || 100)) {
@@ -164,24 +155,18 @@ const LegacyWall: React.FC = () => {
     };
   }, [allTrophies]);
   
-  // Handle trophy click
   const handleTrophyClick = (trophy: GameTrophy, game: Game) => {
     setSelectedTrophy(trophy);
-    // Could navigate to a detail view or open a modal
   };
   
-  // Handle sharing trophy
   const handleShareTrophy = (trophy: GameTrophy, game: Game) => {
-    // Implementation for sharing functionality
     toast({
       title: "Sharing Trophy",
       description: `Sharing ${trophy.name} from ${game.name}`,
     });
   };
   
-  // Toggle bookmark/pin trophy
   const handlePinTrophy = (trophy: GameTrophy, game: Game) => {
-    // Implementation to pin/bookmark trophy
     toast({
       title: trophy.isPinned ? "Trophy Unpinned" : "Trophy Pinned",
       description: `${trophy.name} from ${game.name} has been ${trophy.isPinned ? 'removed from' : 'added to'} your pinned trophies`,
@@ -195,7 +180,7 @@ const LegacyWall: React.FC = () => {
         description="Browse your entire collection of gaming achievements, trophies and milestones through the years."
       />
       
-      <div className="max-w-7xl mx-auto pt-36 px-4 sm:px-6"> {/* Increased padding-top further to pt-36 */}
+      <div className="max-w-7xl mx-auto pt-36 px-4 sm:px-6">
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neon-purple to-neon-blue">
             Trophy Museum
@@ -203,7 +188,6 @@ const LegacyWall: React.FC = () => {
           <p className="mt-2 text-zinc-400">Your gaming legacy — immortalized</p>
         </div>
         
-        {/* Trophy Stats Bar */}
         <div className="bg-black/30 rounded-lg p-4 mb-8 grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold">{stats.totalTrophies}</div>
@@ -227,7 +211,6 @@ const LegacyWall: React.FC = () => {
           </div>
         </div>
         
-        {/* Filters and Search */}
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="relative">
@@ -257,19 +240,28 @@ const LegacyWall: React.FC = () => {
               size="sm"
               onClick={() => setActiveView('grid')}
             >
-              Grid View
+              <LayoutGrid className="h-4 w-4 mr-1" />
+              Grid
             </Button>
             <Button
               variant={activeView === 'timeline' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setActiveView('timeline')}
             >
+              <ListTodo className="h-4 w-4 mr-1" />
               Timeline
+            </Button>
+            <Button
+              variant={activeView === 'calendar' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveView('calendar')}
+            >
+              <Calendar className="h-4 w-4 mr-1" />
+              Calendar
             </Button>
           </div>
         </div>
         
-        {/* Filter Panel */}
         {showFilters && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -375,7 +367,6 @@ const LegacyWall: React.FC = () => {
           </motion.div>
         )}
         
-        {/* No Trophy Message */}
         {filteredTrophies.length === 0 && (
           <div className="text-center py-12">
             <Trophy className="h-16 w-16 mx-auto mb-4 text-neutral-600" />
@@ -396,17 +387,19 @@ const LegacyWall: React.FC = () => {
           </div>
         )}
         
-        {/* Trophy Display */}
         <Tabs defaultValue="all" className="mb-6">
           <TabsList className="glass-card">
             <TabsTrigger value="all">All Trophies</TabsTrigger>
             <TabsTrigger value="milestones">Milestones</TabsTrigger>
             <TabsTrigger value="platinum">Platinum Journey</TabsTrigger>
+            <TabsTrigger value="wishlist">
+              <Heart className="h-4 w-4 mr-1" />
+              Wishlist
+            </TabsTrigger>
           </TabsList>
           
-          {/* All Trophies Tab */}
           <TabsContent value="all" className="mt-6">
-            {activeView === 'grid' ? (
+            {activeView === 'grid' && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {filteredTrophies.map(({ trophy, game }, index) => (
                   <motion.div
@@ -425,7 +418,9 @@ const LegacyWall: React.FC = () => {
                   </motion.div>
                 ))}
               </div>
-            ) : (
+            )}
+            
+            {activeView === 'timeline' && (
               <div className="space-y-16">
                 {Object.entries(trophiesByYear)
                   .sort(([yearA], [yearB]) => parseInt(yearB) - parseInt(yearA))
@@ -456,9 +451,12 @@ const LegacyWall: React.FC = () => {
                   ))}
               </div>
             )}
+            
+            {activeView === 'calendar' && (
+              <TrophyCalendar trophies={filteredTrophies} />
+            )}
           </TabsContent>
           
-          {/* Milestones Tab */}
           <TabsContent value="milestones" className="mt-6">
             {milestoneTrophies.length === 0 ? (
               <div className="text-center py-12 bg-black/20 rounded-lg">
@@ -482,7 +480,6 @@ const LegacyWall: React.FC = () => {
             )}
           </TabsContent>
           
-          {/* Platinum Journey Tab */}
           <TabsContent value="platinum" className="mt-6">
             <div className="bg-black/20 rounded-lg p-6">
               <h2 className="text-2xl font-bold mb-4">Your Platinum Journey</h2>
@@ -503,6 +500,10 @@ const LegacyWall: React.FC = () => {
                 </div>
               )}
             </div>
+          </TabsContent>
+          
+          <TabsContent value="wishlist" className="mt-6">
+            <WishlistManager />
           </TabsContent>
         </Tabs>
       </div>
