@@ -16,6 +16,9 @@ import Friends from "@/pages/Friends";
 import Leaderboard from "@/pages/Leaderboard";
 import AuthRequired from "@/components/AuthRequired";
 import EmailPreferences from "@/pages/EmailPreferences";
+import Dashboard from "@/pages/Dashboard";
+import Games from "@/pages/Games";
+import GameDetail from "@/pages/GameDetail";
 
 // Footer pages
 import About from "@/pages/About";
@@ -88,7 +91,7 @@ const AuthRedirect = () => {
 
   // If user is logged in, redirect to profile page, else show the Auth component
   if (session) {
-    return <Navigate to="/profile" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Auth />;
@@ -124,7 +127,16 @@ const AppRoutes = () => {
       <Route path="/terms" element={<Terms />} />
       <Route path="/cookies" element={<Cookies />} />
 
+      {/* Game pages */}
+      <Route path="/games" element={<Games />} />
+      <Route path="/games/:gameId" element={<GameDetail />} />
+
       {/* Protected routes - require authentication */}
+      <Route path="/dashboard" element={
+        <AuthRequired>
+          <Dashboard />
+        </AuthRequired>
+      } />
       <Route path="/profile" element={
         <AuthRequired>
           <Profile />

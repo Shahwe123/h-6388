@@ -1,64 +1,98 @@
 
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
-import { Session } from '@supabase/supabase-js';
-import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { Trophy, Users, Award, Settings, Home, Gamepad, LayoutDashboard } from 'lucide-react';
 
-/**
- * Props for the NavLinks component
- * @property {Session|null} session - The current user session
- * @property {boolean} isMobile - Whether being rendered in mobile view
- * @property {Function} onClick - Optional click handler for mobile navigation
- */
-type NavLinksProps = {
-  session: Session | null;
-  isMobile?: boolean;
-  onClick?: () => void;
+type NavLink = {
+  name: string;
+  path: string;
+  icon: React.ReactNode;
+  requiresAuth: boolean;
 };
 
 /**
  * NavLinks component
  * 
- * Renders navigation links based on authentication state.
- * Shows different links for authenticated and unauthenticated users.
- * Handles both desktop and mobile navigation styles.
- * 
- * @param {NavLinksProps} props - Component props
- * @returns {JSX.Element} Navigation links UI
+ * Displays the primary navigation links in the navbar
+ * Shows different links based on authentication status
  */
-const NavLinks = ({ session, isMobile = false, onClick }: NavLinksProps) => {
+const NavLinks = () => {
   const location = useLocation();
-  const { pathname } = location;
+  const isAuthenticated = useSelector((state: any) => !!state.user?.userData);
   
-  // Initialize the scroll to top hook
-  useScrollToTop();
-
-  // Different navigation links for authenticated vs unauthenticated users
-  const navLinks = session ? [
-    { path: '/profile', label: 'Profile' },
-    { path: '/friends', label: 'Friends' },
-    { path: '/leaderboard', label: 'Leaderboard' },
-    { path: '/link-accounts', label: 'Link Accounts' },
-    { path: '/settings', label: 'Settings' }
-  ] : [
-    { path: '/', label: 'Home' },
-    { path: '/auth', label: 'Sign In' },
+  // Navigation links configuration
+  const links: NavLink[] = [
+    {
+      name: 'Home',
+      path: '/',
+      icon: <Home className="h-4 w-4" />,
+      requiresAuth: false
+    },
+    {
+      name: 'Dashboard',
+      path: '/dashboard',
+      icon: <LayoutDashboard className="h-4 w-4" />,
+      requiresAuth: true
+    },
+    {
+      name: 'Profile',
+      path: '/profile',
+      icon: <Trophy className="h-4 w-4" />,
+      requiresAuth: true
+    },
+    {
+      name: 'Games',
+      path: '/games',
+      icon: <Gamepad className="h-4 w-4" />,
+      requiresAuth: true
+    },
+    {
+      name: 'Friends',
+      path: '/friends',
+      icon: <Users className="h-4 w-4" />,
+      requiresAuth: true
+    },
+    {
+      name: 'Leaderboard',
+      path: '/leaderboard',
+      icon: <Award className="h-4 w-4" />,
+      requiresAuth: false
+    },
+    {
+      name: 'Settings',
+      path: '/settings',
+      icon: <Settings className="h-4 w-4" />,
+      requiresAuth: true
+    }
   ];
-
+  
+  // Filter links based on authentication status
+  const visibleLinks = links.filter(link => 
+    !link.requiresAuth || (link.requiresAuth && isAuthenticated)
+  );
+  
   return (
-    <>
-      {navLinks.map(link => (
-        <Link
-          key={link.path}
-          to={link.path}
-          className={`${isMobile ? 'block py-2 text-lg' : 'text-sm font-medium'} transition-colors hover:text-white ${
-            pathname === link.path ? 'text-white' : 'text-neutral-400'
-          }`}
-          onClick={onClick}
-        >
-          {link.label}
-        </Link>
-      ))}
-    </>
+    <div className="hidden lg:flex lg:gap-x-6">
+      {visibleLinks.map((link) => {
+        const isActive = location.pathname === link.path || 
+          (link.path !== '/' && location.pathname.startsWith(link.path));
+        
+        return (
+          <Link
+            key={link.name}
+            to={link.path}
+            className={`flex items-center text-sm font-semibold transition-colors px-3 py-2 rounded-md ${
+              isActive
+                ? 'text-white bg-neon-purple/20'
+                : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <span className="mr-1.5">{link.icon}</span>
+            {link.name}
+          </Link>
+        );
+      })}
+    </div>
   );
 };
 
