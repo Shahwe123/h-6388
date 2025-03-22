@@ -9,6 +9,7 @@ type NavLink = {
   path: string;
   icon: React.ReactNode;
   requiresAuth: boolean;
+  hideOnAuth?: boolean; // New property to hide link on auth pages
 };
 
 type NavLinksProps = {
@@ -26,6 +27,7 @@ const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
   const location = useLocation();
   const isAuthenticated = useSelector((state: any) => !!state.user?.user);
   const userData = useSelector((state: any) => state.user?.userData);
+  const isAuthPage = location.pathname.includes('/auth');
   
   // Get the profile path that points to the user's own profile
   const getProfilePath = () => {
@@ -71,7 +73,8 @@ const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
       name: 'Leaderboard',
       path: '/leaderboard',
       icon: <Award className="h-4 w-4" />,
-      requiresAuth: false
+      requiresAuth: false,
+      hideOnAuth: true // Hide this link on auth pages
     },
     {
       name: 'Settings',
@@ -81,9 +84,10 @@ const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
     }
   ];
   
-  // Filter links based on authentication status
+  // Filter links based on authentication status and current page
   const visibleLinks = links.filter(link => 
-    !link.requiresAuth || (link.requiresAuth && isAuthenticated)
+    (!link.requiresAuth || (link.requiresAuth && isAuthenticated)) && 
+    !(link.hideOnAuth && isAuthPage)
   );
   
   // Mobile-specific styling
