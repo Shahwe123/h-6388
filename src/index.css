@@ -69,7 +69,16 @@
   
   /* Page content container with proper spacing for fixed navbar */
   .page-container {
-    @apply pt-28 pb-12 min-h-screen;
+    @apply pt-32 pb-12 min-h-screen;
+  }
+  
+  /* Consistent page title styling */
+  .page-title {
+    @apply text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neon-purple to-neon-blue mb-2;
+  }
+  
+  .page-subtitle {
+    @apply text-zinc-400 mt-2 max-w-3xl mx-auto;
   }
 }
 

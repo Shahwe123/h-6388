@@ -195,7 +195,7 @@ const LegacyWall: React.FC = () => {
         description="Browse your entire collection of gaming achievements, trophies and milestones through the years."
       />
       
-      <div className="max-w-7xl mx-auto pt-28 px-4 sm:px-6"> {/* Increased padding-top from pt-8 to pt-28 */}
+      <div className="max-w-7xl mx-auto pt-36 px-4 sm:px-6"> {/* Increased padding-top further to pt-36 */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neon-purple to-neon-blue">
             Trophy Museum
