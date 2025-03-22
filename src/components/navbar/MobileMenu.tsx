@@ -53,7 +53,6 @@ const MobileMenu = ({
     <div className="md:hidden bg-black backdrop-blur-md">
       <div className="container-padding pt-4 pb-6 space-y-4 border-b border-neon-purple/10">
         <NavLinks 
-          session={session} 
           isMobile={true}
           onClick={onClose}
         />

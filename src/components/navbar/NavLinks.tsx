@@ -2,6 +2,7 @@
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { Trophy, Users, Award, Settings, Home, Gamepad, LayoutDashboard } from 'lucide-react';
+import { Session } from '@supabase/supabase-js';
 
 type NavLink = {
   name: string;
@@ -10,15 +11,20 @@ type NavLink = {
   requiresAuth: boolean;
 };
 
+type NavLinksProps = {
+  isMobile?: boolean;
+  onClick?: () => void;
+};
+
 /**
  * NavLinks component
  * 
  * Displays the primary navigation links in the navbar
  * Shows different links based on authentication status
  */
-const NavLinks = () => {
+const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
   const location = useLocation();
-  const isAuthenticated = useSelector((state: any) => !!state.user?.userData);
+  const isAuthenticated = useSelector((state: any) => !!state.user?.user);
   
   // Navigation links configuration
   const links: NavLink[] = [
@@ -71,6 +77,35 @@ const NavLinks = () => {
     !link.requiresAuth || (link.requiresAuth && isAuthenticated)
   );
   
+  // Mobile-specific styling
+  if (isMobile) {
+    return (
+      <div className="flex flex-col space-y-2">
+        {visibleLinks.map((link) => {
+          const isActive = location.pathname === link.path || 
+            (link.path !== '/' && location.pathname.startsWith(link.path));
+          
+          return (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={`flex items-center text-lg font-medium transition-colors px-3 py-2 rounded-md ${
+                isActive
+                  ? 'text-white bg-neon-purple/20'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+              }`}
+              onClick={onClick}
+            >
+              <span className="mr-2">{link.icon}</span>
+              {link.name}
+            </Link>
+          );
+        })}
+      </div>
+    );
+  }
+  
+  // Desktop styling
   return (
     <div className="hidden lg:flex lg:gap-x-6">
       {visibleLinks.map((link) => {

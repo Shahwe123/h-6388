@@ -32,10 +32,10 @@ const Navbar = () => {
   return (
     <nav className="fixed w-full top-0 z-50 bg-black border-b border-neon-purple/10">
       <div className="max-w-full container-padding mx-auto flex items-center justify-between h-16">
-        <NavbarBrand session={session} />
+        <NavbarBrand />
 
         <div className="hidden md:flex items-center gap-6">
-          <NavLinks session={session} />
+          <NavLinks />
 
           {session && (
             <>
@@ -67,13 +67,13 @@ const Navbar = () => {
       </div>
 
       <MobileMenu
-        session={session}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         onSignOut={handleSignOut}
         notifications={notifications}
         hasUnreadNotifications={hasUnreadNotifications}
         onNotificationsRead={markNotificationsAsRead}
+        session={session}
       />
     </nav>
   );
