@@ -1,7 +1,9 @@
-import { Users, UserCircle } from 'lucide-react';
+
+import { Users, UserCircle, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import RankBadge from '@/components/profile/RankBadge';
 import { mockFriendsForComparison } from '@/data/profileData';
+import { useNavigate } from 'react-router-dom';
 
 interface FriendsComparisonProps {
   friendCount: number;
@@ -9,7 +11,13 @@ interface FriendsComparisonProps {
 }
 
 const FriendsComparison = ({ friendCount, isOwnProfile }: FriendsComparisonProps) => {
+  const navigate = useNavigate();
+  
   if (!isOwnProfile) return null;
+  
+  const handleCompareClick = (friendId: string) => {
+    navigate(`/friends/compare/${friendId}`);
+  };
   
   return (
     <div className="glass-card rounded-xl p-6 mb-8">
@@ -19,6 +27,7 @@ const FriendsComparison = ({ friendCount, isOwnProfile }: FriendsComparisonProps
           variant="outline"
           size="sm"
           className="bg-black/40 border-neon-purple/30 hover:bg-black/60"
+          onClick={() => navigate('/friends')}
         >
           <Users className="h-4 w-4 mr-2" />
           View All
@@ -63,6 +72,16 @@ const FriendsComparison = ({ friendCount, isOwnProfile }: FriendsComparisonProps
                     <div className="text-xs text-neutral-500">Your Lead</div>
                   </div>
                 </div>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-4 bg-black/30 hover:bg-black/60"
+                  onClick={() => handleCompareClick(friend.id)}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Compare Stats
+                </Button>
               </div>
             ))}
           </div>

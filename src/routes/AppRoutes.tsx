@@ -1,163 +1,145 @@
+import React, { useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "@/redux/slices/userSlice";
+// Pages
+import Index from '@/pages/Index';
+import About from '@/pages/About';
+import Blog from '@/pages/Blog';
+import BlogDetail from '@/pages/Blog';
+import Contact from '@/pages/Contact';
+import Pricing from '@/pages/Pricing';
+import Auth from '@/pages/Auth';
+import Terms from '@/pages/Terms';
+import Privacy from '@/pages/Privacy';
+import Cookies from '@/pages/Cookies';
+import Support from '@/pages/Support';
+import Documentation from '@/pages/Documentation';
+import Guides from '@/pages/Guides';
+import EmailPreferences from '@/pages/EmailPreferences';
+import Dashboard from '@/pages/Dashboard';
+import Profile from '@/pages/Profile';
+import Friends from '@/pages/Friends';
+import FriendComparison from '@/pages/FriendComparison';
+import Games from '@/pages/Games';
+import GameDetail from '@/pages/GameDetail';
+import Settings from '@/pages/Settings';
+import LinkAccounts from '@/pages/LinkAccounts';
+import Leaderboard from '@/pages/Leaderboard';
+import NotFound from '@/pages/NotFound';
 
-import Index from "@/pages/Index";
-import BetaLanding from "@/pages/BetaLanding";
-import Auth from "@/pages/Auth";
-import Profile from "@/pages/Profile";
-import Settings from "@/pages/Settings";
-import LinkAccounts from "@/pages/LinkAccounts";
-import Friends from "@/pages/Friends";
-import Leaderboard from "@/pages/Leaderboard";
-import AuthRequired from "@/components/AuthRequired";
-import EmailPreferences from "@/pages/EmailPreferences";
-import Dashboard from "@/pages/Dashboard";
-import Games from "@/pages/Games";
-import GameDetail from "@/pages/GameDetail";
+// Components
+import PrivateRoute from '@/components/AuthRequired';
+import { useToast } from '@/hooks/use-toast';
 
-// Footer pages
-import About from "@/pages/About";
-import Blog from "@/pages/Blog";
-import Contact from "@/pages/Contact";
-import Pricing from "@/pages/Pricing";
-import Guides from "@/pages/Guides";
-import Documentation from "@/pages/Documentation";
-import Support from "@/pages/Support";
-import Privacy from "@/pages/Privacy";
-import Terms from "@/pages/Terms";
-import Cookies from "@/pages/Cookies";
-
-/**
- * AuthRedirect component
- * 
- * This component handles redirecting authenticated users away from the auth page.
- * If a user is already logged in (has an active session), they will be redirected to the profile page.
- * Otherwise, the Auth component will be rendered.
- * 
- * @returns {JSX.Element} Auth component or redirect
- */
-const AuthRedirect = () => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
+const AppRoutes = () => {
+  const navigate = useNavigate();
+  const currentUser = useSelector((state: any) => state.user?.userData);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Get current session on component mount
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-      
-      // Dispatch loginSuccess if session exists
-      if (data.session) {
-        dispatch(loginSuccess(data.session));
-      }
-      
-      setLoading(false);
-    };
+    if (!currentUser && localStorage.getItem('supabase.auth.token')) {
+      toast({
+        title: 'Session Expired',
+        description: 'Your session has expired. Please sign in again.',
+      });
+      navigate('/auth');
+    }
+  }, [currentUser, navigate, toast]);
 
-    getSession();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        // Update Redux state on auth state change
-        if (session) {
-          dispatch(loginSuccess(session));
-        }
-      }
-    );
-
-    // Clean up subscription when component unmounts
-    return () => subscription.unsubscribe();
-  }, [dispatch]);
-
-  // Show loading state while checking session
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-primary flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-neon-purple border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-neutral-300">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // If user is logged in, redirect to profile page, else show the Auth component
-  if (session) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <Auth />;
-};
-
-/**
- * AppRoutes component
- * 
- * Contains all application routes and their components
- * 
- * @returns {JSX.Element} Routes configuration
- */
-const AppRoutes = () => {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<BetaLanding />} />
-      <Route path="/original" element={<Index />} />
-      <Route path="/beta" element={<BetaLanding />} />
-      <Route path="/auth" element={<AuthRedirect />} />
-      <Route path="/leaderboard" element={<Leaderboard />} />
-      <Route path="/email-preferences" element={<EmailPreferences />} />
-
-      {/* Footer pages */}
+      <Route path="/" element={<Index />} />
       <Route path="/about" element={<About />} />
       <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogDetail />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/pricing" element={<Pricing />} />
-      <Route path="/guides" element={<Guides />} />
-      <Route path="/documentation" element={<Documentation />} />
-      <Route path="/support" element={<Support />} />
-      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/auth" element={<Auth />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
       <Route path="/cookies" element={<Cookies />} />
+      <Route path="/support" element={<Support />} />
+      <Route path="/documentation" element={<Documentation />} />
+      <Route path="/guides" element={<Guides />} />
+      <Route path="/email-preferences" element={<EmailPreferences />} />
+      <Route path="/leaderboard" element={<Leaderboard />} />
 
-      {/* Game pages */}
-      <Route path="/games" element={<Games />} />
-      <Route path="/games/:gameId" element={<GameDetail />} />
-
-      {/* Protected routes - require authentication */}
-      <Route path="/dashboard" element={
-        <AuthRequired>
-          <Dashboard />
-        </AuthRequired>
-      } />
-      <Route path="/profile" element={
-        <AuthRequired>
+      {/* Private routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile/:username"
+        element={
           <Profile />
-        </AuthRequired>
-      } />
-      <Route path="/profile/:username" element={<Profile />} />
-      <Route path="/friends" element={
-        <AuthRequired>
-          <Friends />
-        </AuthRequired>
-      } />
-      <Route path="/settings" element={
-        <AuthRequired>
-          <Settings />
-        </AuthRequired>
-      } />
-      <Route path="/link-accounts" element={
-        <AuthRequired>
-          <LinkAccounts />
-        </AuthRequired>
-      } />
+        }
+      />
+      <Route
+        path="/friends"
+        element={
+          <PrivateRoute>
+            <Friends />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/friends/compare/:friendId"
+        element={
+          <PrivateRoute>
+            <FriendComparison />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/games"
+        element={
+          <PrivateRoute>
+            <Games />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/games/:gameId"
+        element={
+          <PrivateRoute>
+            <GameDetail />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <PrivateRoute>
+            <Settings />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/link-accounts"
+        element={
+          <PrivateRoute>
+            <LinkAccounts />
+          </PrivateRoute>
+        }
+      />
+      
+      {/* Catch-all for unknown routes */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
