@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -792,3 +793,27 @@ const GameDetail = () => {
                   size="sm" 
                   className="flex-1"
                   onClick={() => {
+                    togglePinTrophy(selectedTrophy.id);
+                  }}
+                >
+                  {selectedTrophy.isPinned ? 'Unpin Trophy' : 'Pin Trophy'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setSelectedTrophy(null)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
+    </div>
+  );
+};
+
+export default GameDetail;
+
