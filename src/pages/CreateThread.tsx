@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
@@ -7,11 +7,34 @@ import CreateThreadForm from '@/components/forum/CreateThreadForm';
 import { ForumTagType } from '@/types/forum';
 import { useToast } from '@/hooks/use-toast';
 import SEO from '@/components/SEO';
+import { useForumData } from '@/hooks/useForumData';
+import { supabase } from '@/integrations/supabase/client';
 
 const CreateThread: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const { categoriesQuery, createThread, isCreatingThread } = useForumData();
+  
+  // Check if user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      setIsLoggedIn(!!data.session);
+      
+      if (!data.session) {
+        toast({
+          title: "Authentication required",
+          description: "You must be logged in to create a thread",
+          variant: "destructive"
+        });
+        navigate('/forum');
+      }
+    };
+    
+    checkAuth();
+  }, [navigate, toast]);
   
   const handleSubmit = (data: {
     title: string;
@@ -19,23 +42,20 @@ const CreateThread: React.FC = () => {
     tags: ForumTagType[];
     attachments: string[];
     gameName?: string;
+    categoryId: string;
   }) => {
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      
-      toast({
-        title: "Thread created",
-        description: "Your thread has been posted successfully",
-        variant: "default"
-      });
-      
-      // Navigate to forum (in a real app, would navigate to the new thread)
-      navigate('/forum');
-    }, 1000);
+    createThread(data, {
+      onSuccess: (thread) => {
+        if (thread) {
+          navigate(`/forum/thread/${thread.id}`);
+        }
+      }
+    });
   };
+  
+  if (isLoggedIn === false) {
+    return null; // Will redirect via useEffect
+  }
   
   return (
     <div className="min-h-screen bg-primary pb-16">
@@ -56,7 +76,9 @@ const CreateThread: React.FC = () => {
         
         <CreateThreadForm 
           onSubmit={handleSubmit}
-          loading={loading}
+          loading={isCreatingThread}
+          categories={categoriesQuery.data || []}
+          isLoadingCategories={categoriesQuery.isLoading}
         />
       </div>
     </div>

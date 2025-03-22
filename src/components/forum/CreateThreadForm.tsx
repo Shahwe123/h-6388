@@ -1,13 +1,22 @@
 
 import React, { useState } from 'react';
-import { ForumTagType } from '@/types/forum';
+import { ForumTagType, ForumCategory } from '@/types/forum';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Paperclip, X, AlertCircle } from 'lucide-react';
+import { 
+  Paperclip, X, AlertCircle, Loader2 
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface CreateThreadFormProps {
   onSubmit: (data: {
@@ -16,11 +25,19 @@ interface CreateThreadFormProps {
     tags: ForumTagType[];
     attachments: string[];
     gameName?: string;
+    categoryId: string;
   }) => void;
   loading?: boolean;
+  categories: ForumCategory[];
+  isLoadingCategories?: boolean;
 }
 
-const CreateThreadForm: React.FC<CreateThreadFormProps> = ({ onSubmit, loading = false }) => {
+const CreateThreadForm: React.FC<CreateThreadFormProps> = ({ 
+  onSubmit, 
+  loading = false,
+  categories = [],
+  isLoadingCategories = false
+}) => {
   const { toast } = useToast();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -28,6 +45,7 @@ const CreateThreadForm: React.FC<CreateThreadFormProps> = ({ onSubmit, loading =
   const [gameName, setGameName] = useState('');
   const [attachments, setAttachments] = useState<string[]>([]);
   const [previewContent, setPreviewContent] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   
   const availableTags: ForumTagType[] = ['Guide', 'Help', 'Discussion', 'Challenge', 'Flex'];
   
@@ -91,12 +109,22 @@ const CreateThreadForm: React.FC<CreateThreadFormProps> = ({ onSubmit, loading =
       return;
     }
     
+    if (!categoryId) {
+      toast({
+        title: "Category required",
+        description: "Please select a category for your thread",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     onSubmit({
       title,
       content,
       tags: selectedTags,
       attachments,
-      gameName: gameName.trim() || undefined
+      gameName: gameName.trim() || undefined,
+      categoryId
     });
   };
   
@@ -115,6 +143,37 @@ const CreateThreadForm: React.FC<CreateThreadFormProps> = ({ onSubmit, loading =
               onChange={(e) => setTitle(e.target.value)}
               className="mt-1"
             />
+          </div>
+          
+          <div>
+            <Label htmlFor="category">Category</Label>
+            <Select 
+              value={categoryId} 
+              onValueChange={setCategoryId}
+              disabled={isLoadingCategories || categories.length === 0}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {isLoadingCategories ? (
+                  <SelectItem value="loading" disabled>
+                    <span className="flex items-center">
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Loading categories...
+                    </span>
+                  </SelectItem>
+                ) : categories.length === 0 ? (
+                  <SelectItem value="none" disabled>No categories available</SelectItem>
+                ) : (
+                  categories.map(category => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
           </div>
           
           <div>
@@ -223,7 +282,12 @@ const CreateThreadForm: React.FC<CreateThreadFormProps> = ({ onSubmit, loading =
           
           <div className="flex justify-end pt-4">
             <Button type="submit" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Thread'}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : 'Create Thread'}
             </Button>
           </div>
         </div>

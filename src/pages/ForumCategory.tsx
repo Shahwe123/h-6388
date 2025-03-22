@@ -1,32 +1,59 @@
 
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { mockForumCategories, mockForumThreads } from '@/data/forumData';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, PlusCircle, MessageSquare } from 'lucide-react';
 import ThreadListItem from '@/components/forum/ThreadListItem';
 import SEO from '@/components/SEO';
+import { useForumData } from '@/hooks/useForumData';
+import { supabase } from '@/integrations/supabase/client';
 
 const ForumCategory: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { getCategory, getCategoryThreads } = useForumData();
   
-  const category = mockForumCategories.find(cat => cat.id === id);
-  
-  // Filter threads that belong to this category
-  // In a real implementation, this would be filtered by the API
-  const categoryThreads = mockForumThreads.filter(thread => {
-    // For demo purposes, we'll just take the first 3 threads for category 1,
-    // next 2 for category 2, etc.
-    if (id === '1') return ['1', '2', '3'].includes(thread.id);
-    if (id === '2') return ['4', '5'].includes(thread.id);
-    if (id === '3') return thread.tags.includes('Challenge');
-    if (id === '4') return thread.tags.includes('Guide') || thread.tags.includes('Help');
-    if (id === '5') return false; // No threads in this category yet
-    return false;
+  const categoryQuery = useQuery({
+    queryKey: ['forumCategory', id],
+    queryFn: () => forumService.getCategory(id || ''),
+    enabled: !!id,
   });
   
-  if (!category) {
+  const threadsQuery = getCategoryThreads(id || '');
+  
+  // Check if user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      setIsLoggedIn(!!data.session);
+    };
+    
+    checkAuth();
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session);
+    });
+    
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+  
+  if (categoryQuery.isLoading) {
+    return (
+      <div className="min-h-screen bg-primary flex items-center justify-center">
+        <div className="animate-pulse space-y-4 w-full max-w-xl px-4">
+          <div className="h-8 bg-gray-700/50 rounded w-1/3"></div>
+          <div className="h-6 bg-gray-700/50 rounded w-2/3"></div>
+          <div className="h-32 bg-gray-700/50 rounded w-full"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (categoryQuery.error || !categoryQuery.data) {
     return (
       <div className="min-h-screen bg-primary flex items-center justify-center">
         <div className="text-center">
@@ -39,6 +66,8 @@ const ForumCategory: React.FC = () => {
       </div>
     );
   }
+  
+  const category = categoryQuery.data;
   
   return (
     <div className="min-h-screen bg-primary pb-16">
@@ -69,7 +98,7 @@ const ForumCategory: React.FC = () => {
           </div>
           
           <Link to="/forum/create">
-            <Button className="gap-2">
+            <Button className="gap-2" disabled={!isLoggedIn}>
               <PlusCircle size={18} />
               New Thread
             </Button>
@@ -77,23 +106,37 @@ const ForumCategory: React.FC = () => {
         </div>
         
         <div className="mt-6">
-          {categoryThreads.length > 0 ? (
+          {threadsQuery.isLoading ? (
             <div className="space-y-4">
-              {categoryThreads.map(thread => (
-                <ThreadListItem key={thread.id} thread={thread} />
+              {[1, 2, 3].map(i => (
+                <div key={i} className="glass-card rounded-lg p-4 animate-pulse">
+                  <div className="h-5 bg-gray-700/50 rounded w-1/4 mb-3"></div>
+                  <div className="h-6 bg-gray-700/50 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-700/50 rounded w-2/3"></div>
+                </div>
               ))}
             </div>
-          ) : (
+          ) : threadsQuery.error ? (
+            <div className="text-center py-8">
+              <p className="text-red-400">Error loading threads. Please try again later.</p>
+            </div>
+          ) : threadsQuery.data?.length === 0 ? (
             <div className="glass-card p-12 rounded-lg text-center">
               <MessageSquare className="mx-auto h-12 w-12 text-gray-500 mb-4" />
               <h3 className="text-xl font-semibold mb-2">No Threads Yet</h3>
               <p className="text-gray-400 mb-6">Be the first to start a discussion in this category!</p>
               <Link to="/forum/create">
-                <Button size="lg">
+                <Button size="lg" disabled={!isLoggedIn}>
                   <PlusCircle size={18} className="mr-2" />
                   Create New Thread
                 </Button>
               </Link>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {threadsQuery.data?.map(thread => (
+                <ThreadListItem key={thread.id} thread={thread} />
+              ))}
             </div>
           )}
         </div>
