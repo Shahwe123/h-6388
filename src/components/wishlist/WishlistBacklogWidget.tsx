@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { BookMarked, ListChecks, ArrowRight, Crown, Star } from 'lucide-react';
+import { BookMarked, ListChecks, ArrowRight, Crown, Star, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 
 interface GameItem {
   id: number;
@@ -23,9 +28,18 @@ interface GameItem {
 const WishlistBacklogWidget = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>('wishlist');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newGame, setNewGame] = useState<Partial<GameItem>>({
+    name: '',
+    platform: '',
+    priority: 'medium',
+    progress: 0,
+    estimatedTime: 20,
+    notes: ''
+  });
   
   // Mock data for demonstration purposes
-  const [wishlistGames] = useState<GameItem[]>([
+  const [wishlistGames, setWishlistGames] = useState<GameItem[]>([
     {
       id: 101,
       name: "Starfield",
@@ -42,7 +56,7 @@ const WishlistBacklogWidget = () => {
     }
   ]);
   
-  const [backlogGames] = useState<GameItem[]>([
+  const [backlogGames, setBacklogGames] = useState<GameItem[]>([
     {
       id: 201,
       name: "Hogwarts Legacy",
@@ -76,6 +90,51 @@ const WishlistBacklogWidget = () => {
     });
   };
   
+  const handleAddGame = () => {
+    if (!newGame.name) {
+      toast({
+        title: "Error",
+        description: "Game name is required",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const gameToAdd: GameItem = {
+      id: Date.now(),
+      name: newGame.name || '',
+      image: `https://placehold.co/100x150?text=${encodeURIComponent(newGame.name || '')}`,
+      platform: newGame.platform,
+      ...(activeTab === 'wishlist' 
+        ? { priority: newGame.priority as 'high' | 'medium' | 'low' }
+        : { progress: newGame.progress, estimatedTime: newGame.estimatedTime }
+      ),
+      notes: newGame.notes
+    };
+    
+    if (activeTab === 'wishlist') {
+      setWishlistGames(prev => [gameToAdd, ...prev]);
+    } else {
+      setBacklogGames(prev => [gameToAdd, ...prev]);
+    }
+    
+    // Reset the form
+    setNewGame({
+      name: '',
+      platform: '',
+      priority: 'medium',
+      progress: 0,
+      estimatedTime: 20,
+      notes: ''
+    });
+    setIsAddDialogOpen(false);
+    
+    toast({
+      title: "Game added",
+      description: `${gameToAdd.name} has been added to your ${activeTab}.`
+    });
+  };
+  
   const getPriorityColor = (priority: string) => {
     switch(priority) {
       case 'high':
@@ -92,12 +151,102 @@ const WishlistBacklogWidget = () => {
   return (
     <Card className="glass-card overflow-hidden">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center text-xl">
-          {activeTab === 'wishlist' 
-            ? <BookMarked className="mr-2 h-5 w-5 text-neon-purple" /> 
-            : <ListChecks className="mr-2 h-5 w-5 text-neon-blue" />
-          }
-          {activeTab === 'wishlist' ? 'Game Wishlist' : 'Backlog Manager'}
+        <CardTitle className="flex items-center text-xl justify-between">
+          <div className="flex items-center">
+            {activeTab === 'wishlist' 
+              ? <BookMarked className="mr-2 h-5 w-5 text-neon-purple" /> 
+              : <ListChecks className="mr-2 h-5 w-5 text-neon-blue" />
+            }
+            {activeTab === 'wishlist' ? 'Game Wishlist' : 'Backlog Manager'}
+          </div>
+          
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 px-2" title="Add game">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  Add Game to {activeTab === 'wishlist' ? 'Wishlist' : 'Backlog'}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Game Name</Label>
+                  <Input 
+                    id="name" 
+                    placeholder="Enter game name"
+                    value={newGame.name}
+                    onChange={(e) => setNewGame(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="platform">Platform</Label>
+                  <Input 
+                    id="platform" 
+                    placeholder="PlayStation 5, Xbox, PC, etc."
+                    value={newGame.platform}
+                    onChange={(e) => setNewGame(prev => ({ ...prev, platform: e.target.value }))}
+                  />
+                </div>
+                
+                {activeTab === 'wishlist' ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="priority">Priority</Label>
+                    <Select 
+                      value={newGame.priority} 
+                      onValueChange={(value) => setNewGame(prev => ({ ...prev, priority: value as 'high' | 'medium' | 'low' }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="progress">Progress (%)</Label>
+                      <Slider 
+                        id="progress"
+                        min={0} 
+                        max={100} 
+                        step={1} 
+                        value={[newGame.progress || 0]}
+                        onValueChange={(values) => setNewGame(prev => ({ ...prev, progress: values[0] }))}
+                      />
+                      <div className="text-right text-sm text-muted-foreground">
+                        {newGame.progress || 0}%
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="estimatedTime">Estimated Time (hours)</Label>
+                      <Input 
+                        id="estimatedTime" 
+                        type="number"
+                        min={1}
+                        value={newGame.estimatedTime?.toString()}
+                        onChange={(e) => setNewGame(prev => ({ ...prev, estimatedTime: parseInt(e.target.value) || 0 }))}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={handleAddGame}>
+                  Add to {activeTab === 'wishlist' ? 'Wishlist' : 'Backlog'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardTitle>
       </CardHeader>
       <CardContent className="pb-3">

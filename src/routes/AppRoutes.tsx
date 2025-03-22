@@ -28,6 +28,8 @@ import Settings from '@/pages/Settings';
 import LinkAccounts from '@/pages/LinkAccounts';
 import Leaderboard from '@/pages/Leaderboard';
 import NotFound from '@/pages/NotFound';
+import Wishlist from '@/pages/Wishlist';
+import Backlog from '@/pages/Backlog';
 
 // Components
 import AuthRequired from '@/components/AuthRequired';
@@ -82,6 +84,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/link-accounts" element={<LinkAccounts />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/backlog" element={<Backlog />} />
       </Route>
 
       {/* Catch-all for unknown routes */}
