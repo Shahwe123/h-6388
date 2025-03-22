@@ -1,7 +1,7 @@
 
 import { Progress } from '@/components/ui/progress';
 import { Trophy, Clock } from 'lucide-react';
-import { GamePlatform, ComparisonGameData } from '@/types/game';
+import { GamePlatform } from '@/types/game';
 
 interface GameComparisonProps {
   gamePlatform: GamePlatform;

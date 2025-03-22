@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Game, GamePlatform } from '@/types/game';
+import { Game, GamePlatform, GameTrophy } from '@/types/game';
 
 /**
  * Fetch user games and achievements
@@ -73,18 +73,21 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       if (achievementDetailsError) throw achievementDetailsError;
 
       // Transform gamePlatforms data to match the expected Game interface
-      const formattedGames = gamePlatforms.map(gp => {
+      const formattedGames: Game[] = gamePlatforms.map(gp => {
         // Get achievements for this game platform
         const gameAchievements = achievements.filter(a => a.game_platform_id === gp.id);
         
         // Format each achievement with user status
-        const formattedAchievements = gameAchievements.map(achievement => {
+        const formattedAchievements: GameTrophy[] = gameAchievements.map(achievement => {
           const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
           return {
             id: achievement.id,
             name: achievement.name,
             description: achievement.description || '',
             image: achievement.icon_url || '',
+            type: 'bronze', // Default type if not specified
+            rarity: 'common', // Default rarity if not specified
+            rarityPercentage: 100, // Default percentage if not specified
             achieved: userAchievement?.unlocked || false,
             achievedDate: userAchievement?.unlock_time,
             gamePlatformId: gp.id
@@ -96,12 +99,10 @@ export const getGames = async (userId: string): Promise<Game[]> => {
           name: gp.games.name,
           platform: gp.platforms.name,
           image: gp.games.icon_url || '',
-          platformSpecificId: gp.platform_specific_id,
           description: gp.games.description,
-          gamePlatformId: gp.id,
+          completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100,
           trophies: formattedAchievements,
-          trophyCount: formattedAchievements.length,
-          completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100
+          trophyCount: formattedAchievements.length
         };
       });
       
@@ -114,11 +115,10 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       name: gp.games.name,
       platform: gp.platforms.name,
       image: gp.games.icon_url || '',
-      platformSpecificId: gp.platform_specific_id,
       description: gp.games.description,
-      gamePlatformId: gp.id,
       completion: 0,
-      trophyCount: 0
+      trophyCount: 0,
+      trophies: []
     }));
   } catch (error) {
     console.error('Error fetching games:', error);
@@ -150,7 +150,7 @@ export const getComparisonData = async (userId: string, friendId: string): Promi
       if (friendGame) {
         // Create a comparison object
         sharedGames.push({
-          id: userGame.gamePlatformId || 0,
+          id: 0, // We'll need to get the actual game platform ID
           gameId: userGame.id,
           platformId: 0, // We'd need to get this from the platform table
           game: {
