@@ -106,7 +106,7 @@ const Guides = () => {
   };
   
   return (
-    <div className="min-h-screen bg-primary pt-24 pb-16">
+    <div className="page-container bg-primary">
       <SEO 
         title="Game Achievement Guides" 
         description="Unlock every trophy with our expert game achievement guides and walkthroughs."
