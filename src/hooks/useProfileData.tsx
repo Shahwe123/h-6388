@@ -32,6 +32,11 @@ export const useProfileData = (username: string | null) => {
       
       // If username is not provided and user is logged in, fetch current user's profile
       let profileUsername = username;
+      if (profileUsername) {
+        // Decode the URL-encoded username
+        profileUsername = decodeURIComponent(profileUsername);
+      }
+      
       if (!profileUsername && currentUserId) {
         // Fetch the username for the current user
         const { data: userData, error: userError } = await supabase
@@ -57,11 +62,11 @@ export const useProfileData = (username: string | null) => {
         return;
       }
       
-      // Fetch profile data
+      // Fetch profile data - make sure to trim the username to handle whitespace issues
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('username', profileUsername)
+        .eq('username', profileUsername.trim())
         .single();
         
       if (error) {

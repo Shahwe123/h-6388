@@ -25,6 +25,15 @@ type NavLinksProps = {
 const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
   const location = useLocation();
   const isAuthenticated = useSelector((state: any) => !!state.user?.user);
+  const userData = useSelector((state: any) => state.user?.userData);
+  
+  // Get the profile path that points to the user's own profile
+  const getProfilePath = () => {
+    if (userData?.user_metadata?.username) {
+      return `/profile/${encodeURIComponent(userData.user_metadata.username.trim())}`;
+    }
+    return '/profile';
+  };
   
   // Navigation links configuration
   const links: NavLink[] = [
@@ -42,7 +51,7 @@ const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
     },
     {
       name: 'Profile',
-      path: '/profile',
+      path: getProfilePath(),
       icon: <Trophy className="h-4 w-4" />,
       requiresAuth: true
     },
@@ -83,7 +92,7 @@ const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
       <div className="flex flex-col space-y-2">
         {visibleLinks.map((link) => {
           const isActive = location.pathname === link.path || 
-            (link.path !== '/' && location.pathname.startsWith(link.path));
+            (link.path !== '/' && location.pathname.startsWith(link.path.split('?')[0]));
           
           return (
             <Link
@@ -110,7 +119,7 @@ const NavLinks = ({ isMobile, onClick }: NavLinksProps) => {
     <div className="hidden lg:flex lg:gap-x-6">
       {visibleLinks.map((link) => {
         const isActive = location.pathname === link.path || 
-          (link.path !== '/' && location.pathname.startsWith(link.path));
+          (link.path !== '/' && location.pathname.startsWith(link.path.split('?')[0]));
         
         return (
           <Link

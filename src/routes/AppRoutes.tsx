@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -83,12 +84,8 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-      <Route
-        path="/profile/:username"
-        element={
-          <Profile />
-        }
-      />
+      {/* Fix the profile route to properly handle usernames with special characters */}
+      <Route path="/profile/:username" element={<Profile />} />
       <Route
         path="/friends"
         element={

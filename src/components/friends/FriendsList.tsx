@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -85,6 +86,13 @@ const FriendsList = ({ friends, currentUser, loading }: FriendsListProps) => {
     }
   };
 
+  // Function to navigate to a friend's profile
+  const navigateToProfile = (username: string) => {
+    if (!username) return;
+    // Ensure the username is properly encoded for URLs
+    navigate(`/profile/${encodeURIComponent(username.trim())}`);
+  };
+
   return (
     <div className="glass-card rounded-xl">
       <div className="p-4 border-b border-zinc-800">
@@ -136,7 +144,7 @@ const FriendsList = ({ friends, currentUser, loading }: FriendsListProps) => {
                     variant="outline" 
                     size="sm"
                     className="text-xs"
-                    onClick={() => navigate(`/profile/${friendItem.friend.username}`)}
+                    onClick={() => navigateToProfile(friendItem.friend.username)}
                   >
                     <User className="h-3.5 w-3.5 mr-1" />
                     Profile
