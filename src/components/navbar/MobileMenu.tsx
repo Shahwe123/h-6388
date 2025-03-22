@@ -1,22 +1,38 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { Session } from '@supabase/supabase-js';
 
 interface MobileMenuProps {
   isMenuOpen: boolean;
   toggleMenu: () => void;
+  onSignOut?: () => Promise<void>;
+  session?: Session | null;
+  notifications?: any[];
+  hasUnreadNotifications?: boolean;
+  onNotificationsRead?: () => Promise<void>;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-const MobileMenu = ({ isMenuOpen, toggleMenu }: MobileMenuProps) => {
-  const { logout } = useAuth();
-
+const MobileMenu = ({ 
+  isMenuOpen, 
+  toggleMenu,
+  onSignOut,
+  session,
+  isOpen,
+  onClose
+}: MobileMenuProps) => {
   const closeMenu = () => {
     toggleMenu();
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
-    <div className={`${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} fixed top-0 right-0 h-full w-full bg-background z-50 transition-transform duration-300 ease-in-out transform md:hidden`}>
+    <div className={`${isMenuOpen || isOpen ? 'translate-x-0' : 'translate-x-full'} fixed top-0 right-0 h-full w-full bg-background z-50 transition-transform duration-300 ease-in-out transform md:hidden`}>
       <div className="absolute top-4 left-4">
         <button onClick={closeMenu}>
           <X className="h-6 w-6 text-neutral-200" />
@@ -65,37 +81,43 @@ const MobileMenu = ({ isMenuOpen, toggleMenu }: MobileMenuProps) => {
             </Link>
           </li>
 
-          <li>
-            <Link 
-              to="/profile" 
-              className="text-xl font-semibold hover:text-neon-blue transition-colors"
-              onClick={closeMenu}
-            >
-              Profile
-            </Link>
-          </li>
-          
-          <li>
-            <Link 
-              to="/forum" 
-              className="text-xl font-semibold hover:text-neon-blue transition-colors"
-              onClick={closeMenu}
-            >
-              Forum
-            </Link>
-          </li>
-          
-          <li>
-            <button
-              onClick={() => {
-                logout();
-                closeMenu();
-              }}
-              className="text-xl font-semibold hover:text-neon-blue transition-colors"
-            >
-              Logout
-            </button>
-          </li>
+          {session && (
+            <>
+              <li>
+                <Link 
+                  to="/profile" 
+                  className="text-xl font-semibold hover:text-neon-blue transition-colors"
+                  onClick={closeMenu}
+                >
+                  Profile
+                </Link>
+              </li>
+              
+              <li>
+                <Link 
+                  to="/forum" 
+                  className="text-xl font-semibold hover:text-neon-blue transition-colors"
+                  onClick={closeMenu}
+                >
+                  Forum
+                </Link>
+              </li>
+              
+              <li>
+                <button
+                  onClick={() => {
+                    if (onSignOut) {
+                      onSignOut();
+                    }
+                    closeMenu();
+                  }}
+                  className="text-xl font-semibold hover:text-neon-blue transition-colors"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </div>

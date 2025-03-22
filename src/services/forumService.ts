@@ -1,551 +1,489 @@
-import { supabase } from "@/integrations/supabase/client";
-import { 
-  ForumCategory, 
-  ForumCategoryResponse, 
-  ForumThread, 
-  ForumThreadResponse, 
-  ThreadComment, 
-  ThreadCommentResponse,
-  ForumUser,
-  ForumTagType
-} from "@/types/forum";
 
-// User profile fetching function
-export const fetchUserProfile = async (userId: string): Promise<ForumUser | null> => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, username, avatar_url, created_at')
-    .eq('id', userId)
-    .single();
-  
-  if (error || !data) {
-    console.error('Error fetching user profile:', error);
-    return null;
-  }
-  
-  // In a real app, you would fetch additional user data like rank, level, etc.
-  return {
-    id: data.id,
-    username: data.username,
-    avatarUrl: data.avatar_url,
-    joinDate: data.created_at,
-    // These would come from other tables in a real app
-    rank: 'Novice',
-    level: 1,
-    badgeCount: 0,
-    trophyCount: 0,
-    isAdmin: false,
-    isModerator: false
-  };
-};
+import { supabase } from '@/integrations/supabase/client';
+import { ForumCategory, ForumThread, ThreadComment, ForumTag, ThreadStatus } from '@/types/forum';
 
-// Helper to convert API response to ForumCategory
-const mapCategoryResponse = async (category: ForumCategoryResponse): Promise<ForumCategory> => {
-  // Get recent threads for this category
-  const { data: threadsData } = await supabase
-    .from('forum_threads')
-    .select('*')
-    .eq('category_id', category.id)
-    .order('last_activity', { ascending: false })
-    .limit(2);
-    
-  const recentThreads = threadsData ? await Promise.all(
-    threadsData.map(thread => mapThreadResponse(thread as ForumThreadResponse))
-  ) : [];
-  
-  // Count threads in this category
-  const { count } = await supabase
-    .from('forum_threads')
-    .select('*', { count: 'exact', head: true })
-    .eq('category_id', category.id);
-  
-  return {
-    id: category.id,
-    name: category.name,
-    description: category.description,
-    threadCount: count || 0,
-    recentThreads
-  };
-};
-
-// Helper to convert API response to ForumThread
-const mapThreadResponse = async (thread: ForumThreadResponse): Promise<ForumThread> => {
-  // Fetch author details
-  const author = await fetchUserProfile(thread.author_id) || {
-    id: thread.author_id,
-    username: 'Unknown User'
-  };
-  
-  // Count comments
-  const { count } = await supabase
-    .from('thread_comments')
-    .select('*', { count: 'exact', head: true })
-    .eq('thread_id', thread.id);
-  
-  // Check if current user has upvoted this thread
-  let userHasUpvoted = false;
-  const user = supabase.auth.getUser();
-  if (user) {
-    const { data } = await supabase.rpc('user_has_upvoted_thread', {
-      thread_id: thread.id,
-      user_id: (await user).data.user?.id
-    });
-    userHasUpvoted = !!data;
-  }
-  
+// Helper to convert DB types to frontend types
+const convertThreadFromDB = (thread: any, userId?: string): ForumThread => {
   return {
     id: thread.id,
     title: thread.title,
     content: thread.content,
     authorId: thread.author_id,
-    author,
+    author: thread.author || { id: thread.author_id, username: 'Unknown User' },
     createdAt: thread.created_at,
-    updatedAt: thread.updated_at,
-    tags: thread.tags,
-    status: thread.status,
-    viewCount: thread.view_count,
-    upvotes: thread.upvotes,
-    userHasUpvoted,
-    commentCount: count || 0,
-    isBookmarked: false, // This would be fetched separately
-    isReported: false, // This would be fetched separately
-    gameName: thread.game_name || undefined,
+    tags: thread.tags || [],
+    status: thread.status || 'normal',
+    viewCount: thread.view_count || 0,
+    upvotes: thread.upvotes || 0,
+    commentCount: thread.comment_count || 0,
+    categoryId: thread.category_id,
+    gameName: thread.game_name || null,
     attachments: thread.attachments || [],
     lastActivity: thread.last_activity,
-    isEdited: thread.is_edited,
-    categoryId: thread.category_id
+    isEdited: thread.is_edited || false,
+    userHasUpvoted: userId ? thread.user_has_upvoted || false : false,
+    isBookmarked: userId ? thread.is_bookmarked || false : false,
   };
 };
 
-// Helper to convert API response to ThreadComment
-const mapCommentResponse = async (comment: ThreadCommentResponse): Promise<ThreadComment> => {
-  // Fetch author details
-  const author = await fetchUserProfile(comment.author_id) || {
-    id: comment.author_id,
-    username: 'Unknown User'
-  };
-  
-  // Check if current user has upvoted this comment
-  let userHasUpvoted = false;
-  const user = supabase.auth.getUser();
-  if (user) {
-    const { data } = await supabase.rpc('user_has_upvoted_comment', {
-      comment_id: comment.id,
-      user_id: (await user).data.user?.id
-    });
-    userHasUpvoted = !!data;
-  }
-  
-  // Count replies
-  let replyCount = 0;
-  if (!comment.parent_comment_id) {
-    const { count } = await supabase
-      .from('thread_comments')
-      .select('*', { count: 'exact', head: true })
-      .eq('parent_comment_id', comment.id);
-    replyCount = count || 0;
-  }
-  
+const convertCommentFromDB = (comment: any, userId?: string): ThreadComment => {
   return {
     id: comment.id,
     threadId: comment.thread_id,
     content: comment.content,
     authorId: comment.author_id,
-    author,
+    author: comment.author || { id: comment.author_id, username: 'Unknown User' },
     createdAt: comment.created_at,
-    updatedAt: comment.updated_at,
-    upvotes: comment.upvotes,
-    userHasUpvoted,
+    upvotes: comment.upvotes || 0,
     attachments: comment.attachments || [],
-    isEdited: comment.is_edited,
-    isReported: comment.is_reported,
-    parentCommentId: comment.parent_comment_id || undefined,
-    replyCount
+    isEdited: comment.is_edited || false,
+    userHasUpvoted: userId ? comment.user_has_upvoted || false : false,
+    parentCommentId: comment.parent_comment_id || null,
+    isReported: comment.is_reported || false,
   };
 };
 
-// Forum API operations
+// Forum service
 export const forumService = {
-  // Categories
+  // Get all categories
   async getCategories(): Promise<ForumCategory[]> {
     const { data, error } = await supabase
       .from('forum_categories')
       .select('*')
-      .order('name');
-    
-    if (error) {
-      console.error('Error fetching categories:', error);
-      return [];
-    }
-    
-    return Promise.all(data.map(category => 
-      mapCategoryResponse(category as ForumCategoryResponse)
-    ));
+      .order('name', { ascending: true });
+      
+    if (error) throw error;
+    return data as ForumCategory[];
   },
   
-  async getCategory(id: string): Promise<ForumCategory | null> {
+  // Get a single category by ID
+  async getCategory(id: string): Promise<ForumCategory> {
     const { data, error } = await supabase
       .from('forum_categories')
       .select('*')
       .eq('id', id)
       .single();
+      
+    if (error) throw error;
+    if (!data) throw new Error('Category not found');
     
-    if (error || !data) {
-      console.error('Error fetching category:', error);
-      return null;
-    }
-    
-    return mapCategoryResponse(data as ForumCategoryResponse);
+    return data as ForumCategory;
   },
   
-  // Threads
-  async getThreads(options: {
-    categoryId?: string;
-    sortBy?: 'recent' | 'trending';
-    limit?: number;
-  } = {}): Promise<ForumThread[]> {
+  // Get threads in a specific category
+  async getCategoryThreads(categoryId: string, userId?: string): Promise<ForumThread[]> {
     let query = supabase
       .from('forum_threads')
-      .select('*');
+      .select(`
+        *,
+        author:profiles(id, username, avatar_url)
+      `)
+      .eq('category_id', categoryId)
+      .order('created_at', { ascending: false });
     
-    if (options.categoryId) {
-      query = query.eq('category_id', options.categoryId);
-    }
-    
-    if (options.sortBy === 'trending') {
-      query = query.order('upvotes', { ascending: false });
-    } else {
-      query = query.order('last_activity', { ascending: false });
-    }
-    
-    if (options.limit) {
-      query = query.limit(options.limit);
+    // If user is logged in, check if threads are upvoted/bookmarked
+    if (userId) {
+      query = query.select(`
+        *,
+        author:profiles(id, username, avatar_url),
+        user_has_upvoted:thread_upvotes!inner(user_id)
+      `);
     }
     
     const { data, error } = await query;
     
-    if (error) {
-      console.error('Error fetching threads:', error);
-      return [];
-    }
+    if (error) throw error;
     
-    return Promise.all(data.map(thread => 
-      mapThreadResponse(thread as ForumThreadResponse)
-    ));
+    // Get comment counts for each thread
+    const threads = await Promise.all(
+      (data || []).map(async (thread) => {
+        const { data: countData, error: countError } = await supabase
+          .rpc('get_thread_comment_count', { thread_id: thread.id });
+        
+        if (countError) console.error('Error getting comment count:', countError);
+        
+        // Check if user has bookmarked this thread
+        let isBookmarked = false;
+        if (userId) {
+          const { data: bookmarkData, error: bookmarkError } = await supabase
+            .rpc('user_has_bookmarked_thread', { 
+              thread_id: thread.id, 
+              user_id: userId 
+            });
+          
+          if (!bookmarkError) {
+            isBookmarked = bookmarkData || false;
+          }
+        }
+        
+        return convertThreadFromDB({
+          ...thread,
+          comment_count: countData || 0,
+          is_bookmarked: isBookmarked
+        }, userId);
+      })
+    );
+    
+    return threads;
   },
   
-  async getThread(id: string): Promise<ForumThread | null> {
-    // First, increment view count using a raw SQL query instead of RPC
-    await supabase.from('forum_threads')
-      .update({ view_count: () => 'view_count + 1' })
-      .eq('id', id)
+  // Create a new thread
+  async createThread(
+    title: string, 
+    content: string, 
+    categoryId: string, 
+    authorId: string, 
+    tags: string[], 
+    gameName?: string, 
+    attachments?: string[]
+  ): Promise<ForumThread> {
+    // Validate tags to ensure they match the enum
+    const validTags: ForumTag[] = tags
+      .filter(tag => ['Guide', 'Help', 'Discussion', 'Challenge', 'Flex'].includes(tag)) as ForumTag[];
     
-    const { data, error } = await supabase
-      .from('forum_threads')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error || !data) {
-      console.error('Error fetching thread:', error);
-      return null;
-    }
-    
-    return mapThreadResponse(data as ForumThreadResponse);
-  },
-  
-  async createThread(threadData: {
-    title: string;
-    content: string;
-    tags: ForumTagType[];
-    categoryId: string;
-    gameName?: string;
-    attachments?: string[];
-  }): Promise<ForumThread | null> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      console.error('User must be logged in to create a thread');
-      return null;
+    if (validTags.length === 0 && tags.length > 0) {
+      throw new Error('Invalid tags provided');
     }
     
     const { data, error } = await supabase
       .from('forum_threads')
       .insert({
-        title: threadData.title,
-        content: threadData.content,
-        tags: threadData.tags as unknown as string[],
-        category_id: threadData.categoryId,
-        author_id: user.data.user.id,
-        game_name: threadData.gameName || null,
-        attachments: threadData.attachments || null,
-        status: 'normal',
-        view_count: 0,
-        upvotes: 0,
-        last_activity: new Date().toISOString()
+        title,
+        content,
+        category_id: categoryId,
+        author_id: authorId,
+        tags: validTags,
+        game_name: gameName,
+        attachments,
+        status: 'normal' as ThreadStatus,
+        last_activity: new Date().toISOString(),
       })
       .select()
       .single();
+      
+    if (error) throw error;
     
-    if (error || !data) {
-      console.error('Error creating thread:', error);
-      return null;
-    }
-    
-    return mapThreadResponse(data as ForumThreadResponse);
+    return convertThreadFromDB(data, authorId);
   },
   
-  // Comments
-  async getComments(threadId: string, parentCommentId?: string): Promise<ThreadComment[]> {
-    let query = supabase
+  // Get a single thread by ID with comments
+  async getThread(id: string, userId?: string): Promise<{thread: ForumThread, comments: ThreadComment[]}> {
+    // Fetch the thread
+    const { data: threadData, error: threadError } = await supabase
+      .from('forum_threads')
+      .select(`
+        *,
+        author:profiles(id, username, avatar_url)
+      `)
+      .eq('id', id)
+      .single();
+      
+    if (threadError) throw threadError;
+    if (!threadData) throw new Error('Thread not found');
+    
+    // Update view count
+    try {
+      await supabase.rpc('increment_thread_view_count', {
+        thread_id: id
+      });
+    } catch (err) {
+      console.error('Error incrementing view count:', err);
+    }
+    
+    // Check if user has upvoted/bookmarked
+    let userHasUpvoted = false;
+    let isBookmarked = false;
+    
+    if (userId) {
+      const { data: upvoteData } = await supabase
+        .rpc('user_has_upvoted_thread', { 
+          thread_id: id, 
+          user_id: userId 
+        });
+      
+      userHasUpvoted = upvoteData || false;
+      
+      const { data: bookmarkData } = await supabase
+        .rpc('user_has_bookmarked_thread', { 
+          thread_id: id, 
+          user_id: userId 
+        });
+      
+      isBookmarked = bookmarkData || false;
+    }
+    
+    // Fetch the comments
+    const { data: commentsData, error: commentsError } = await supabase
       .from('thread_comments')
-      .select('*')
-      .eq('thread_id', threadId)
-      .order('created_at');
+      .select(`
+        *,
+        author:profiles(id, username, avatar_url)
+      `)
+      .eq('thread_id', id)
+      .order('created_at', { ascending: true });
+      
+    if (commentsError) throw commentsError;
     
-    if (parentCommentId) {
-      query = query.eq('parent_comment_id', parentCommentId);
-    } else {
-      query = query.is('parent_comment_id', null);
-    }
+    // Check which comments the user has upvoted
+    const comments = await Promise.all(
+      (commentsData || []).map(async (comment) => {
+        let userHasUpvotedComment = false;
+        
+        if (userId) {
+          const { data: upvoteData } = await supabase
+            .rpc('user_has_upvoted_comment', { 
+              comment_id: comment.id, 
+              user_id: userId 
+            });
+          
+          userHasUpvotedComment = upvoteData || false;
+        }
+        
+        return convertCommentFromDB({
+          ...comment,
+          user_has_upvoted: userHasUpvotedComment
+        }, userId);
+      })
+    );
     
-    const { data, error } = await query;
+    // Get comment count
+    const { data: countData } = await supabase
+      .rpc('get_thread_comment_count', { thread_id: id });
     
-    if (error) {
-      console.error('Error fetching comments:', error);
-      return [];
-    }
+    const thread = convertThreadFromDB({
+      ...threadData,
+      comment_count: countData || 0,
+      user_has_upvoted: userHasUpvoted,
+      is_bookmarked: isBookmarked
+    }, userId);
     
-    return Promise.all(data.map(comment => 
-      mapCommentResponse(comment as ThreadCommentResponse)
-    ));
+    return { thread, comments };
   },
   
-  async createComment(commentData: {
-    threadId: string;
-    content: string;
-    parentCommentId?: string;
-    attachments?: string[];
-  }): Promise<ThreadComment | null> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      console.error('User must be logged in to create a comment');
-      return null;
-    }
-    
+  // Post a comment on a thread
+  async postComment(
+    threadId: string, 
+    content: string, 
+    authorId: string, 
+    parentCommentId?: string,
+    attachments?: string[]
+  ): Promise<ThreadComment> {
     const { data, error } = await supabase
       .from('thread_comments')
       .insert({
-        thread_id: commentData.threadId,
-        content: commentData.content,
-        author_id: user.data.user.id,
-        parent_comment_id: commentData.parentCommentId || null,
-        attachments: commentData.attachments || null,
-        upvotes: 0
+        thread_id: threadId,
+        content,
+        author_id: authorId,
+        parent_comment_id: parentCommentId,
+        attachments
       })
       .select()
       .single();
+      
+    if (error) throw error;
     
-    if (error || !data) {
-      console.error('Error creating comment:', error);
-      return null;
-    }
-    
-    // Update last_activity on the thread
+    // Update the thread's last activity timestamp
     await supabase
       .from('forum_threads')
       .update({ last_activity: new Date().toISOString() })
-      .eq('id', commentData.threadId);
+      .eq('id', threadId);
     
-    return mapCommentResponse(data as ThreadCommentResponse);
+    return convertCommentFromDB(data, authorId);
   },
   
-  // Upvotes
-  async upvoteThread(threadId: string, upvote: boolean): Promise<boolean> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      console.error('User must be logged in to upvote');
-      return false;
-    }
+  // Upvote a thread
+  async upvoteThread(threadId: string, userId: string): Promise<void> {
+    // Check if already upvoted
+    const { data, error } = await supabase
+      .rpc('user_has_upvoted_thread', { 
+        thread_id: threadId, 
+        user_id: userId 
+      });
     
-    if (upvote) {
-      // Add upvote
-      const { error: insertError } = await supabase
-        .from('thread_upvotes')
-        .insert({
-          thread_id: threadId,
-          user_id: user.data.user.id
-        });
-      
-      if (insertError) {
-        console.error('Error upvoting thread:', insertError);
-        return false;
-      }
-      
-      // Increment upvote count
-      await supabase
-        .from('forum_threads')
-        .update({ upvotes: () => 'upvotes + 1' })
-        .eq('id', threadId);
-    } else {
-      // Remove upvote
+    if (error) throw error;
+    
+    if (data) {
+      // Already upvoted, remove upvote
       const { error: deleteError } = await supabase
         .from('thread_upvotes')
         .delete()
         .eq('thread_id', threadId)
-        .eq('user_id', user.data.user.id);
+        .eq('user_id', userId);
       
-      if (deleteError) {
-        console.error('Error removing thread upvote:', deleteError);
-        return false;
-      }
+      if (deleteError) throw deleteError;
       
       // Decrement upvote count
-      await supabase
-        .from('forum_threads')
-        .update({ upvotes: () => 'upvotes - 1' })
-        .eq('id', threadId);
-    }
-    
-    return true;
-  },
-  
-  async upvoteComment(commentId: string, upvote: boolean): Promise<boolean> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      console.error('User must be logged in to upvote');
-      return false;
-    }
-    
-    if (upvote) {
-      // Add upvote
+      await supabase.rpc('decrement_thread_upvote_count', {
+        thread_id: threadId
+      });
+    } else {
+      // Not upvoted, add upvote
       const { error: insertError } = await supabase
-        .from('comment_upvotes')
+        .from('thread_upvotes')
         .insert({
-          comment_id: commentId,
-          user_id: user.data.user.id
+          thread_id: threadId,
+          user_id: userId
         });
       
-      if (insertError) {
-        console.error('Error upvoting comment:', insertError);
-        return false;
-      }
+      if (insertError) throw insertError;
       
-      // Increment upvote count directly
-      await supabase
-        .from('thread_comments')
-        .update({ upvotes: () => 'upvotes + 1' })
-        .eq('id', commentId);
-    } else {
-      // Remove upvote
+      // Increment upvote count
+      await supabase.rpc('increment_thread_upvote_count', {
+        thread_id: threadId
+      });
+    }
+  },
+  
+  // Upvote a comment
+  async upvoteComment(commentId: string, userId: string): Promise<void> {
+    // Check if already upvoted
+    const { data, error } = await supabase
+      .rpc('user_has_upvoted_comment', { 
+        comment_id: commentId, 
+        user_id: userId 
+      });
+    
+    if (error) throw error;
+    
+    if (data) {
+      // Already upvoted, remove upvote
       const { error: deleteError } = await supabase
         .from('comment_upvotes')
         .delete()
         .eq('comment_id', commentId)
-        .eq('user_id', user.data.user.id);
+        .eq('user_id', userId);
       
-      if (deleteError) {
-        console.error('Error removing comment upvote:', deleteError);
-        return false;
-      }
+      if (deleteError) throw deleteError;
       
-      // Decrement upvote count directly
-      await supabase
-        .from('thread_comments')
-        .update({ upvotes: () => 'upvotes - 1' })
-        .eq('id', commentId);
-    }
-    
-    return true;
-  },
-  
-  // Bookmarks
-  async bookmarkThread(threadId: string, bookmark: boolean): Promise<boolean> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      console.error('User must be logged in to bookmark');
-      return false;
-    }
-    
-    if (bookmark) {
-      // Add bookmark
-      const { error } = await supabase
-        .from('thread_bookmarks')
+      // Decrement upvote count
+      await supabase.rpc('decrement_comment_upvote_count', {
+        comment_id: commentId
+      });
+    } else {
+      // Not upvoted, add upvote
+      const { error: insertError } = await supabase
+        .from('comment_upvotes')
         .insert({
-          thread_id: threadId,
-          user_id: user.data.user.id
+          comment_id: commentId,
+          user_id: userId
         });
       
-      if (error) {
-        console.error('Error bookmarking thread:', error);
-        return false;
-      }
-    } else {
-      // Remove bookmark
-      const { error } = await supabase
+      if (insertError) throw insertError;
+      
+      // Increment upvote count
+      await supabase.rpc('increment_comment_upvote_count', {
+        comment_id: commentId
+      });
+    }
+  },
+  
+  // Bookmark a thread
+  async toggleBookmark(threadId: string, userId: string): Promise<boolean> {
+    // Check if already bookmarked
+    const { data, error } = await supabase
+      .rpc('user_has_bookmarked_thread', { 
+        thread_id: threadId, 
+        user_id: userId 
+      });
+    
+    if (error) throw error;
+    
+    if (data) {
+      // Already bookmarked, remove bookmark
+      const { error: deleteError } = await supabase
         .from('thread_bookmarks')
         .delete()
         .eq('thread_id', threadId)
-        .eq('user_id', user.data.user.id);
+        .eq('user_id', userId);
       
-      if (error) {
-        console.error('Error removing thread bookmark:', error);
-        return false;
-      }
+      if (deleteError) throw deleteError;
+      return false; // No longer bookmarked
+    } else {
+      // Not bookmarked, add bookmark
+      const { error: insertError } = await supabase
+        .from('thread_bookmarks')
+        .insert({
+          thread_id: threadId,
+          user_id: userId
+        });
+      
+      if (insertError) throw insertError;
+      return true; // Now bookmarked
     }
-    
-    return true;
   },
   
-  // Reports
-  async reportThread(threadId: string, reason: string): Promise<boolean> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      console.error('User must be logged in to report');
-      return false;
-    }
-    
+  // Report a thread
+  async reportThread(threadId: string, userId: string, reason: string): Promise<void> {
     const { error } = await supabase
       .from('thread_reports')
       .insert({
         thread_id: threadId,
-        user_id: user.data.user.id,
+        user_id: userId,
         reason
       });
     
-    if (error) {
-      console.error('Error reporting thread:', error);
-      return false;
-    }
-    
-    return true;
+    if (error) throw error;
   },
   
-  async reportComment(commentId: string, reason: string): Promise<boolean> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) {
-      console.error('User must be logged in to report');
-      return false;
-    }
-    
+  // Report a comment
+  async reportComment(commentId: string, userId: string, reason: string): Promise<void> {
     const { error } = await supabase
       .from('comment_reports')
       .insert({
         comment_id: commentId,
-        user_id: user.data.user.id,
+        user_id: userId,
         reason
       });
     
-    if (error) {
-      console.error('Error reporting comment:', error);
-      return false;
-    }
+    if (error) throw error;
     
-    // Mark comment as reported
+    // Mark the comment as reported
     await supabase
       .from('thread_comments')
       .update({ is_reported: true })
       .eq('id', commentId);
+  },
+  
+  // Get bookmarked threads for a user
+  async getUserBookmarks(userId: string): Promise<ForumThread[]> {
+    const { data, error } = await supabase
+      .from('thread_bookmarks')
+      .select(`
+        thread_id,
+        thread:forum_threads(
+          *,
+          author:profiles(id, username, avatar_url)
+        )
+      `)
+      .eq('user_id', userId);
     
-    return true;
+    if (error) throw error;
+    
+    // Get comment counts for each thread
+    const threads = await Promise.all(
+      (data || []).map(async (bookmark) => {
+        const thread = bookmark.thread;
+        if (!thread) return null;
+        
+        const { data: countData } = await supabase
+          .rpc('get_thread_comment_count', { thread_id: thread.id });
+        
+        // Check if user has upvoted this thread
+        const { data: upvoteData } = await supabase
+          .rpc('user_has_upvoted_thread', { 
+            thread_id: thread.id, 
+            user_id: userId 
+          });
+        
+        return convertThreadFromDB({
+          ...thread,
+          comment_count: countData || 0,
+          user_has_upvoted: upvoteData || false,
+          is_bookmarked: true // Since these are bookmarks
+        }, userId);
+      })
+    );
+    
+    return threads.filter(Boolean) as ForumThread[];
   }
 };

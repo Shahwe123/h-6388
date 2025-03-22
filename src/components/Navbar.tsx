@@ -1,3 +1,4 @@
+
 import { useNavbarState } from '@/hooks/useNavbarState';
 import NavLinks from './navbar/NavLinks';
 import NotificationButton from './navbar/NotificationButton';
@@ -77,8 +78,8 @@ const Navbar = () => {
       </div>
 
       <MobileMenu
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
+        isMenuOpen={isMobileMenuOpen} 
+        toggleMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         onSignOut={handleSignOut}
         notifications={notifications}
         hasUnreadNotifications={hasUnreadNotifications}
