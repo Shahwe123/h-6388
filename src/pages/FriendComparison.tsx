@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,16 +20,19 @@ const FriendComparison = () => {
   const [loading, setLoading] = useState(true);
   const [friendData, setFriendData] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
-  const currentUser = useSelector((state: any) => state.user?.userData);
+  const currentUser = useSelector((state: any) => state.user?.user);
   
   useEffect(() => {
     const fetchComparisonData = async () => {
       try {
         setLoading(true);
 
-        // Check if we have necessary data to proceed
-        if (!currentUser?.id) {
-          console.error("User data is missing");
+        // Check current session directly
+        const { data: sessionData } = await supabase.auth.getSession();
+        const session = sessionData.session;
+
+        if (!session) {
+          console.error("No active session found");
           toast({
             title: "Authentication required",
             description: "Please sign in to view comparisons",
@@ -69,11 +71,11 @@ const FriendComparison = () => {
           return;
         }
         
-        // Fetch current user's profile
+        // Fetch current user's profile using the session user id instead of Redux
         const { data: userProfile, error: userError } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', currentUser.id)
+          .eq('id', session.user.id)
           .single();
           
         if (userError) {
@@ -178,7 +180,7 @@ const FriendComparison = () => {
     };
     
     fetchComparisonData();
-  }, [currentUser, friendId, navigate, toast]);
+  }, [friendId, navigate, toast]);
   
   if (loading) {
     return <Loading />;
