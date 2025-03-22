@@ -3,7 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   games: [], // List of games user has played
-  achievements: {}, // Achievements per game (key: gameId)
+  platforms: [], // Available gaming platforms
+  gamePlatforms: [], // Game-platform combinations
+  achievements: {}, // Achievements per game (key: gamePlatformId)
   loading: false,
   error: null,
   legacyTrophies: [], // Special legacy/milestone trophies
@@ -33,36 +35,45 @@ const gamesSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    setPlatforms: (state, action) => {
+      state.platforms = action.payload;
+    },
+    setGamePlatforms: (state, action) => {
+      state.gamePlatforms = action.payload;
+    },
     setAchievements: (state, action) => {
-      const { gameId, achievements } = action.payload;
-      state.achievements[gameId] = achievements;
+      const { gamePlatformId, achievements } = action.payload;
+      state.achievements[gamePlatformId] = achievements;
     },
     setLegacyTrophies: (state, action) => {
       state.legacyTrophies = action.payload;
     },
     markTrophyAsLegacy: (state, action) => {
-      const { gameId, trophyId, isLegacy } = action.payload;
+      const { gamePlatformId, trophyId, isLegacy } = action.payload;
       
       // Update the trophy in the games array
-      const gameIndex = state.games.findIndex(game => game.id === gameId);
-      if (gameIndex >= 0 && state.games[gameIndex].trophies) {
-        const trophyIndex = state.games[gameIndex].trophies.findIndex(
-          trophy => trophy.id === trophyId
-        );
-        
-        if (trophyIndex >= 0) {
-          state.games[gameIndex].trophies[trophyIndex].isLegacy = isLegacy;
+      const gamePlatformIndex = state.gamePlatforms.findIndex(gp => gp.id === gamePlatformId);
+      if (gamePlatformIndex >= 0) {
+        const gameIndex = state.games.findIndex(game => game.id === state.gamePlatforms[gamePlatformIndex].gameId);
+        if (gameIndex >= 0 && state.games[gameIndex].trophies) {
+          const trophyIndex = state.games[gameIndex].trophies.findIndex(
+            trophy => trophy.id === trophyId
+          );
+          
+          if (trophyIndex >= 0) {
+            state.games[gameIndex].trophies[trophyIndex].isLegacy = isLegacy;
+          }
         }
       }
       
       // Update the trophy in achievements
-      if (state.achievements[gameId]) {
-        const trophyIndex = state.achievements[gameId].findIndex(
+      if (state.achievements[gamePlatformId]) {
+        const trophyIndex = state.achievements[gamePlatformId].findIndex(
           trophy => trophy.id === trophyId
         );
         
         if (trophyIndex >= 0) {
-          state.achievements[gameId][trophyIndex].isLegacy = isLegacy;
+          state.achievements[gamePlatformId][trophyIndex].isLegacy = isLegacy;
         }
       }
     },
@@ -73,17 +84,31 @@ const gamesSlice = createSlice({
       };
     },
     pinTrophy: (state, action) => {
-      const { gameId, trophyId, isPinned } = action.payload;
+      const { gamePlatformId, trophyId, isPinned } = action.payload;
       
       // Update the trophy in the games array
-      const gameIndex = state.games.findIndex(game => game.id === gameId);
-      if (gameIndex >= 0 && state.games[gameIndex].trophies) {
-        const trophyIndex = state.games[gameIndex].trophies.findIndex(
+      const gamePlatformIndex = state.gamePlatforms.findIndex(gp => gp.id === gamePlatformId);
+      if (gamePlatformIndex >= 0) {
+        const gameIndex = state.games.findIndex(game => game.id === state.gamePlatforms[gamePlatformIndex].gameId);
+        if (gameIndex >= 0 && state.games[gameIndex].trophies) {
+          const trophyIndex = state.games[gameIndex].trophies.findIndex(
+            trophy => trophy.id === trophyId
+          );
+          
+          if (trophyIndex >= 0) {
+            state.games[gameIndex].trophies[trophyIndex].isPinned = isPinned;
+          }
+        }
+      }
+      
+      // Update the trophy in achievements
+      if (state.achievements[gamePlatformId]) {
+        const trophyIndex = state.achievements[gamePlatformId].findIndex(
           trophy => trophy.id === trophyId
         );
         
         if (trophyIndex >= 0) {
-          state.games[gameIndex].trophies[trophyIndex].isPinned = isPinned;
+          state.achievements[gamePlatformId][trophyIndex].isPinned = isPinned;
         }
       }
     },
@@ -94,6 +119,8 @@ export const {
   fetchGamesStart, 
   fetchGamesSuccess, 
   fetchGamesFailure, 
+  setPlatforms,
+  setGamePlatforms,
   setAchievements,
   setLegacyTrophies,
   markTrophyAsLegacy,

@@ -1,23 +1,35 @@
 
 import { Progress } from '@/components/ui/progress';
 import { Trophy, Clock } from 'lucide-react';
+import { GamePlatform } from '@/types/game';
 
 interface GameComparisonProps {
-  game: any;
+  gamePlatform: GamePlatform;
   userData: any;
   friendData: any;
 }
 
-const GameComparison = ({ game, userData, friendData }: GameComparisonProps) => {
+const GameComparison = ({ gamePlatform, userData, friendData }: GameComparisonProps) => {
+  // Use the game reference if available, otherwise fall back to direct properties
+  const game = gamePlatform.game || { name: 'Unknown Game' };
+
   // Determine who's leading in each category
-  const trophyLeader = game.userTrophies > game.friendTrophies ? 'user' : 
-                       game.userTrophies < game.friendTrophies ? 'friend' : 'tie';
+  const trophyLeader = (gamePlatform.userTrophies || 0) > (gamePlatform.friendTrophies || 0) ? 'user' : 
+                       (gamePlatform.userTrophies || 0) < (gamePlatform.friendTrophies || 0) ? 'friend' : 'tie';
                        
-  const playtimeLeader = game.userPlaytime > game.friendPlaytime ? 'user' : 
-                         game.userPlaytime < game.friendPlaytime ? 'friend' : 'tie';
+  const playtimeLeader = (gamePlatform.userPlaytime || 0) > (gamePlatform.friendPlaytime || 0) ? 'user' : 
+                         (gamePlatform.userPlaytime || 0) < (gamePlatform.friendPlaytime || 0) ? 'friend' : 'tie';
                          
-  const completionLeader = game.userCompletion > game.friendCompletion ? 'user' : 
-                          game.userCompletion < game.friendCompletion ? 'friend' : 'tie';
+  const completionLeader = (gamePlatform.userCompletion || 0) > (gamePlatform.friendCompletion || 0) ? 'user' : 
+                          (gamePlatform.userCompletion || 0) < (gamePlatform.friendCompletion || 0) ? 'friend' : 'tie';
+  
+  // Default values for safety
+  const userTrophies = gamePlatform.userTrophies || 0;
+  const friendTrophies = gamePlatform.friendTrophies || 0;
+  const userPlaytime = gamePlatform.userPlaytime || 0;
+  const friendPlaytime = gamePlatform.friendPlaytime || 0;
+  const userCompletion = gamePlatform.userCompletion || 0;
+  const friendCompletion = gamePlatform.friendCompletion || 0;
   
   return (
     <div className="bg-black/30 rounded-lg p-4">
@@ -31,7 +43,7 @@ const GameComparison = ({ game, userData, friendData }: GameComparisonProps) => 
           
           <div className="flex-1 grid grid-cols-5 gap-2 items-center">
             <div className={`text-right font-bold ${trophyLeader === 'user' ? 'text-green-500' : ''}`}>
-              {game.userTrophies}
+              {userTrophies}
             </div>
             
             <div className="col-span-3">
@@ -42,17 +54,17 @@ const GameComparison = ({ game, userData, friendData }: GameComparisonProps) => 
               <div className="flex h-2 rounded-full overflow-hidden bg-black/40">
                 <div 
                   className="bg-neon-purple"
-                  style={{ width: `${(game.userTrophies / (game.userTrophies + game.friendTrophies)) * 100}%` }}
+                  style={{ width: `${(userTrophies / (userTrophies + friendTrophies || 1)) * 100}%` }}
                 ></div>
                 <div 
                   className="bg-neon-blue"
-                  style={{ width: `${(game.friendTrophies / (game.userTrophies + game.friendTrophies)) * 100}%` }}
+                  style={{ width: `${(friendTrophies / (userTrophies + friendTrophies || 1)) * 100}%` }}
                 ></div>
               </div>
             </div>
             
             <div className={`text-left font-bold ${trophyLeader === 'friend' ? 'text-green-500' : ''}`}>
-              {game.friendTrophies}
+              {friendTrophies}
             </div>
           </div>
         </div>
@@ -64,24 +76,24 @@ const GameComparison = ({ game, userData, friendData }: GameComparisonProps) => 
           
           <div className="flex-1 grid grid-cols-5 gap-2 items-center">
             <div className={`text-right font-bold ${playtimeLeader === 'user' ? 'text-green-500' : ''}`}>
-              {game.userPlaytime} hrs
+              {userPlaytime} hrs
             </div>
             
             <div className="col-span-3">
               <div className="h-2 rounded-full overflow-hidden bg-black/40 flex">
                 <div 
                   className="bg-neon-purple"
-                  style={{ width: `${(game.userPlaytime / (game.userPlaytime + game.friendPlaytime)) * 100}%` }}
+                  style={{ width: `${(userPlaytime / (userPlaytime + friendPlaytime || 1)) * 100}%` }}
                 ></div>
                 <div 
                   className="bg-neon-blue"
-                  style={{ width: `${(game.friendPlaytime / (game.userPlaytime + game.friendPlaytime)) * 100}%` }}
+                  style={{ width: `${(friendPlaytime / (userPlaytime + friendPlaytime || 1)) * 100}%` }}
                 ></div>
               </div>
             </div>
             
             <div className={`text-left font-bold ${playtimeLeader === 'friend' ? 'text-green-500' : ''}`}>
-              {game.friendPlaytime} hrs
+              {friendPlaytime} hrs
             </div>
           </div>
         </div>
@@ -92,20 +104,20 @@ const GameComparison = ({ game, userData, friendData }: GameComparisonProps) => 
             <div className="flex justify-between mb-1">
               <span className="text-sm">Your completion</span>
               <span className={`text-sm font-medium ${completionLeader === 'user' ? 'text-green-500' : ''}`}>
-                {game.userCompletion}%
+                {userCompletion}%
               </span>
             </div>
-            <Progress value={game.userCompletion} className="h-2 bg-black/40" />
+            <Progress value={userCompletion} className="h-2 bg-black/40" />
           </div>
           
           <div>
             <div className="flex justify-between mb-1">
               <span className="text-sm">Friend's completion</span>
               <span className={`text-sm font-medium ${completionLeader === 'friend' ? 'text-green-500' : ''}`}>
-                {game.friendCompletion}%
+                {friendCompletion}%
               </span>
             </div>
-            <Progress value={game.friendCompletion} className="h-2 bg-black/40" />
+            <Progress value={friendCompletion} className="h-2 bg-black/40" />
           </div>
         </div>
       </div>

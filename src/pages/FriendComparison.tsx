@@ -12,6 +12,7 @@ import Loading from '@/components/ui/Loading';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BarChart3, Gamepad, Clock, Trophy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { GamePlatform } from '@/types/game';
 
 const FriendComparison = () => {
   const { friendId } = useParams();
@@ -119,11 +120,13 @@ const FriendComparison = () => {
           recentActivity: "1 day ago"
         };
         
-        // Mock game comparison data
+        // Mock game comparison data - now structured as GamePlatform objects
         const mockGameComparison = [
           {
             id: 1,
-            name: "Elden Ring",
+            gameId: 1,
+            platformId: 1,
+            game: { id: 1, name: "Elden Ring", image: "" },
             userTrophies: 24,
             friendTrophies: 18,
             userPlaytime: 120,
@@ -133,7 +136,9 @@ const FriendComparison = () => {
           },
           {
             id: 2,
-            name: "God of War Ragnarök",
+            gameId: 2,
+            platformId: 1,
+            game: { id: 2, name: "God of War Ragnarök", image: "" },
             userTrophies: 32,
             friendTrophies: 36,
             userPlaytime: 86,
@@ -143,7 +148,9 @@ const FriendComparison = () => {
           },
           {
             id: 3,
-            name: "Cyberpunk 2077",
+            gameId: 3,
+            platformId: 1,
+            game: { id: 3, name: "Cyberpunk 2077", image: "" },
             userTrophies: 28,
             friendTrophies: 22,
             userPlaytime: 104,
@@ -151,7 +158,7 @@ const FriendComparison = () => {
             userCompletion: 88,
             friendCompletion: 72
           },
-        ];
+        ] as GamePlatform[];
         
         // Set friend data with mocked stats
         setFriendData({
@@ -315,10 +322,10 @@ const FriendComparison = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {userData.games.map((game: any) => (
+                  {userData.games.map((gamePlatform: GamePlatform) => (
                     <GameComparison 
-                      key={game.id}
-                      game={game}
+                      key={gamePlatform.id}
+                      gamePlatform={gamePlatform}
                       userData={userData}
                       friendData={friendData}
                     />
@@ -465,16 +472,16 @@ const FriendComparison = () => {
                   <div className="glass-card p-4 rounded-xl">
                     <h3 className="text-lg font-semibold mb-4">Your Top Games by Playtime</h3>
                     <div className="space-y-3">
-                      {userData.games.map((game: any) => (
-                        <div key={game.id} className="bg-black/30 p-3 rounded-lg">
+                      {userData.games.map((gamePlatform: GamePlatform) => (
+                        <div key={gamePlatform.id} className="bg-black/30 p-3 rounded-lg">
                           <div className="flex justify-between mb-2">
-                            <span className="font-medium">{game.name}</span>
-                            <span className="font-mono">{game.userPlaytime} hrs</span>
+                            <span className="font-medium">{gamePlatform.game.name}</span>
+                            <span className="font-mono">{gamePlatform.userPlaytime} hrs</span>
                           </div>
                           <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden">
                             <div 
                               className="bg-neon-purple h-full" 
-                              style={{ width: `${(game.userPlaytime / 120) * 100}%` }}
+                              style={{ width: `${(gamePlatform.userPlaytime / 120) * 100}%` }}
                             ></div>
                           </div>
                         </div>
@@ -485,16 +492,16 @@ const FriendComparison = () => {
                   <div className="glass-card p-4 rounded-xl">
                     <h3 className="text-lg font-semibold mb-4">Your Friend's Top Games by Playtime</h3>
                     <div className="space-y-3">
-                      {friendData.games.map((game: any) => (
-                        <div key={game.id} className="bg-black/30 p-3 rounded-lg">
+                      {friendData.games.map((gamePlatform: GamePlatform) => (
+                        <div key={gamePlatform.id} className="bg-black/30 p-3 rounded-lg">
                           <div className="flex justify-between mb-2">
-                            <span className="font-medium">{game.name}</span>
-                            <span className="font-mono">{game.friendPlaytime} hrs</span>
+                            <span className="font-medium">{gamePlatform.game.name}</span>
+                            <span className="font-mono">{gamePlatform.friendPlaytime} hrs</span>
                           </div>
                           <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden">
                             <div 
                               className="bg-green-500 h-full" 
-                              style={{ width: `${(game.friendPlaytime / 98) * 100}%` }}
+                              style={{ width: `${(gamePlatform.friendPlaytime / 98) * 100}%` }}
                             ></div>
                           </div>
                         </div>
