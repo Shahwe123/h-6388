@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet-async';
@@ -24,7 +23,6 @@ const Dashboard = () => {
       try {
         setIsLoading(true);
         
-        // Fetch pinned trophies (placeholder for now)
         const mockPinnedTrophies = [
           {
             id: 1,
@@ -71,7 +69,6 @@ const Dashboard = () => {
     fetchData();
   }, [toast]);
   
-  // Weekly stats (placeholder)
   const weeklyStats = {
     trophiesEarned: 12,
     xpGained: 340,
@@ -79,7 +76,6 @@ const Dashboard = () => {
     hoursPlayed: 18
   };
   
-  // Recent activity (placeholder)
   const recentActivity = [
     { type: 'trophy', game: 'Spider-Man 2', name: 'Web Slinger', date: '2 hours ago' },
     { type: 'game', name: 'God of War Ragnarök', action: 'started playing', date: '1 day ago' },
@@ -89,21 +85,20 @@ const Dashboard = () => {
   
   if (isLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-primary flex items-center justify-center">
+      <div className="page-container bg-primary flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-neon-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
   
   return (
-    <div className="min-h-screen bg-primary pb-16">
+    <div className="page-container bg-primary">
       <Helmet>
         <title>Dashboard | PlatinumPath</title>
         <meta name="description" content="View your gaming stats, pinned trophies, and progress" />
       </Helmet>
       
-      <div className="max-w-7xl mx-auto pt-8 container-padding">
-        {/* Welcome Header */}
+      <div className="max-w-7xl mx-auto container-padding">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">
             Welcome back, {profile?.username || 'Gamer'}
@@ -112,9 +107,7 @@ const Dashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Main content area */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Weekly Stats */}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -149,7 +142,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            {/* Stats Charts */}
             <Tabs defaultValue="progression">
               <TabsList className="glass-card mb-4">
                 <TabsTrigger value="progression">Trophy Progression</TabsTrigger>
@@ -193,7 +185,6 @@ const Dashboard = () => {
           </div>
           
           <div className="space-y-6">
-            {/* Next Goals / Pinned Trophies */}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -241,7 +232,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            {/* Recent Activity */}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -276,7 +266,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            {/* Friends Activity Preview */}
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="flex items-center">

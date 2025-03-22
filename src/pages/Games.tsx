@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -167,25 +166,21 @@ const Games = () => {
     fetchGames();
   }, [username]);
   
-  // Filter and sort games when filters change
   useEffect(() => {
     let result = [...games];
     
-    // Apply search filter
     if (searchQuery) {
       result = result.filter(game => 
         game.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     
-    // Apply platform filter
     if (platformFilter !== 'all') {
       result = result.filter(game => 
         game.platform.toLowerCase().includes(platformFilter.toLowerCase())
       );
     }
     
-    // Apply sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'name':
@@ -205,7 +200,7 @@ const Games = () => {
   
   if (isLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-primary flex items-center justify-center">
+      <div className="page-container bg-primary flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-neon-purple border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -213,7 +208,7 @@ const Games = () => {
   
   if (!profile) {
     return (
-      <div className="min-h-screen bg-primary flex items-center justify-center">
+      <div className="page-container bg-primary flex items-center justify-center">
         <div className="text-center">
           <Gamepad className="h-16 w-16 mx-auto mb-4 text-zinc-600" />
           <h2 className="text-2xl font-bold mb-2">Profile Not Found</h2>
@@ -224,13 +219,13 @@ const Games = () => {
   }
   
   return (
-    <div className="min-h-screen bg-primary pb-16">
+    <div className="page-container bg-primary">
       <Helmet>
         <title>Game Collection | PlatinumPath</title>
         <meta name="description" content="View your game collection and achievements" />
       </Helmet>
       
-      <div className="max-w-7xl mx-auto pt-8 container-padding">
+      <div className="max-w-7xl mx-auto container-padding">
         <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold">
@@ -259,7 +254,6 @@ const Games = () => {
           </div>
         </div>
         
-        {/* Filters */}
         <Card className="glass-card mb-6">
           <CardContent className="p-4">
             <div className="flex flex-wrap gap-4">
@@ -312,7 +306,6 @@ const Games = () => {
           </CardContent>
         </Card>
         
-        {/* Games Display */}
         {filteredGames.length === 0 ? (
           <div className="glass-card p-10 text-center">
             <Gamepad className="h-16 w-16 mx-auto mb-4 text-zinc-600" />
