@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { 
   ForumCategory, 
@@ -7,7 +6,8 @@ import {
   ForumThreadResponse, 
   ThreadComment, 
   ThreadCommentResponse,
-  ForumUser
+  ForumUser,
+  ForumTagType
 } from "@/types/forum";
 
 // User profile fetching function
@@ -235,8 +235,10 @@ export const forumService = {
   },
   
   async getThread(id: string): Promise<ForumThread | null> {
-    // First, increment view count
-    await supabase.rpc('increment_thread_view_count', { thread_id: id });
+    // First, increment view count using a raw SQL query instead of RPC
+    await supabase.from('forum_threads')
+      .update({ view_count: () => 'view_count + 1' })
+      .eq('id', id)
     
     const { data, error } = await supabase
       .from('forum_threads')
@@ -255,7 +257,7 @@ export const forumService = {
   async createThread(threadData: {
     title: string;
     content: string;
-    tags: string[];
+    tags: ForumTagType[];
     categoryId: string;
     gameName?: string;
     attachments?: string[];
@@ -271,7 +273,7 @@ export const forumService = {
       .insert({
         title: threadData.title,
         content: threadData.content,
-        tags: threadData.tags,
+        tags: threadData.tags as unknown as string[],
         category_id: threadData.categoryId,
         author_id: user.data.user.id,
         game_name: threadData.gameName || null,
@@ -380,7 +382,10 @@ export const forumService = {
       }
       
       // Increment upvote count
-      await supabase.rpc('increment_thread_upvote_count', { thread_id: threadId });
+      await supabase
+        .from('forum_threads')
+        .update({ upvotes: () => 'upvotes + 1' })
+        .eq('id', threadId);
     } else {
       // Remove upvote
       const { error: deleteError } = await supabase
@@ -395,7 +400,10 @@ export const forumService = {
       }
       
       // Decrement upvote count
-      await supabase.rpc('decrement_thread_upvote_count', { thread_id: threadId });
+      await supabase
+        .from('forum_threads')
+        .update({ upvotes: () => 'upvotes - 1' })
+        .eq('id', threadId);
     }
     
     return true;
@@ -422,8 +430,11 @@ export const forumService = {
         return false;
       }
       
-      // Increment upvote count
-      await supabase.rpc('increment_comment_upvote_count', { comment_id: commentId });
+      // Increment upvote count directly
+      await supabase
+        .from('thread_comments')
+        .update({ upvotes: () => 'upvotes + 1' })
+        .eq('id', commentId);
     } else {
       // Remove upvote
       const { error: deleteError } = await supabase
@@ -437,8 +448,11 @@ export const forumService = {
         return false;
       }
       
-      // Decrement upvote count
-      await supabase.rpc('decrement_comment_upvote_count', { comment_id: commentId });
+      // Decrement upvote count directly
+      await supabase
+        .from('thread_comments')
+        .update({ upvotes: () => 'upvotes - 1' })
+        .eq('id', commentId);
     }
     
     return true;

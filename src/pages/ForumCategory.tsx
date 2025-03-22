@@ -1,17 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, PlusCircle, MessageSquare } from 'lucide-react';
 import ThreadListItem from '@/components/forum/ThreadListItem';
 import SEO from '@/components/SEO';
 import { useForumData } from '@/hooks/useForumData';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { forumService } from '@/services/forumService';
 
 const ForumCategory: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getCategory, getCategoryThreads } = useForumData();
+  const { getCategoryThreads } = useForumData();
   
   const categoryQuery = useQuery({
     queryKey: ['forumCategory', id],

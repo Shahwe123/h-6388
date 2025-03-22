@@ -74,7 +74,8 @@ export const mockForumThreads: ForumThread[] = [
     commentCount: 42,
     isBookmarked: true,
     gameName: 'Elden Ring',
-    lastActivity: '2023-12-01T09:45:00Z'
+    lastActivity: '2023-12-01T09:45:00Z',
+    categoryId: '1'
   },
   {
     id: '2',
@@ -89,7 +90,8 @@ export const mockForumThreads: ForumThread[] = [
     upvotes: 43,
     commentCount: 31,
     gameName: 'Elden Ring',
-    lastActivity: '2023-11-30T22:10:00Z'
+    lastActivity: '2023-11-30T22:10:00Z',
+    categoryId: '2'
   },
   {
     id: '3',
@@ -104,7 +106,8 @@ export const mockForumThreads: ForumThread[] = [
     upvotes: 156,
     commentCount: 27,
     attachments: ['https://placehold.co/600x400/png'],
-    lastActivity: '2023-11-29T16:30:00Z'
+    lastActivity: '2023-11-29T16:30:00Z',
+    categoryId: '1'
   },
   {
     id: '4',
@@ -119,7 +122,8 @@ export const mockForumThreads: ForumThread[] = [
     upvotes: 89,
     commentCount: 18,
     gameName: 'Bloodborne',
-    lastActivity: '2023-11-30T14:20:00Z'
+    lastActivity: '2023-11-30T14:20:00Z',
+    categoryId: '3'
   },
   {
     id: '5',
@@ -133,7 +137,8 @@ export const mockForumThreads: ForumThread[] = [
     viewCount: 1123,
     upvotes: 94,
     commentCount: 52,
-    lastActivity: '2023-11-30T18:45:00Z'
+    lastActivity: '2023-11-30T18:45:00Z',
+    categoryId: '4'
   }
 ];
 
