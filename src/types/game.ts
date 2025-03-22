@@ -43,6 +43,13 @@ export interface GamePlatform {
   platformSpecificId?: string;
   game?: Game;
   platform?: Platform;
+  // Comparison-related properties
+  userTrophies?: number;
+  friendTrophies?: number;
+  userPlaytime?: number;
+  friendPlaytime?: number;
+  userCompletion?: number;
+  friendCompletion?: number;
 }
 
 /**
@@ -108,4 +115,18 @@ export interface LegacyWallFilter {
   type?: TrophyFilter;
   rarity?: 'common' | 'rare' | 'ultra-rare' | 'all';
   milestones?: boolean;
+}
+
+/**
+ * Interface for game comparison data
+ */
+export interface ComparisonGameData {
+  id: number;
+  name: string;
+  userTrophies: number;
+  friendTrophies: number;
+  userPlaytime: number;
+  friendPlaytime: number;
+  userCompletion: number;
+  friendCompletion: number;
 }

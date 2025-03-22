@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { Game, GamePlatform } from '@/types/game';
 
 /**
  * Fetch user games and achievements
@@ -12,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
  * @returns {Promise<Array>} An array of games and achievements
  * @throws {Error} If there's an issue fetching the data
  */
-export const getGames = async (userId: string) => {
+export const getGames = async (userId: string): Promise<Game[]> => {
   try {
     // First, fetch the user's game platforms
     const { data: userGames, error: userGamesError } = await supabase
@@ -121,6 +122,57 @@ export const getGames = async (userId: string) => {
     }));
   } catch (error) {
     console.error('Error fetching games:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch comparison data between two users for shared games
+ * 
+ * @param {string} userId The primary user's ID
+ * @param {string} friendId The friend's user ID to compare with
+ * @returns {Promise<GamePlatform[]>} Array of GamePlatform objects with comparison data
+ */
+export const getComparisonData = async (userId: string, friendId: string): Promise<GamePlatform[]> => {
+  try {
+    // Get user games
+    const userGames = await getGames(userId);
+    
+    // Get friend games
+    const friendGames = await getGames(friendId);
+    
+    // Find shared games (games that both users have)
+    const sharedGames: GamePlatform[] = [];
+    
+    userGames.forEach(userGame => {
+      const friendGame = friendGames.find(fg => fg.id === userGame.id);
+      
+      if (friendGame) {
+        // Create a comparison object
+        sharedGames.push({
+          id: userGame.gamePlatformId || 0,
+          gameId: userGame.id,
+          platformId: 0, // We'd need to get this from the platform table
+          game: {
+            id: userGame.id,
+            name: userGame.name,
+            platform: userGame.platform,
+            image: userGame.image,
+            completion: 0 // This will be replaced by userCompletion
+          },
+          userTrophies: userGame.trophyCount || 0,
+          friendTrophies: friendGame.trophyCount || 0,
+          userPlaytime: userGame.totalPlaytime || 0,
+          friendPlaytime: friendGame.totalPlaytime || 0,
+          userCompletion: userGame.completion || 0,
+          friendCompletion: friendGame.completion || 0
+        });
+      }
+    });
+    
+    return sharedGames;
+  } catch (error) {
+    console.error('Error fetching comparison data:', error);
     throw error;
   }
 };
