@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Game, GamePlatform, GameTrophy } from '@/types/game';
 
