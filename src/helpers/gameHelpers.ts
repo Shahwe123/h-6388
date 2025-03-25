@@ -102,7 +102,9 @@ export const getGames = async (userId: string): Promise<Game[]> => {
           description: gp.games.description,
           completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100,
           trophies: formattedAchievements,
-          trophyCount: formattedAchievements.length
+          trophyCount: formattedAchievements.length,
+          gamePlatformId: gp.id, // Add this property to the Game object
+          totalPlaytime: 0 // Default value for total playtime
         };
       });
       
@@ -118,7 +120,9 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       description: gp.games.description,
       completion: 0,
       trophyCount: 0,
-      trophies: []
+      trophies: [],
+      gamePlatformId: gp.id, // Add this property to the Game object
+      totalPlaytime: 0 // Default value for total playtime
     }));
   } catch (error) {
     console.error('Error fetching games:', error);
@@ -187,3 +191,4 @@ export const getComparisonData = async (userId: string, friendId: string): Promi
     throw error;
   }
 };
+
