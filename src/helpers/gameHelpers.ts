@@ -67,42 +67,81 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       // Fetch achievement details
       const { data: achievements, error: achievementDetailsError } = await supabase
         .from('achievements')
-        .select('id, name, description, game_platform_id, icon_url, locked_icon_url')
+        .select('id, name, description, game_platform_id, icon_url, locked_icon_url, platform_api_name')
         .in('id', achievementIds);
         
       if (achievementDetailsError) throw achievementDetailsError;
 
+      // Get all achievements for each game, not just the ones the user has earned
+      const { data: allAchievements, error: allAchievementsError } = await supabase
+        .from('achievements')
+        .select('id, name, description, game_platform_id, icon_url, locked_icon_url, platform_api_name')
+        .in('game_platform_id', gamePlatformIds);
+        
+      if (allAchievementsError) throw allAchievementsError;
+
       // Transform gamePlatforms data to match the expected Game interface
       const formattedGames: Game[] = gamePlatforms.map(gp => {
-        // Get achievements for this game platform
-        const gameAchievements = achievements.filter(a => a.game_platform_id === gp.id);
+        // Get all achievements for this game platform
+        const gameAllAchievements = allAchievements.filter(a => a.game_platform_id === gp.id);
         
         // Format each achievement with user status
-        const formattedAchievements: GameTrophy[] = gameAchievements.map(achievement => {
+        const formattedAchievements: GameTrophy[] = gameAllAchievements.map(achievement => {
           const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
+          
+          // Determine trophy type based on name or description patterns
+          let trophyType = 'bronze';
+          if (achievement.name?.toLowerCase().includes('platinum') || 
+              achievement.description?.toLowerCase().includes('platinum') || 
+              achievement.platform_api_name?.toLowerCase().includes('platinum')) {
+            trophyType = 'platinum';
+          } else if (achievement.name?.toLowerCase().includes('gold') || 
+                    achievement.description?.toLowerCase().includes('gold') || 
+                    achievement.platform_api_name?.toLowerCase().includes('gold')) {
+            trophyType = 'gold';
+          } else if (achievement.name?.toLowerCase().includes('silver') || 
+                    achievement.description?.toLowerCase().includes('silver') || 
+                    achievement.platform_api_name?.toLowerCase().includes('silver')) {
+            trophyType = 'silver';
+          }
+          
           return {
             id: achievement.id,
             name: achievement.name,
             description: achievement.description || '',
             image: achievement.icon_url || '',
-            type: 'bronze', // Default type if not specified
+            lockedImage: achievement.locked_icon_url || '',
+            type: trophyType,
             rarity: 'common', // Default rarity if not specified
-            rarityPercentage: 100, // Default percentage if not specified
+            rarityPercentage: Math.floor(Math.random() * 100), // Random placeholder for now
             achieved: userAchievement?.unlocked || false,
             achievedDate: userAchievement?.unlock_time,
             gamePlatformId: gp.id
           };
         });
         
+        // Calculate earned trophies and completion percentage
+        const earnedTrophies = formattedAchievements.filter(a => a.achieved).length;
+        const completionPercentage = formattedAchievements.length > 0 
+          ? (earnedTrophies / formattedAchievements.length) * 100 
+          : 0;
+        
+        // For Steam games, try to fetch a better image if icon_url is too small
+        const gameName = gp.games.name;
+        const betterImage = gp.games.icon_url?.replace('/apps/', '/apps/logoheader/') || null;
+        
         return {
           id: gp.games.id,
           name: gp.games.name,
           platform: gp.platforms.name,
-          image: gp.games.icon_url || '',
+          image: betterImage || gp.games.icon_url || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(gameName)}`,
           description: gp.games.description,
-          completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100,
+          completion: completionPercentage,
           trophies: formattedAchievements,
-          trophyCount: formattedAchievements.length
+          trophyCount: formattedAchievements.length,
+          lastPlayed: formattedAchievements.filter(a => a.achieved && a.achievedDate)
+            .sort((a, b) => new Date(b.achievedDate!).getTime() - new Date(a.achievedDate!).getTime())[0]?.achievedDate,
+          gamePlatformId: gp.id
         };
       });
       
@@ -114,11 +153,12 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       id: gp.games.id,
       name: gp.games.name,
       platform: gp.platforms.name,
-      image: gp.games.icon_url || '',
+      image: gp.games.icon_url || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(gp.games.name)}`,
       description: gp.games.description,
       completion: 0,
       trophyCount: 0,
-      trophies: []
+      trophies: [],
+      gamePlatformId: gp.id
     }));
   } catch (error) {
     console.error('Error fetching games:', error);

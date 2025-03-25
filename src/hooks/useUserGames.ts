@@ -32,11 +32,17 @@ export const useUserGames = () => {
         // Fetch user games using the helper function
         const userGames = await getGames(userId);
         
+        // Fix any missing image URLs with proper placeholder
+        const gamesWithFixedImages = userGames.map(game => ({
+          ...game,
+          image: game.image || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`
+        }));
+        
         // Update local state
-        setGames(userGames);
+        setGames(gamesWithFixedImages);
         
         // Update Redux store
-        dispatch(fetchGamesSuccess(userGames));
+        dispatch(fetchGamesSuccess(gamesWithFixedImages));
         
       } catch (err: any) {
         console.error('Error fetching user games:', err);

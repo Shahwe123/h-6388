@@ -236,12 +236,13 @@ const Games = () => {
                 <div className="glass-card h-full overflow-hidden rounded-lg flex flex-col">
                   <div className="relative">
                     <img 
-                      src={game.image || 'https://placehold.co/300x400?text=Game'} 
+                      src={game.image || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`} 
                       alt={game.name}
                       className="w-full object-cover aspect-[3/4]"
+                      loading="lazy"
                       onError={(e) => {
                         const imgElement = e.target as HTMLImageElement;
-                        imgElement.src = 'https://placehold.co/300x400?text=Game';
+                        imgElement.src = `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`;
                       }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
@@ -277,12 +278,13 @@ const Games = () => {
               <Link to={`/games/${game.id}`} key={game.id}>
                 <div className="glass-card p-3 flex items-center hover:bg-neon-purple/10 transition-colors">
                   <img 
-                    src={game.image || 'https://placehold.co/300x400?text=Game'} 
+                    src={game.image || `https://placehold.co/160x160/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`} 
                     alt={game.name}
                     className="w-16 h-16 object-cover rounded"
+                    loading="lazy"
                     onError={(e) => {
                       const imgElement = e.target as HTMLImageElement;
-                      imgElement.src = 'https://placehold.co/64x64?text=Game';
+                      imgElement.src = `https://placehold.co/160x160/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`;
                     }}
                   />
                   <div className="ml-4 flex-1">

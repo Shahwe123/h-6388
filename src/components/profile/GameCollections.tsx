@@ -92,12 +92,13 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
               <div className="bg-black/20 rounded-lg overflow-hidden h-full flex flex-col">
                 <div className="relative">
                   <img 
-                    src={game.image || 'https://placehold.co/300x400?text=Game'} 
+                    src={game.image || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`} 
                     alt={game.name}
                     className="w-full aspect-[3/4] object-cover"
+                    loading="lazy"
                     onError={(e) => {
                       const imgElement = e.target as HTMLImageElement;
-                      imgElement.src = 'https://placehold.co/300x400?text=Game';
+                      imgElement.src = `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`;
                     }}
                   />
                   <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
