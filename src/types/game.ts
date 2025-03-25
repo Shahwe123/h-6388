@@ -24,6 +24,7 @@ export interface Game {
   rarityScore?: number; // Average rarity of all trophies
   milestoneInfo?: MilestoneInfo; // Additional information for milestone trophies
   gamePlatformId?: number; // Reference to the game-platform combination
+  platformSpecificId?: string; // The platform's specific ID for this game (like Steam app ID)
 }
 
 /**

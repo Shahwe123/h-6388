@@ -129,20 +129,36 @@ export const getGames = async (userId: string): Promise<Game[]> => {
         
         // For Steam games, try to fetch a better image if icon_url is too small
         const gameName = gp.games.name;
-        const betterImage = gp.games.icon_url?.replace('/apps/', '/apps/logoheader/') || null;
+        
+        // Generate fallback images with better quality
+        const gameNameForImage = encodeURIComponent(gameName.replace(/[^\w\s-]/g, ''));
+        const fallbackImage = `https://placehold.co/400x600/2a2a2a/ffffff?text=${gameNameForImage}`;
+        
+        // Prioritize better image sources:
+        // 1. If we have a Steam game, try to get a better Steam header image
+        // 2. Otherwise use the existing icon_url from the database
+        // 3. If neither works, fall back to a placeholder with the game name
+        let imageUrl = gp.games.icon_url || fallbackImage;
+        
+        // For Steam games, try to use a better image format
+        if (gp.platforms.name.toLowerCase() === 'steam' && gp.platform_specific_id) {
+          // Try to use the Steam header image which is higher quality
+          imageUrl = `https://cdn.cloudflare.steamstatic.com/steam/apps/${gp.platform_specific_id}/header.jpg`;
+        }
         
         return {
           id: gp.games.id,
           name: gp.games.name,
           platform: gp.platforms.name,
-          image: betterImage || gp.games.icon_url || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(gameName)}`,
+          image: imageUrl,
           description: gp.games.description,
           completion: completionPercentage,
           trophies: formattedAchievements,
           trophyCount: formattedAchievements.length,
           lastPlayed: formattedAchievements.filter(a => a.achieved && a.achievedDate)
             .sort((a, b) => new Date(b.achievedDate!).getTime() - new Date(a.achievedDate!).getTime())[0]?.achievedDate,
-          gamePlatformId: gp.id
+          gamePlatformId: gp.id,
+          platformSpecificId: gp.platform_specific_id
         };
       });
       
@@ -150,17 +166,31 @@ export const getGames = async (userId: string): Promise<Game[]> => {
     }
     
     // If no achievements found, just return the games with basic info
-    return gamePlatforms.map(gp => ({
-      id: gp.games.id,
-      name: gp.games.name,
-      platform: gp.platforms.name,
-      image: gp.games.icon_url || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(gp.games.name)}`,
-      description: gp.games.description,
-      completion: 0,
-      trophyCount: 0,
-      trophies: [],
-      gamePlatformId: gp.id
-    }));
+    return gamePlatforms.map(gp => {
+      // Generate fallback image with better quality
+      const gameNameForImage = encodeURIComponent(gp.games.name.replace(/[^\w\s-]/g, ''));
+      const fallbackImage = `https://placehold.co/400x600/2a2a2a/ffffff?text=${gameNameForImage}`;
+      
+      // Get a better image for Steam games if possible
+      let imageUrl = gp.games.icon_url || fallbackImage;
+      
+      if (gp.platforms.name.toLowerCase() === 'steam' && gp.platform_specific_id) {
+        imageUrl = `https://cdn.cloudflare.steamstatic.com/steam/apps/${gp.platform_specific_id}/header.jpg`;
+      }
+      
+      return {
+        id: gp.games.id,
+        name: gp.games.name,
+        platform: gp.platforms.name,
+        image: imageUrl,
+        description: gp.games.description,
+        completion: 0,
+        trophyCount: 0,
+        trophies: [],
+        gamePlatformId: gp.id,
+        platformSpecificId: gp.platform_specific_id
+      };
+    });
   } catch (error) {
     console.error('Error fetching games:', error);
     throw error;
