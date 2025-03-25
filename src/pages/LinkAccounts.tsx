@@ -106,10 +106,10 @@ const LinkAccounts = () => {
         try {
           setProcessingData(true);
           setProcessingPlatform('Steam');
-          
+
           await fetchSteamData(
-            updates.steam_id, 
-            profile.id, 
+            updates.steam_id,
+            profile.id,
             dispatch,
             () => {
               toast({
@@ -207,8 +207,8 @@ const LinkAccounts = () => {
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-primary">
-      <SEO 
-        title="Link Your Gaming Accounts" 
+      <SEO
+        title="Link Your Gaming Accounts"
         description="Connect your PlayStation, Xbox, and Steam accounts to track achievements seamlessly."
       />
       <div className="container-padding mx-auto max-w-3xl">
