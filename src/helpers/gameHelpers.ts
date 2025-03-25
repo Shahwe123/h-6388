@@ -90,7 +90,9 @@ export const getGames = async (userId: string): Promise<Game[]> => {
           const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
           
           // Determine trophy type based on name or description patterns
-          let trophyType = 'bronze';
+          // Use explicit type to ensure it's one of the allowed types
+          let trophyType: "platinum" | "gold" | "silver" | "bronze" = 'bronze';
+          
           if (achievement.name?.toLowerCase().includes('platinum') || 
               achievement.description?.toLowerCase().includes('platinum') || 
               achievement.platform_api_name?.toLowerCase().includes('platinum')) {
@@ -110,20 +112,19 @@ export const getGames = async (userId: string): Promise<Game[]> => {
             name: achievement.name,
             description: achievement.description || '',
             image: achievement.icon_url || '',
-            lockedImage: achievement.locked_icon_url || '',
-            type: trophyType,
             rarity: 'common', // Default rarity if not specified
             rarityPercentage: Math.floor(Math.random() * 100), // Random placeholder for now
             achieved: userAchievement?.unlocked || false,
             achievedDate: userAchievement?.unlock_time,
-            gamePlatformId: gp.id
+            gamePlatformId: gp.id,
+            type: trophyType
           };
         });
         
         // Calculate earned trophies and completion percentage
         const earnedTrophies = formattedAchievements.filter(a => a.achieved).length;
         const completionPercentage = formattedAchievements.length > 0 
-          ? (earnedTrophies / formattedAchievements.length) * 100 
+          ? Math.round((earnedTrophies / formattedAchievements.length) * 100) 
           : 0;
         
         // For Steam games, try to fetch a better image if icon_url is too small
