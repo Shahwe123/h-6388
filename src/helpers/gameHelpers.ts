@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Game, GamePlatform, GameTrophy } from '@/types/game';
 
@@ -134,30 +135,38 @@ export const getGames = async (userId: string): Promise<Game[]> => {
  */
 export const getComparisonData = async (userId: string, friendId: string): Promise<GamePlatform[]> => {
   try {
-    // Get user games
-    const userGames = await getGames(userId);
+    console.log(`Fetching comparison data for user ${userId} and friend ${friendId}`);
     
-    // Get friend games
+    // Get both users' games
+    const userGames = await getGames(userId);
     const friendGames = await getGames(friendId);
+    
+    console.log(`User has ${userGames.length} games, friend has ${friendGames.length} games`);
     
     // Find shared games (games that both users have)
     const sharedGames: GamePlatform[] = [];
     
-    userGames.forEach(userGame => {
+    // Loop through user games and find matches in friend games
+    for (const userGame of userGames) {
+      // Find matching game by game ID
       const friendGame = friendGames.find(fg => fg.id === userGame.id);
       
+      // If both users have this game, add to comparison data
       if (friendGame) {
+        console.log(`Found shared game: ${userGame.name}`);
+        
         // Create a comparison object
-        sharedGames.push({
-          id: 0, // We'll need to get the actual game platform ID
+        const comparisonGame: GamePlatform = {
+          id: userGame.gamePlatformId || 0,
           gameId: userGame.id,
-          platformId: 0, // We'd need to get this from the platform table
+          platformId: 0, // We'll get this from the platform info where available
           game: {
             id: userGame.id,
             name: userGame.name,
             platform: userGame.platform,
             image: userGame.image,
-            completion: 0 // This will be replaced by userCompletion
+            description: userGame.description,
+            completion: userGame.completion,
           },
           userTrophies: userGame.trophyCount || 0,
           friendTrophies: friendGame.trophyCount || 0,
@@ -165,10 +174,13 @@ export const getComparisonData = async (userId: string, friendId: string): Promi
           friendPlaytime: friendGame.totalPlaytime || 0,
           userCompletion: userGame.completion || 0,
           friendCompletion: friendGame.completion || 0
-        });
+        };
+        
+        sharedGames.push(comparisonGame);
       }
-    });
+    }
     
+    console.log(`Found ${sharedGames.length} shared games for comparison`);
     return sharedGames;
   } catch (error) {
     console.error('Error fetching comparison data:', error);
