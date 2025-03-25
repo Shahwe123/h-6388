@@ -31,9 +31,6 @@ export const fetchSteamData = async (
       throw new Error('Not authenticated');
     }
 
-    // Show detailed logging for debugging
-    console.log(`Fetching Steam data for Steam ID: ${steamId}`);
-
     const response = await fetch("https://nvjjragekchczuxgdvvo.supabase.co/functions/v1/fetch-steam-data", {
       method: "POST",
       headers: {
@@ -46,13 +43,10 @@ export const fetchSteamData = async (
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Steam API error (${response.status}): ${errorText}`);
-      throw new Error(`Failed to fetch Steam data: ${response.status} ${errorText}`);
+      throw new Error('Failed to fetch Steam data');
     }
 
     const data = await response.json();
-    console.log('Steam data received:', data);
     await processAndStoreSteamData(data, userId, dispatch);
     onSuccess?.();
   } catch (error) {
@@ -317,8 +311,6 @@ export const fetchXboxData = async (gamerTag: string) => {
       throw new Error('Not authenticated');
     }
 
-    console.log(`Fetching Xbox data for gamertag: ${gamerTag}`);
-
     const response = await fetch("https://nvjjragekchczuxgdvvo.supabase.co/functions/v1/fetch-xbox-data", {
       method: "POST",
       headers: {
@@ -331,13 +323,11 @@ export const fetchXboxData = async (gamerTag: string) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Xbox API error (${response.status}): ${errorText}`);
-      throw new Error(`Failed to fetch Xbox data: ${response.status} ${errorText}`);
+      throw new Error('Failed to fetch Xbox data');
     }
 
     const data = await response.json();
-    console.log('Xbox data received:', data);
+    console.log(data); // TODO: add data to redux store
     return data;
   } catch (error) {
     console.error("Error fetching Xbox data:", error);
