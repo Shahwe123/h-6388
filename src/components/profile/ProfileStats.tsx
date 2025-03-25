@@ -24,21 +24,14 @@ const ProfileStats = ({ trophiesCount = 0, platinumCount = 0, completionPercenta
     }
     
     let totalTrophies = 0;
-    let earnedTrophies = 0;
     let platinumTrophies = 0;
     let totalCompletion = 0;
     
     games.forEach((game: Game) => {
       // Count trophies
       if (game.trophies && Array.isArray(game.trophies)) {
-        const earned = game.trophies.filter(t => t.achieved).length;
-        earnedTrophies += earned;
-        totalTrophies += game.trophies.length;
+        totalTrophies += game.trophies.filter(t => t.achieved).length;
         platinumTrophies += game.trophies.filter(t => t.achieved && t.type === 'platinum').length;
-      } else if (game.trophyCounts) {
-        earnedTrophies += game.trophyCounts.earned || 0;
-        totalTrophies += game.trophyCounts.total || 0;
-        platinumTrophies += game.trophyCounts.platinum || 0;
       } else if (game.trophyCount) {
         totalTrophies += game.trophyCount;
       }
@@ -49,12 +42,10 @@ const ProfileStats = ({ trophiesCount = 0, platinumCount = 0, completionPercenta
       }
     });
     
-    // Calculate average completion - now based on total earned vs total available
-    const avgCompletion = totalTrophies > 0 
-      ? Math.round((earnedTrophies / totalTrophies) * 100) 
-      : (games.length > 0 ? Math.round(totalCompletion / games.length) : 0);
+    // Calculate average completion
+    const avgCompletion = games.length > 0 ? Math.round(totalCompletion / games.length) : 0;
     
-    return { totalTrophies: earnedTrophies, platinumTrophies, avgCompletion };
+    return { totalTrophies, platinumTrophies, avgCompletion };
   };
   
   const stats = calculateStats();

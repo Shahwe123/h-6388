@@ -49,26 +49,11 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
         if (profile) {
           if (isOwnProfile && games.length > 0) {
             // For own profile, use games from Redux state
-            // Sort by lastPlayed (most recent first) before getting first 4
-            const sortedGames = [...games].sort((a, b) => {
-              const dateA = a.lastPlayed ? new Date(a.lastPlayed).getTime() : 0;
-              const dateB = b.lastPlayed ? new Date(b.lastPlayed).getTime() : 0;
-              return dateB - dateA;
-            });
-            
-            setProfileGames(sortedGames.slice(0, 4));
+            setProfileGames(games.slice(0, 4)); // Show only the first 4 games
           } else if (profile.id) {
             // For other profiles, fetch games directly
             const fetchedGames = await getGames(profile.id);
-            
-            // Sort by lastPlayed (most recent first) before getting first 4
-            const sortedGames = fetchedGames.sort((a, b) => {
-              const dateA = a.lastPlayed ? new Date(a.lastPlayed).getTime() : 0;
-              const dateB = b.lastPlayed ? new Date(b.lastPlayed).getTime() : 0;
-              return dateB - dateA;
-            });
-            
-            setProfileGames(sortedGames.slice(0, 4)); 
+            setProfileGames(fetchedGames.slice(0, 4)); // Show only the first 4 games
           }
         }
       } catch (error) {
@@ -132,19 +117,7 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
                     <Progress value={game.completion} className="h-1 bg-black/40" />
                   </div>
                   <div className="mt-auto text-xs text-neutral-400 flex justify-between">
-                    <span>
-                      {game.trophies 
-                        ? `${game.trophies.filter(t => t.achieved).length}/${game.trophies.length} Trophies`
-                        : game.trophyCounts
-                          ? `${game.trophyCounts.earned}/${game.trophyCounts.total} Trophies`
-                          : `${game.trophyCount || 0} Trophies`
-                      }
-                    </span>
-                    {game.lastPlayed && (
-                      <span>
-                        {new Date(game.lastPlayed).toLocaleDateString()}
-                      </span>
-                    )}
+                    <span>{game.trophyCount || (game.trophies?.length || 0)} Trophies</span>
                   </div>
                 </div>
               </div>
