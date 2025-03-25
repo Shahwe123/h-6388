@@ -7,6 +7,9 @@ import { Profile } from '@/types/profile';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
+import { useSelector } from 'react-redux';
+import { Game } from '@/types/game';
+import { getGames } from '@/helpers/gameHelpers';
 
 /**
  * Props interface for the GameCollections component
@@ -18,16 +21,6 @@ interface GameCollectionsProps {
   profile: Profile;
   hasLinkedAccounts: boolean;
   isOwnProfile: boolean;
-}
-
-interface GameItem {
-  id: number;
-  name: string;
-  platform: string;
-  image: string;
-  completion: number;
-  trophyCount?: number;
-  lastPlayed?: string;
 }
 
 /**
@@ -44,67 +37,34 @@ interface GameItem {
  * @returns {JSX.Element} The game collections UI
  */
 const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameCollectionsProps) => {
-  const [games, setGames] = useState<GameItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const games = useSelector((state: any) => state.games?.games || []);
+  const [profileGames, setProfileGames] = useState<Game[]>([]);
   
   useEffect(() => {
     const fetchGames = async () => {
       try {
         setLoading(true);
         
-        // For now, use placeholder game data
-        const placeholderGames: GameItem[] = [
-          {
-            id: 1,
-            name: "God of War Ragnarök",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=God+of+War",
-            completion: 78,
-            trophyCount: 42,
-            lastPlayed: "2025-03-18T14:22:00Z"
-          },
-          {
-            id: 2,
-            name: "Elden Ring",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=Elden+Ring",
-            completion: 65,
-            trophyCount: 38,
-            lastPlayed: "2025-03-15T18:30:00Z"
-          },
-          {
-            id: 3,
-            name: "Cyberpunk 2077",
-            platform: "Steam",
-            image: "https://placehold.co/300x400?text=Cyberpunk",
-            completion: 83,
-            trophyCount: 44,
-            lastPlayed: "2025-03-10T23:40:00Z"
-          },
-          {
-            id: 4,
-            name: "Halo Infinite",
-            platform: "Xbox Series X",
-            image: "https://placehold.co/300x400?text=Halo",
-            completion: 52,
-            trophyCount: 32,
-            lastPlayed: "2025-03-05T19:30:00Z"
+        if (profile) {
+          if (isOwnProfile && games.length > 0) {
+            // For own profile, use games from Redux state
+            setProfileGames(games.slice(0, 4)); // Show only the first 4 games
+          } else if (profile.id) {
+            // For other profiles, fetch games directly
+            const fetchedGames = await getGames(profile.id);
+            setProfileGames(fetchedGames.slice(0, 4)); // Show only the first 4 games
           }
-        ];
-        
-        setGames(placeholderGames);
-        setLoading(false);
+        }
       } catch (error) {
         console.error("Error fetching games:", error);
+      } finally {
         setLoading(false);
       }
     };
     
-    // If the profile has any linked accounts (or for demo purposes), fetch games
-    if (profile) {
-      fetchGames();
-    }
-  }, [profile]);
+    fetchGames();
+  }, [profile, games, isOwnProfile]);
   
   // If no accounts are linked and not own profile, don't show this section at all
   if (!hasLinkedAccounts && !isOwnProfile) return null;
@@ -125,16 +85,20 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
         <div className="flex justify-center py-8">
           <div className="w-8 h-8 border-4 border-neon-purple border-t-transparent rounded-full animate-spin"></div>
         </div>
-      ) : games.length > 0 ? (
+      ) : profileGames.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {games.map((game) => (
+          {profileGames.map((game) => (
             <RouterLink to={`/games/${game.id}`} key={game.id} className="transition-transform hover:scale-105">
               <div className="bg-black/20 rounded-lg overflow-hidden h-full flex flex-col">
                 <div className="relative">
                   <img 
-                    src={game.image} 
+                    src={game.image || 'https://placehold.co/300x400?text=Game'} 
                     alt={game.name}
                     className="w-full aspect-[3/4] object-cover"
+                    onError={(e) => {
+                      const imgElement = e.target as HTMLImageElement;
+                      imgElement.src = 'https://placehold.co/300x400?text=Game';
+                    }}
                   />
                   <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
                     <div className="flex justify-between text-xs">
@@ -142,7 +106,7 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
                         {game.platform}
                       </span>
                       <span className="bg-neon-purple/40 px-1.5 py-0.5 rounded">
-                        {game.completion}%
+                        {Math.round(game.completion)}%
                       </span>
                     </div>
                   </div>
@@ -153,7 +117,7 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
                     <Progress value={game.completion} className="h-1 bg-black/40" />
                   </div>
                   <div className="mt-auto text-xs text-neutral-400 flex justify-between">
-                    <span>{game.trophyCount} Trophies</span>
+                    <span>{game.trophyCount || (game.trophies?.length || 0)} Trophies</span>
                   </div>
                 </div>
               </div>

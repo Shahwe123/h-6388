@@ -23,6 +23,7 @@ export interface Game {
   yearEarned?: number; // Year when the first trophy was earned
   rarityScore?: number; // Average rarity of all trophies
   milestoneInfo?: MilestoneInfo; // Additional information for milestone trophies
+  gamePlatformId?: number; // Reference to the game-platform combination
 }
 
 /**

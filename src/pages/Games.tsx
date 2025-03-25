@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -14,16 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
-interface Game {
-  id: number;
-  name: string;
-  platform: string;
-  image: string;
-  completion: number;
-  trophyCount: number;
-  lastPlayed: string;
-}
+import { useSelector } from 'react-redux';
+import { Game } from '@/types/game';
+import { getGames } from '@/helpers/gameHelpers';
+import { format } from 'date-fns';
+import SEO from "../components/SEO";
 
 const Games = () => {
   const { username } = useParams();
@@ -34,6 +30,10 @@ const Games = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [platformFilter, setPlatformFilter] = useState('all');
   const [sortBy, setSortBy] = useState('lastPlayed');
+  const [availablePlatforms, setAvailablePlatforms] = useState<string[]>([]);
+  
+  // Get games from Redux store for the current user
+  const reduxGames = useSelector((state: any) => state.games?.games || []);
   
   const { profile, loading: profileLoading, isOwnProfile } = useProfileData(username || null);
   
@@ -42,120 +42,22 @@ const Games = () => {
       try {
         setIsLoading(true);
         
-        // Placeholder games data
-        const mockGames: Game[] = [
-          {
-            id: 1,
-            name: "Elden Ring",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=Elden+Ring",
-            completion: 72,
-            trophyCount: 42,
-            lastPlayed: "2025-03-18T14:22:00Z"
-          },
-          {
-            id: 2,
-            name: "God of War Ragnarök",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=God+of+War",
-            completion: 96,
-            trophyCount: 51,
-            lastPlayed: "2025-03-20T18:30:00Z"
-          },
-          {
-            id: 3,
-            name: "Starfield",
-            platform: "Xbox Series X",
-            image: "https://placehold.co/300x400?text=Starfield",
-            completion: 45,
-            trophyCount: 28,
-            lastPlayed: "2025-03-10T21:15:00Z"
-          },
-          {
-            id: 4,
-            name: "Cyberpunk 2077",
-            platform: "Steam",
-            image: "https://placehold.co/300x400?text=Cyberpunk",
-            completion: 83,
-            trophyCount: 44,
-            lastPlayed: "2025-03-15T23:40:00Z"
-          },
-          {
-            id: 5,
-            name: "Spider-Man 2",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=Spider-Man+2",
-            completion: 100,
-            trophyCount: 50,
-            lastPlayed: "2025-03-05T12:10:00Z"
-          },
-          {
-            id: 6,
-            name: "Horizon Forbidden West",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=Horizon",
-            completion: 68,
-            trophyCount: 38,
-            lastPlayed: "2025-02-28T17:20:00Z"
-          },
-          {
-            id: 7,
-            name: "Halo Infinite",
-            platform: "Xbox Series X",
-            image: "https://placehold.co/300x400?text=Halo",
-            completion: 52,
-            trophyCount: 32,
-            lastPlayed: "2025-03-12T19:30:00Z"
-          },
-          {
-            id: 8,
-            name: "The Witcher 3",
-            platform: "Steam",
-            image: "https://placehold.co/300x400?text=Witcher+3",
-            completion: 89,
-            trophyCount: 52,
-            lastPlayed: "2025-02-20T16:45:00Z"
-          },
-          {
-            id: 9,
-            name: "Baldur's Gate 3",
-            platform: "Steam",
-            image: "https://placehold.co/300x400?text=Baldurs+Gate+3",
-            completion: 64,
-            trophyCount: 36,
-            lastPlayed: "2025-03-16T22:00:00Z"
-          },
-          {
-            id: 10,
-            name: "Final Fantasy VII Rebirth",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=FF7+Rebirth",
-            completion: 78,
-            trophyCount: 45,
-            lastPlayed: "2025-03-19T15:15:00Z"
-          },
-          {
-            id: 11,
-            name: "Hollow Knight",
-            platform: "Steam",
-            image: "https://placehold.co/300x400?text=Hollow+Knight",
-            completion: 37,
-            trophyCount: 24,
-            lastPlayed: "2025-02-25T20:30:00Z"
-          },
-          {
-            id: 12,
-            name: "Hogwarts Legacy",
-            platform: "PlayStation 5",
-            image: "https://placehold.co/300x400?text=Hogwarts+Legacy",
-            completion: 91,
-            trophyCount: 48,
-            lastPlayed: "2025-03-08T14:00:00Z"
-          }
-        ];
+        let userGames: Game[] = [];
         
-        setGames(mockGames);
-        setFilteredGames(mockGames);
+        if (isOwnProfile && reduxGames.length > 0) {
+          // Use games from Redux for current user
+          userGames = reduxGames;
+        } else if (profile?.id) {
+          // Fetch games for the profile being viewed
+          userGames = await getGames(profile.id);
+        }
+        
+        // Extract unique platforms
+        const platforms = [...new Set(userGames.map(game => game.platform))];
+        setAvailablePlatforms(platforms);
+        
+        setGames(userGames);
+        setFilteredGames(userGames);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching games:", error);
@@ -163,8 +65,10 @@ const Games = () => {
       }
     };
     
-    fetchGames();
-  }, [username]);
+    if (!profileLoading && profile) {
+      fetchGames();
+    }
+  }, [username, reduxGames, profile, profileLoading, isOwnProfile]);
   
   useEffect(() => {
     let result = [...games];
@@ -188,9 +92,15 @@ const Games = () => {
         case 'completion':
           return b.completion - a.completion;
         case 'trophyCount':
-          return b.trophyCount - a.trophyCount;
+          const aTrophyCount = a.trophyCount || (a.trophies?.length || 0);
+          const bTrophyCount = b.trophyCount || (b.trophies?.length || 0);
+          return bTrophyCount - aTrophyCount;
         case 'lastPlayed':
         default:
+          // If lastPlayed isn't available, sort by name
+          if (!a.lastPlayed && !b.lastPlayed) return a.name.localeCompare(b.name);
+          if (!a.lastPlayed) return 1;
+          if (!b.lastPlayed) return -1;
           return new Date(b.lastPlayed).getTime() - new Date(a.lastPlayed).getTime();
       }
     });
@@ -220,10 +130,10 @@ const Games = () => {
   
   return (
     <div className="page-container bg-primary">
-      <Helmet>
-        <title>Game Collection | PlatinumPath</title>
-        <meta name="description" content="View your game collection and achievements" />
-      </Helmet>
+      <SEO
+        title="Game Collection | PlatinumPath"
+        description="View your game collection and achievements"
+      />
       
       <div className="max-w-7xl mx-auto container-padding">
         <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
@@ -279,9 +189,11 @@ const Games = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Platforms</SelectItem>
-                    <SelectItem value="playstation">PlayStation</SelectItem>
-                    <SelectItem value="xbox">Xbox</SelectItem>
-                    <SelectItem value="steam">Steam</SelectItem>
+                    {availablePlatforms.map(platform => (
+                      <SelectItem key={platform} value={platform.toLowerCase()}>
+                        {platform}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -311,6 +223,11 @@ const Games = () => {
             <Gamepad className="h-16 w-16 mx-auto mb-4 text-zinc-600" />
             <h2 className="text-xl font-bold mb-2">No Games Found</h2>
             <p className="text-zinc-400">Try adjusting your filters or search query.</p>
+            {isOwnProfile && games.length === 0 && (
+              <Link to="/link-accounts" className="block mt-4">
+                <Button className="mt-4">Link Your Gaming Accounts</Button>
+              </Link>
+            )}
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -319,9 +236,13 @@ const Games = () => {
                 <div className="glass-card h-full overflow-hidden rounded-lg flex flex-col">
                   <div className="relative">
                     <img 
-                      src={game.image} 
+                      src={game.image || 'https://placehold.co/300x400?text=Game'} 
                       alt={game.name}
                       className="w-full object-cover aspect-[3/4]"
+                      onError={(e) => {
+                        const imgElement = e.target as HTMLImageElement;
+                        imgElement.src = 'https://placehold.co/300x400?text=Game';
+                      }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                       <div className="flex justify-between items-center">
@@ -329,7 +250,7 @@ const Games = () => {
                           {game.platform}
                         </div>
                         <div className="text-xs font-medium bg-neon-purple/80 px-2 py-1 rounded">
-                          {game.completion}%
+                          {Math.round(game.completion)}%
                         </div>
                       </div>
                     </div>
@@ -337,8 +258,13 @@ const Games = () => {
                   <div className="p-3">
                     <h3 className="font-bold text-sm line-clamp-1">{game.name}</h3>
                     <div className="flex justify-between mt-2 text-xs text-zinc-400">
-                      <span>{game.trophyCount} Trophies</span>
-                      <span>{new Date(game.lastPlayed).toLocaleDateString()}</span>
+                      <span>{game.trophyCount || (game.trophies?.length || 0)} Trophies</span>
+                      <span>
+                        {game.lastPlayed 
+                          ? format(new Date(game.lastPlayed), 'MM/dd/yyyy')
+                          : 'No date'
+                        }
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -351,22 +277,29 @@ const Games = () => {
               <Link to={`/games/${game.id}`} key={game.id}>
                 <div className="glass-card p-3 flex items-center hover:bg-neon-purple/10 transition-colors">
                   <img 
-                    src={game.image} 
+                    src={game.image || 'https://placehold.co/300x400?text=Game'} 
                     alt={game.name}
                     className="w-16 h-16 object-cover rounded"
+                    onError={(e) => {
+                      const imgElement = e.target as HTMLImageElement;
+                      imgElement.src = 'https://placehold.co/64x64?text=Game';
+                    }}
                   />
                   <div className="ml-4 flex-1">
                     <h3 className="font-bold">{game.name}</h3>
                     <div className="flex items-center text-sm text-zinc-400">
                       <span>{game.platform}</span>
                       <span className="mx-2">•</span>
-                      <span>{game.trophyCount} Trophies</span>
+                      <span>{game.trophyCount || (game.trophies?.length || 0)} Trophies</span>
                     </div>
                   </div>
                   <div className="text-right mr-2">
-                    <div className="text-lg font-bold">{game.completion}%</div>
+                    <div className="text-lg font-bold">{Math.round(game.completion)}%</div>
                     <div className="text-xs text-zinc-400">
-                      {new Date(game.lastPlayed).toLocaleDateString()}
+                      {game.lastPlayed 
+                        ? format(new Date(game.lastPlayed), 'MM/dd/yyyy')
+                        : 'No date'
+                      }
                     </div>
                   </div>
                 </div>
