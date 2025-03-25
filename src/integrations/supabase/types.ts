@@ -335,18 +335,21 @@ export type Database = {
       user_achievements: {
         Row: {
           achievement_id: number
+          id: string | null
           unlock_time: string | null
           unlocked: boolean
           user_id: string
         }
         Insert: {
           achievement_id: number
+          id?: string | null
           unlock_time?: string | null
           unlocked?: boolean
           user_id: string
         }
         Update: {
           achievement_id?: number
+          id?: string | null
           unlock_time?: string | null
           unlocked?: boolean
           user_id?: string
@@ -395,18 +398,21 @@ export type Database = {
         Row: {
           game_id: number
           game_platform_id: number | null
+          id: string | null
           platform_name: string
           user_id: string
         }
         Insert: {
           game_id: number
           game_platform_id?: number | null
+          id?: string | null
           platform_name: string
           user_id: string
         }
         Update: {
           game_id?: number
           game_platform_id?: number | null
+          id?: string | null
           platform_name?: string
           user_id?: string
         }
