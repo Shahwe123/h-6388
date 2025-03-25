@@ -15,42 +15,58 @@ import { Game, GamePlatform, GameTrophy } from '@/types/game';
  */
 export const getGames = async (userId: string): Promise<Game[]> => {
   try {
+    console.log('Fetching games for user:', userId);
+    
     // First, fetch the user's game platforms
     const { data: userGames, error: userGamesError } = await supabase
       .from('user_games')
-      .select('game_platform_id')
+      .select('game_platform_id, game_id, platform_name')
       .eq('user_id', userId);
     
-    if (userGamesError) throw userGamesError;
+    if (userGamesError) {
+      console.error('Error fetching user games:', userGamesError);
+      throw userGamesError;
+    }
     
     // If no games found, return empty array
     if (!userGames || userGames.length === 0) {
+      console.log('No games found for user:', userId);
       return [];
     }
     
-    // Extract the game platform IDs for the next query
-    const gamePlatformIds = userGames.map(g => g.game_platform_id).filter(id => id !== null);
+    console.log('Found user games:', userGames.length);
     
-    if (gamePlatformIds.length === 0) {
+    // Extract the game platform IDs and game IDs
+    const gamePlatformIds = userGames
+      .map(g => g.game_platform_id)
+      .filter(id => id !== null);
+    
+    const gameIds = userGames
+      .map(g => g.game_id)
+      .filter(id => id !== null);
+    
+    if (gameIds.length === 0) {
+      console.log('No game IDs found');
       return [];
     }
 
-    // Fetch game platform details with related game and platform information
-    const { data: gamePlatforms, error: gamePlatformsError } = await supabase
-      .from('game_platforms')
-      .select(`
-        id, 
-        platform_specific_id,
-        games!inner(id, name, icon_url, description),
-        platforms!inner(id, name)
-      `)
-      .in('id', gamePlatformIds);
+    // Fetch game details directly
+    const { data: games, error: gamesError } = await supabase
+      .from('games')
+      .select('id, name, icon_url, description')
+      .in('id', gameIds);
       
-    if (gamePlatformsError) throw gamePlatformsError;
+    if (gamesError) {
+      console.error('Error fetching games:', gamesError);
+      throw gamesError;
+    }
 
-    if (!gamePlatforms || gamePlatforms.length === 0) {
+    if (!games || games.length === 0) {
+      console.log('No game details found');
       return [];
     }
+
+    console.log('Fetched game details:', games.length);
 
     // Fetch user achievements
     const { data: userAchievements, error: achievementsError } = await supabase
@@ -58,9 +74,17 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       .select('achievement_id, unlock_time, unlocked')
       .eq('user_id', userId);
     
-    if (achievementsError) throw achievementsError;
+    if (achievementsError) {
+      console.error('Error fetching user achievements:', achievementsError);
+      throw achievementsError;
+    }
     
-    // If user has achievements, fetch their details and merge with games
+    console.log('Fetched user achievements:', userAchievements?.length || 0);
+    
+    // Map to store achievements by game platform
+    const achievementsByGameId = new Map();
+    
+    // If user has achievements, fetch their details and organize by game
     if (userAchievements && userAchievements.length > 0) {
       const achievementIds = userAchievements.map(a => a.achievement_id);
       
@@ -70,61 +94,148 @@ export const getGames = async (userId: string): Promise<Game[]> => {
         .select('id, name, description, game_platform_id, icon_url, locked_icon_url')
         .in('id', achievementIds);
         
-      if (achievementDetailsError) throw achievementDetailsError;
-
-      // Transform gamePlatforms data to match the expected Game interface
-      const formattedGames: Game[] = gamePlatforms.map(gp => {
-        // Get achievements for this game platform
-        const gameAchievements = achievements.filter(a => a.game_platform_id === gp.id);
-        
-        // Format each achievement with user status
-        const formattedAchievements: GameTrophy[] = gameAchievements.map(achievement => {
-          const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
-          return {
-            id: achievement.id,
-            name: achievement.name,
-            description: achievement.description || '',
-            image: achievement.icon_url || '',
-            type: 'bronze', // Default type if not specified
-            rarity: 'common', // Default rarity if not specified
-            rarityPercentage: 100, // Default percentage if not specified
-            achieved: userAchievement?.unlocked || false,
-            achievedDate: userAchievement?.unlock_time,
-            gamePlatformId: gp.id
-          };
-        });
-        
-        return {
-          id: gp.games.id,
-          name: gp.games.name,
-          platform: gp.platforms.name,
-          image: gp.games.icon_url || '',
-          description: gp.games.description,
-          completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100,
-          trophies: formattedAchievements,
-          trophyCount: formattedAchievements.length
-        };
-      });
+      if (achievementDetailsError) {
+        console.error('Error fetching achievement details:', achievementDetailsError);
+        throw achievementDetailsError;
+      }
       
-      return formattedGames;
+      console.log('Fetched achievement details:', achievements?.length || 0);
+      
+      // Group achievements by game platform ID
+      if (achievements) {
+        // Get all game platform IDs from achievements
+        const achievementGamePlatformIds = [...new Set(achievements.map(a => a.game_platform_id))];
+        
+        // Get the game IDs associated with these platform IDs
+        const { data: achievementGamePlatforms, error: gameMapError } = await supabase
+          .from('game_platforms')
+          .select('id, game_id')
+          .in('id', achievementGamePlatformIds);
+          
+        if (gameMapError) {
+          console.error('Error mapping game platforms:', gameMapError);
+          throw gameMapError;
+        }
+        
+        // Create a map of game platform ID to game ID
+        const gameIdByPlatformId = {};
+        if (achievementGamePlatforms) {
+          achievementGamePlatforms.forEach(gp => {
+            gameIdByPlatformId[gp.id] = gp.game_id;
+          });
+        }
+        
+        // Group achievements by game ID
+        achievements.forEach(achievement => {
+          const gameId = gameIdByPlatformId[achievement.game_platform_id];
+          if (gameId) {
+            if (!achievementsByGameId.has(gameId)) {
+              achievementsByGameId.set(gameId, []);
+            }
+            
+            const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
+            
+            achievementsByGameId.get(gameId).push({
+              id: achievement.id,
+              name: achievement.name,
+              description: achievement.description || '',
+              image: achievement.icon_url || '',
+              type: determineAchievementType(achievement.name), // Helper function to guess trophy type
+              rarity: 'common', // Default rarity
+              rarityPercentage: 100, // Default percentage
+              achieved: userAchievement?.unlocked || false,
+              achievedDate: userAchievement?.unlock_time,
+              gamePlatformId: achievement.game_platform_id
+            });
+          }
+        });
+      }
     }
     
-    // If no achievements found, just return the games with basic info
-    return gamePlatforms.map(gp => ({
-      id: gp.games.id,
-      name: gp.games.name,
-      platform: gp.platforms.name,
-      image: gp.games.icon_url || '',
-      description: gp.games.description,
-      completion: 0,
-      trophyCount: 0,
-      trophies: []
-    }));
+    // Transform game data to match the expected Game interface
+    const formattedGames: Game[] = games.map(game => {
+      // Find the platform for this game from user_games
+      const userGame = userGames.find(ug => ug.game_id === game.id);
+      const platform = userGame?.platform_name || 'Unknown Platform';
+      
+      // Get trophies for this game
+      const trophies = achievementsByGameId.get(game.id) || [];
+      
+      // Calculate completion percentage
+      const completion = trophies.length > 0
+        ? (trophies.filter(t => t.achieved).length / trophies.length) * 100
+        : 0;
+      
+      const lastPlayed = trophies.length > 0 
+        ? trophies
+            .filter(t => t.achieved && t.achievedDate)
+            .sort((a, b) => new Date(b.achievedDate || 0).getTime() - new Date(a.achievedDate || 0).getTime())[0]?.achievedDate
+        : null;
+      
+      return {
+        id: game.id,
+        name: game.name,
+        platform: platform,
+        image: game.icon_url || '',
+        description: game.description || '',
+        completion: Math.round(completion),
+        trophies: trophies,
+        trophyCount: trophies.length,
+        lastPlayed: lastPlayed || new Date().toISOString(), // Default to current date if no trophies
+        gamePlatformId: userGame?.game_platform_id
+      };
+    });
+    
+    console.log('Returning formatted games:', formattedGames.length);
+    return formattedGames;
   } catch (error) {
-    console.error('Error fetching games:', error);
+    console.error('Error in getGames function:', error);
     throw error;
   }
 };
+
+/**
+ * Helper function to determine trophy type based on name and description
+ * This is a fallback when the type isn't explicitly provided
+ */
+function determineAchievementType(name: string): 'platinum' | 'gold' | 'silver' | 'bronze' {
+  const nameLower = name.toLowerCase();
+  
+  // Check for platinum indicators
+  if (
+    nameLower.includes('platinum') ||
+    nameLower.includes('all trophies') ||
+    nameLower.includes('100%') ||
+    nameLower.includes('complete') ||
+    nameLower.includes('collect all')
+  ) {
+    return 'platinum';
+  }
+  
+  // Check for gold indicators
+  if (
+    nameLower.includes('master') ||
+    nameLower.includes('legendary') ||
+    nameLower.includes('expert') ||
+    nameLower.includes('incredible') ||
+    nameLower.includes('extraordinary')
+  ) {
+    return 'gold';
+  }
+  
+  // Check for silver indicators
+  if (
+    nameLower.includes('advanced') ||
+    nameLower.includes('skilled') ||
+    nameLower.includes('veteran') ||
+    nameLower.includes('proficient')
+  ) {
+    return 'silver';
+  }
+  
+  // Default to bronze for everything else
+  return 'bronze';
+}
 
 /**
  * Fetch comparison data between two users for shared games
