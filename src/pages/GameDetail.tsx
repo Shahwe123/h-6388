@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -753,4 +754,45 @@ const GameDetail = () => {
                   </div>
                 </div>
                 
-                <div className="bg-
+                <div className="bg-black/30 p-3 rounded-lg flex items-center">
+                  <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                    <BarChart className="h-4 w-4 text-zinc-500" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium">{selectedTrophy.rarity || 'Common'}</p>
+                    <p className="text-xs text-zinc-500">
+                      {selectedTrophy.rarityPercentage?.toFixed(1) || '0'}% of players have this
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex justify-between">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedTrophy(null)}
+                  >
+                    Close
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      if (selectedTrophy) togglePinTrophy(selectedTrophy.id);
+                    }}
+                  >
+                    <Pin className={`h-4 w-4 mr-1 ${selectedTrophy.isPinned ? 'text-neon-purple' : ''}`} />
+                    {selectedTrophy.isPinned ? 'Unpin Trophy' : 'Pin to Dashboard'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
+    </div>
+  );
+};
+
+export default GameDetail;
