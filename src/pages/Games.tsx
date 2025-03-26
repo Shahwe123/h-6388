@@ -235,16 +235,18 @@ const Games = () => {
               <Link to={`/games/${game.id}`} key={game.id} className="transition-transform hover:scale-105">
                 <div className="glass-card h-full overflow-hidden rounded-lg flex flex-col">
                   <div className="relative">
-                    <img 
-                      src={game.image || `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`} 
-                      alt={game.name}
-                      className="w-full object-cover aspect-[3/4]"
-                      loading="lazy"
-                      onError={(e) => {
-                        const imgElement = e.target as HTMLImageElement;
-                        imgElement.src = `https://placehold.co/400x600/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`;
-                      }}
-                    />
+                    <div className="w-full aspect-[3/4] bg-gradient-to-b from-black/30 to-black/10 flex items-center justify-center overflow-hidden">
+                      <img 
+                        src={game.image} 
+                        alt={game.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          const imgElement = e.target as HTMLImageElement;
+                          imgElement.src = `https://placehold.co/400x600/2a2a2a/ffffff?text=${encodeURIComponent(game.name)}`;
+                        }}
+                      />
+                    </div>
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                       <div className="flex justify-between items-center">
                         <div className="text-xs font-medium bg-black/60 px-2 py-1 rounded">
@@ -277,16 +279,18 @@ const Games = () => {
             {filteredGames.map(game => (
               <Link to={`/games/${game.id}`} key={game.id}>
                 <div className="glass-card p-3 flex items-center hover:bg-neon-purple/10 transition-colors">
-                  <img 
-                    src={game.image || `https://placehold.co/160x160/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`} 
-                    alt={game.name}
-                    className="w-16 h-16 object-cover rounded"
-                    loading="lazy"
-                    onError={(e) => {
-                      const imgElement = e.target as HTMLImageElement;
-                      imgElement.src = `https://placehold.co/160x160/2a2a2a/6f6f6f?text=${encodeURIComponent(game.name)}`;
-                    }}
-                  />
+                  <div className="w-16 h-16 flex items-center justify-center bg-black/20 rounded overflow-hidden">
+                    <img 
+                      src={game.image} 
+                      alt={game.name}
+                      className="max-w-full max-h-full object-contain"
+                      loading="lazy"
+                      onError={(e) => {
+                        const imgElement = e.target as HTMLImageElement;
+                        imgElement.src = `https://placehold.co/160x160/2a2a2a/ffffff?text=${encodeURIComponent(game.name.substring(0, 2))}`;
+                      }}
+                    />
+                  </div>
                   <div className="ml-4 flex-1">
                     <h3 className="font-bold">{game.name}</h3>
                     <div className="flex items-center text-sm text-zinc-400">

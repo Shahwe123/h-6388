@@ -91,17 +91,18 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
             <RouterLink to={`/games/${game.id}`} key={game.id} className="transition-transform hover:scale-105">
               <div className="bg-black/20 rounded-lg overflow-hidden h-full flex flex-col">
                 <div className="relative">
-                  <img 
-                    src={game.image} 
-                    alt={game.name}
-                    className="w-full aspect-[3/4] object-cover"
-                    loading="lazy"
-                    onError={(e) => {
-                      const imgElement = e.target as HTMLImageElement;
-                      const fallback = encodeURIComponent(game.name.replace(/[^\w\s-]/g, ''));
-                      imgElement.src = `https://placehold.co/400x600/2a2a2a/ffffff?text=${fallback}`;
-                    }}
-                  />
+                  <div className="w-full aspect-[3/4] bg-gradient-to-b from-black/30 to-black/10 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={game.image} 
+                      alt={game.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        const imgElement = e.target as HTMLImageElement;
+                        imgElement.src = `https://placehold.co/400x600/2a2a2a/ffffff?text=${encodeURIComponent(game.name)}`;
+                      }}
+                    />
+                  </div>
                   <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
                     <div className="flex justify-between text-xs">
                       <span className="bg-black/60 px-1.5 py-0.5 rounded">
