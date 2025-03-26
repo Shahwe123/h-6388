@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -17,6 +18,7 @@ export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
   const [games, setGames] = useState<SteamGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSteamGames = async () => {
@@ -90,6 +92,11 @@ export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
     fetchSteamGames();
   }, [userId]);
 
+  const handleGameClick = (gameId: number) => {
+    // Navigate to the game detail page when a game is clicked
+    navigate(`/games/${gameId}`);
+  };
+
   if (loading) {
     return (
       <div className="w-full h-32 flex items-center justify-center">
@@ -122,22 +129,28 @@ export const SteamGamesCollection = ({ userId }: { userId?: string }) => {
     <ScrollArea className="h-72 rounded-md border border-neon-purple/20 p-4">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-1">
         {games.map((game) => (
-          <div key={game.appid} className="glass-card p-3 rounded-lg flex flex-col items-center">
-            {game.img_icon_url ? (
-              <img
-                src={`http://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
-                alt={game.name}
-                className="w-16 h-16 mb-2 rounded"
-                onError={(e) => {
-                  const imgElement = e.target as HTMLImageElement;
-                  imgElement.src = 'https://placehold.co/64x64?text=Game';
-                }}
-              />
-            ) : (
-              <div className="w-16 h-16 bg-gray-800 flex items-center justify-center rounded mb-2">
-                <span className="text-xs">No Image</span>
-              </div>
-            )}
+          <div 
+            key={game.appid} 
+            className="glass-card p-3 rounded-lg flex flex-col items-center cursor-pointer"
+            onClick={() => handleGameClick(game.appid)}
+          >
+            <div className="w-16 h-16 flex items-center justify-center mb-2">
+              {game.img_icon_url ? (
+                <img
+                  src={`http://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
+                  alt={game.name}
+                  className="max-w-16 max-h-16 rounded object-contain"
+                  onError={(e) => {
+                    const imgElement = e.target as HTMLImageElement;
+                    imgElement.src = 'https://placehold.co/64x64?text=Game';
+                  }}
+                />
+              ) : (
+                <div className="w-16 h-16 bg-gray-800 flex items-center justify-center rounded">
+                  <span className="text-xs">No Image</span>
+                </div>
+              )}
+            </div>
             <p className="text-sm font-medium text-center line-clamp-1">{game.name}</p>
             <Badge variant="outline" className="mt-1 text-xs">
               {Math.round(game.playtime_forever / 60)} hrs

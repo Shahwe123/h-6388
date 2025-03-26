@@ -32,6 +32,8 @@ export const useUserGames = () => {
         // Fetch user games using the helper function
         const userGames = await getGames(userId);
         
+        console.log('Fetched user games:', userGames.length, userGames);
+        
         // Update local state
         setGames(userGames);
         

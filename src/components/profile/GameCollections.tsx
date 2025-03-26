@@ -1,11 +1,10 @@
 
-import { Link as RouterLink } from 'react-router-dom';
-import { Gamepad, Link, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Gamepad, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Profile } from '@/types/profile';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import { useSelector } from 'react-redux';
 import { Game } from '@/types/game';
@@ -40,6 +39,7 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
   const [loading, setLoading] = useState(true);
   const games = useSelector((state: any) => state.games?.games || []);
   const [profileGames, setProfileGames] = useState<Game[]>([]);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchGames = async () => {
@@ -65,6 +65,11 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
     
     fetchGames();
   }, [profile, games, isOwnProfile]);
+
+  // Handle game click
+  const handleGameClick = (gameId: number) => {
+    navigate(`/games/${gameId}`);
+  };
   
   // If no accounts are linked and not own profile, don't show this section at all
   if (!hasLinkedAccounts && !isOwnProfile) return null;
@@ -73,12 +78,15 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
     <div className="glass-card rounded-xl p-6 mb-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">Game Collection</h2>
-        <RouterLink to="/games">
-          <Button variant="ghost" size="sm" className="text-neon-purple hover:text-neon-purple/80">
-            <span>See All</span>
-            <ArrowRight className="ml-1 h-4 w-4" />
-          </Button>
-        </RouterLink>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-neon-purple hover:text-neon-purple/80"
+          onClick={() => navigate('/games')}
+        >
+          <span>See All</span>
+          <ArrowRight className="ml-1 h-4 w-4" />
+        </Button>
       </div>
       
       {loading ? (
@@ -88,20 +96,26 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
       ) : profileGames.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {profileGames.map((game) => (
-            <RouterLink to={`/games/${game.id}`} key={game.id} className="transition-transform hover:scale-105">
+            <div 
+              key={game.id} 
+              className="transition-transform hover:scale-105 cursor-pointer"
+              onClick={() => handleGameClick(game.id)}
+            >
               <div className="bg-black/20 rounded-lg overflow-hidden h-full flex flex-col">
                 <div className="relative">
-                  <div className="w-full aspect-[3/4] bg-gradient-to-b from-black/30 to-black/10 flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={game.image} 
-                      alt={game.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      onError={(e) => {
-                        const imgElement = e.target as HTMLImageElement;
-                        imgElement.src = `https://placehold.co/400x600/2a2a2a/ffffff?text=${encodeURIComponent(game.name)}`;
-                      }}
-                    />
+                  <div className="w-full aspect-[1/1] flex items-center justify-center p-4">
+                    <div className="w-16 h-16 flex items-center justify-center">
+                      <img 
+                        src={game.image} 
+                        alt={game.name}
+                        className="max-w-16 max-h-16 object-contain"
+                        loading="lazy"
+                        onError={(e) => {
+                          const imgElement = e.target as HTMLImageElement;
+                          imgElement.src = `https://placehold.co/64x64/2a2a2a/ffffff?text=${encodeURIComponent(game.name.substring(0, 2))}`;
+                        }}
+                      />
+                    </div>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
                     <div className="flex justify-between text-xs">
@@ -124,7 +138,7 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
                   </div>
                 </div>
               </div>
-            </RouterLink>
+            </div>
           ))}
         </div>
       ) : (
@@ -133,11 +147,13 @@ const GameCollections = ({ profile, hasLinkedAccounts, isOwnProfile }: GameColle
           <p>No games found in collection</p>
           <p className="text-sm mt-1">Connect your gaming accounts to see your games</p>
           {isOwnProfile && (
-            <RouterLink to="/link-accounts" className="block mt-4">
-              <Button className="bg-gradient-game mt-2" size="sm">
-                Link Accounts
-              </Button>
-            </RouterLink>
+            <Button 
+              className="bg-gradient-game mt-2" 
+              size="sm"
+              onClick={() => navigate('/link-accounts')}
+            >
+              Link Accounts
+            </Button>
           )}
         </div>
       )}

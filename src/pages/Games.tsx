@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useProfileData } from '@/hooks/useProfileData';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,7 @@ import SEO from "../components/SEO";
 
 const Games = () => {
   const { username } = useParams();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [games, setGames] = useState<Game[]>([]);
   const [filteredGames, setFilteredGames] = useState<Game[]>([]);
@@ -107,6 +108,11 @@ const Games = () => {
     
     setFilteredGames(result);
   }, [games, searchQuery, platformFilter, sortBy]);
+
+  // Handle game click to navigate properly
+  const handleGameClick = (gameId: number) => {
+    navigate(`/games/${gameId}`);
+  };
   
   if (isLoading || profileLoading) {
     return (
@@ -224,28 +230,38 @@ const Games = () => {
             <h2 className="text-xl font-bold mb-2">No Games Found</h2>
             <p className="text-zinc-400">Try adjusting your filters or search query.</p>
             {isOwnProfile && games.length === 0 && (
-              <Link to="/link-accounts" className="block mt-4">
-                <Button className="mt-4">Link Your Gaming Accounts</Button>
-              </Link>
+              <Button 
+                className="mt-4"
+                onClick={() => navigate('/link-accounts')}
+              >
+                Link Your Gaming Accounts
+              </Button>
             )}
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredGames.map(game => (
-              <Link to={`/games/${game.id}`} key={game.id} className="transition-transform hover:scale-105">
+              <div 
+                key={game.id} 
+                className="transition-transform hover:scale-105 cursor-pointer"
+                onClick={() => handleGameClick(game.id)}
+              >
                 <div className="glass-card h-full overflow-hidden rounded-lg flex flex-col">
                   <div className="relative">
-                    <div className="w-full aspect-[3/4] bg-gradient-to-b from-black/30 to-black/10 flex items-center justify-center overflow-hidden">
-                      <img 
-                        src={game.image} 
-                        alt={game.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          const imgElement = e.target as HTMLImageElement;
-                          imgElement.src = `https://placehold.co/400x600/2a2a2a/ffffff?text=${encodeURIComponent(game.name)}`;
-                        }}
-                      />
+                    <div className="w-full aspect-[1/1] bg-gradient-to-b from-black/30 to-black/10 flex items-center justify-center overflow-hidden">
+                      {/* Use a container with fixed dimensions for the game image */}
+                      <div className="w-16 h-16 rounded flex items-center justify-center overflow-hidden">
+                        <img 
+                          src={game.image} 
+                          alt={game.name}
+                          className="w-full h-full object-contain max-w-16 max-h-16"
+                          loading="lazy"
+                          onError={(e) => {
+                            const imgElement = e.target as HTMLImageElement;
+                            imgElement.src = `https://placehold.co/64x64/2a2a2a/ffffff?text=${encodeURIComponent(game.name.substring(0, 2))}`;
+                          }}
+                        />
+                      </div>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                       <div className="flex justify-between items-center">
@@ -271,23 +287,27 @@ const Games = () => {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (
           <div className="space-y-3">
             {filteredGames.map(game => (
-              <Link to={`/games/${game.id}`} key={game.id}>
+              <div 
+                key={game.id}
+                onClick={() => handleGameClick(game.id)}
+                className="cursor-pointer"
+              >
                 <div className="glass-card p-3 flex items-center hover:bg-neon-purple/10 transition-colors">
                   <div className="w-16 h-16 flex items-center justify-center bg-black/20 rounded overflow-hidden">
                     <img 
                       src={game.image} 
                       alt={game.name}
-                      className="max-w-full max-h-full object-contain"
+                      className="max-w-full max-h-full object-contain max-w-16 max-h-16"
                       loading="lazy"
                       onError={(e) => {
                         const imgElement = e.target as HTMLImageElement;
-                        imgElement.src = `https://placehold.co/160x160/2a2a2a/ffffff?text=${encodeURIComponent(game.name.substring(0, 2))}`;
+                        imgElement.src = `https://placehold.co/64x64/2a2a2a/ffffff?text=${encodeURIComponent(game.name.substring(0, 2))}`;
                       }}
                     />
                   </div>
@@ -309,7 +329,7 @@ const Games = () => {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
