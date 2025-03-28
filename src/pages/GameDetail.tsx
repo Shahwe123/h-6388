@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -23,18 +23,48 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { useSelector, useDispatch } from 'react-redux';
-import { getGames } from '@/helpers/gameHelpers';
-import { Game, GameTrophy } from '@/types/game';
-import { pinTrophy } from '@/redux/slices/gamesSlice';
-import SEO from '../components/SEO';
-import { format } from 'date-fns';
+
+interface GameTrophy {
+  id: number;
+  name: string;
+  description: string;
+  type: 'platinum' | 'gold' | 'silver' | 'bronze';
+  image: string;
+  rarity: string;
+  rarityPercentage: number;
+  achieved: boolean;
+  achievedDate?: string;
+  isPinned?: boolean;
+}
+
+interface Game {
+  id: number;
+  name: string;
+  platform: string;
+  coverImage: string;
+  bannerImage: string;
+  description: string;
+  releaseDate: string;
+  developer: string;
+  publisher: string;
+  genres: string[];
+  completion: number;
+  totalPlaytime: number;
+  trophyCounts: {
+    bronze: number;
+    silver: number;
+    gold: number;
+    platinum: number;
+    total: number;
+    earned: number;
+  };
+  trophies: GameTrophy[];
+  lastPlayed: string;
+}
 
 const GameDetail = () => {
   const { gameId } = useParams();
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [game, setGame] = useState<Game | null>(null);
   const [selectedTrophy, setSelectedTrophy] = useState<GameTrophy | null>(null);
@@ -42,65 +72,126 @@ const GameDetail = () => {
   const [trophySort, setTrophySort] = useState('default');
   const [filteredTrophies, setFilteredTrophies] = useState<GameTrophy[]>([]);
   
-  // Get all games from Redux store
-  const reduxGames = useSelector((state: any) => state.games?.games || []);
-  
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
         setIsLoading(true);
         
-        if (!gameId) {
-          navigate('/games');
-          return;
-        }
+        // Mock game data
+        const mockGame: Game = {
+          id: parseInt(gameId || '1'),
+          name: "God of War Ragnarök",
+          platform: "PlayStation 5",
+          coverImage: "https://placehold.co/300x400?text=God+of+War",
+          bannerImage: "https://placehold.co/1200x400?text=God+of+War+Banner",
+          description: "Embark on a mythic journey for answers and allies before Ragnarök arrives in this sequel to the critically acclaimed God of War (2018).",
+          releaseDate: "2022-11-09",
+          developer: "Santa Monica Studio",
+          publisher: "Sony Interactive Entertainment",
+          genres: ["Action", "Adventure"],
+          completion: 78,
+          totalPlaytime: 63,
+          trophyCounts: {
+            bronze: 30,
+            silver: 15,
+            gold: 5,
+            platinum: 1,
+            total: 51,
+            earned: 40
+          },
+          lastPlayed: "2025-03-20T18:30:00Z",
+          trophies: [
+            {
+              id: 1,
+              name: "Father and Son",
+              description: "Platinum Trophy: Collect all other trophies",
+              type: "platinum",
+              image: "https://placehold.co/100x100?text=Plat",
+              rarity: "Rare",
+              rarityPercentage: 8.2,
+              achieved: false,
+              isPinned: true
+            },
+            {
+              id: 2,
+              name: "The Journey Begins",
+              description: "Complete the first quest",
+              type: "bronze",
+              image: "https://placehold.co/100x100?text=Bronze",
+              rarity: "Common",
+              rarityPercentage: 92.5,
+              achieved: true,
+              achievedDate: "2025-01-15T14:22:00Z"
+            },
+            {
+              id: 3,
+              name: "Dragon Slayer",
+              description: "Defeat the ice dragon",
+              type: "silver",
+              image: "https://placehold.co/100x100?text=Silver",
+              rarity: "Uncommon",
+              rarityPercentage: 45.1,
+              achieved: true,
+              achievedDate: "2025-01-20T16:42:00Z"
+            },
+            {
+              id: 4,
+              name: "Collector",
+              description: "Find all collectibles in Midgard",
+              type: "gold",
+              image: "https://placehold.co/100x100?text=Gold",
+              rarity: "Very Rare",
+              rarityPercentage: 6.8,
+              achieved: false
+            },
+            {
+              id: 5,
+              name: "Weapon Master",
+              description: "Fully upgrade all weapons",
+              type: "gold",
+              image: "https://placehold.co/100x100?text=Gold",
+              rarity: "Very Rare",
+              rarityPercentage: 12.3,
+              achieved: true,
+              achievedDate: "2025-02-05T19:15:00Z"
+            },
+            {
+              id: 6,
+              name: "Realm Traveler",
+              description: "Visit all realms",
+              type: "silver",
+              image: "https://placehold.co/100x100?text=Silver",
+              rarity: "Uncommon",
+              rarityPercentage: 38.7,
+              achieved: true,
+              achievedDate: "2025-01-25T21:30:00Z"
+            },
+            {
+              id: 7,
+              name: "Treasure Hunter",
+              description: "Open 10 Nornir chests",
+              type: "bronze",
+              image: "https://placehold.co/100x100?text=Bronze",
+              rarity: "Common",
+              rarityPercentage: 65.2,
+              achieved: true,
+              achievedDate: "2025-01-18T15:10:00Z"
+            },
+            {
+              id: 8,
+              name: "Mist Walker",
+              description: "Complete all trials in Niflheim",
+              type: "gold",
+              image: "https://placehold.co/100x100?text=Gold",
+              rarity: "Ultra Rare",
+              rarityPercentage: 3.9,
+              achieved: false
+            }
+          ]
+        };
         
-        // Try to find the game in Redux store first
-        const gameIdNum = parseInt(gameId);
-        let gameData = reduxGames.find((g: Game) => g.id === gameIdNum);
-        
-        // If not found in Redux, try to fetch from API
-        if (!gameData) {
-          // Get current user
-          const { data: sessionData } = await supabase.auth.getSession();
-          if (sessionData.session) {
-            const userId = sessionData.session.user.id;
-            // Fetch user games using the helper function
-            const userGames = await getGames(userId);
-            gameData = userGames.find((g) => g.id === gameIdNum);
-          }
-        }
-        
-        if (gameData) {
-          // Ensure trophies array exists
-          if (!gameData.trophies) {
-            gameData.trophies = [];
-          }
-
-          // Create trophy counts if not present
-          if (!gameData.trophyCounts) {
-            const trophyCounts = {
-              bronze: gameData.trophies.filter(t => t.type === 'bronze').length,
-              silver: gameData.trophies.filter(t => t.type === 'silver').length,
-              gold: gameData.trophies.filter(t => t.type === 'gold').length,
-              platinum: gameData.trophies.filter(t => t.type === 'platinum').length,
-              total: gameData.trophies.length,
-              earned: gameData.trophies.filter(t => t.achieved).length
-            };
-            gameData.trophyCounts = trophyCounts;
-          }
-
-          setGame(gameData);
-          setFilteredTrophies(gameData.trophies || []);
-        } else {
-          toast({
-            title: "Game not found",
-            description: "We couldn't find this game in your collection.",
-            variant: "destructive"
-          });
-          navigate('/games');
-        }
-        
+        setGame(mockGame);
+        setFilteredTrophies(mockGame.trophies);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching game details:", error);
@@ -110,16 +201,15 @@ const GameDetail = () => {
           variant: "destructive"
         });
         setIsLoading(false);
-        navigate('/games');
       }
     };
     
     fetchGameDetails();
-  }, [gameId, reduxGames, toast, navigate]);
+  }, [gameId, toast]);
   
   // Filter trophies when filter or sort changes
   useEffect(() => {
-    if (!game || !game.trophies) return;
+    if (!game) return;
     
     let result = [...game.trophies];
     
@@ -157,43 +247,34 @@ const GameDetail = () => {
   const togglePinTrophy = (trophyId: number) => {
     if (!game) return;
     
-    const trophy = game.trophies?.find(t => t.id === trophyId);
-    if (!trophy) return;
+    const updatedTrophies = game.trophies.map(trophy => 
+      trophy.id === trophyId 
+        ? { ...trophy, isPinned: !trophy.isPinned }
+        : trophy
+    );
     
-    const isPinned = !trophy.isPinned;
-    
-    // Update Redux store
-    if (game.gamePlatformId) {
-      dispatch(pinTrophy({
-        gamePlatformId: game.gamePlatformId,
-        trophyId: trophyId,
-        isPinned: isPinned
-      }));
-    }
-    
-    // Update local state
-    const updatedTrophies = game.trophies?.map(t => 
-      t.id === trophyId ? { ...t, isPinned: isPinned } : t
-    ) || [];
-    
-    setGame(game => game ? { 
-      ...game, 
-      trophies: updatedTrophies 
-    } : null);
+    setGame({
+      ...game,
+      trophies: updatedTrophies
+    });
     
     setFilteredTrophies(prevFiltered => 
-      prevFiltered.map(t => 
-        t.id === trophyId ? { ...t, isPinned: isPinned } : t
+      prevFiltered.map(trophy => 
+        trophy.id === trophyId 
+          ? { ...trophy, isPinned: !trophy.isPinned }
+          : trophy
       )
     );
     
+    const trophy = game.trophies.find(t => t.id === trophyId);
+    
     toast({
-      title: isPinned 
-        ? "Trophy pinned to dashboard" 
-        : "Trophy unpinned",
-      description: isPinned 
-        ? `Added ${trophy.name} to your goals` 
-        : `Removed ${trophy.name} from your goals`,
+      title: trophy?.isPinned 
+        ? "Trophy unpinned" 
+        : "Trophy pinned to dashboard",
+      description: trophy?.isPinned 
+        ? `Removed ${trophy.name} from your goals` 
+        : `Added ${trophy?.name} to your goals`,
       variant: "default"
     });
   };
@@ -223,19 +304,6 @@ const GameDetail = () => {
     );
   }
   
-  // Calculate actual trophy counts
-  const earnedCount = game.trophies?.filter(t => t.achieved).length || 0;
-  const totalCount = game.trophies?.length || 0;
-  const bronzeCount = game.trophies?.filter(t => t.type === 'bronze').length || 0;
-  const silverCount = game.trophies?.filter(t => t.type === 'silver').length || 0;
-  const goldCount = game.trophies?.filter(t => t.type === 'gold').length || 0;
-  const platinumCount = game.trophies?.filter(t => t.type === 'platinum').length || 0;
-  
-  const earnedBronze = game.trophies?.filter(t => t.type === 'bronze' && t.achieved).length || 0;
-  const earnedSilver = game.trophies?.filter(t => t.type === 'silver' && t.achieved).length || 0;
-  const earnedGold = game.trophies?.filter(t => t.type === 'gold' && t.achieved).length || 0;
-  const earnedPlatinum = game.trophies?.filter(t => t.type === 'platinum' && t.achieved).length || 0;
-  
   const trophyBgColor = (type: string, achieved: boolean) => {
     if (!achieved) return 'bg-zinc-900 opacity-60';
     
@@ -259,43 +327,26 @@ const GameDetail = () => {
       default: return 'text-white';
     }
   };
-
-  // Format release date if available
-  const formattedReleaseDate = game.releaseDate 
-    ? new Date(game.releaseDate).toLocaleDateString()
-    : 'Unknown';
-
-  // Format last played date if available
-  const formattedLastPlayed = game.lastPlayed
-    ? new Date(game.lastPlayed).toLocaleDateString()
-    : 'Unknown';
   
   return (
     <div className="min-h-screen bg-primary pb-16">
-      <SEO
-        title={`${game.name} | PlatinumPath`}
-        description={`View trophies and progress for ${game.name}`}
-      />
+      <Helmet>
+        <title>{game.name} | PlatinumPath</title>
+        <meta name="description" content={`View trophies and progress for ${game.name}`} />
+      </Helmet>
       
       {/* Game Banner */}
       <div 
         className="w-full h-64 bg-cover bg-center relative"
-        style={{ 
-          backgroundImage: `url(${game.bannerImage || game.image})`,
-          backgroundPosition: 'center top'
-        }}
+        style={{ backgroundImage: `url(${game.bannerImage})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-transparent" />
         <div className="absolute bottom-0 container-padding w-full">
           <div className="max-w-7xl mx-auto flex items-end gap-6 pb-6">
             <img 
-              src={game.coverImage || game.image} 
+              src={game.coverImage} 
               alt={game.name}
               className="w-32 h-44 object-cover rounded-lg shadow-lg border-2 border-black/20"
-              onError={(e) => {
-                const imgElement = e.target as HTMLImageElement;
-                imgElement.src = `https://placehold.co/400x600/2a2a2a/ffffff?text=${encodeURIComponent(game.name)}`;
-              }}
             />
             <div className="flex-1">
               <h1 className="text-4xl font-bold">{game.name}</h1>
@@ -304,10 +355,10 @@ const GameDetail = () => {
                   {game.platform}
                 </span>
                 <span className="text-sm text-zinc-300">
-                  {game.developer || 'Unknown Developer'}
+                  {game.developer}
                 </span>
                 <span className="text-sm text-zinc-300">
-                  {game.releaseDate ? new Date(game.releaseDate).getFullYear() : 'Unknown Year'}
+                  {new Date(game.releaseDate).getFullYear()}
                 </span>
               </div>
             </div>
@@ -416,39 +467,22 @@ const GameDetail = () => {
                         } hover:brightness-110`}
                         onClick={() => setSelectedTrophy(trophy)}
                       >
-                        <div className={`flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-md ${
-                          trophy.achieved ? 'saturate-100' : 'saturate-0 opacity-70'
-                        } overflow-hidden bg-black/40`}>
+                        <div className={`flex-shrink-0 w-12 h-12 rounded-md ${
+                          trophy.achieved ? 'saturate-100' : 'saturate-0'
+                        } overflow-hidden`}>
                           <img 
                             src={trophy.image} 
                             alt={trophy.name}
-                            className="max-w-full max-h-full object-contain"
-                            onError={(e) => {
-                              const imgElement = e.target as HTMLImageElement;
-                              switch (trophy.type) {
-                                case 'platinum':
-                                  imgElement.src = 'https://placehold.co/64x64/2a80b9/ffffff?text=P';
-                                  break;
-                                case 'gold':
-                                  imgElement.src = 'https://placehold.co/64x64/f1c40f/ffffff?text=G';
-                                  break;
-                                case 'silver':
-                                  imgElement.src = 'https://placehold.co/64x64/bdc3c7/ffffff?text=S';
-                                  break;
-                                case 'bronze':
-                                  imgElement.src = 'https://placehold.co/64x64/cd6133/ffffff?text=B';
-                                  break;
-                              }
-                            }}
+                            className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="ml-3 flex-1">
                           <div className="flex justify-between items-start">
-                            <div className="pr-8">
+                            <div>
                               <h3 className={`font-medium ${trophy.achieved ? 'text-white' : 'text-zinc-500'}`}>
                                 {trophy.name}
                               </h3>
-                              <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">
+                              <p className="text-xs text-zinc-500 mt-0.5 pr-8">
                                 {trophy.description}
                               </p>
                             </div>
@@ -481,7 +515,7 @@ const GameDetail = () => {
                               )}
                             </div>
                             <span className={`text-xs px-2 py-0.5 rounded-full ${trophyBgColor(trophy.type, true)} ${trophyTextColor(trophy.type, true)}`}>
-                              {trophy.rarity || 'Common'} ({trophy.rarityPercentage?.toFixed(1) || '0'}%)
+                              {trophy.rarity} ({trophy.rarityPercentage}%)
                             </span>
                           </div>
                         </div>
@@ -500,23 +534,23 @@ const GameDetail = () => {
                     <h3 className="text-lg font-bold">Game Description</h3>
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4">
-                    <p className="text-zinc-300">{game.description || 'No description available for this game.'}</p>
+                    <p className="text-zinc-300">{game.description}</p>
                     <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-zinc-500">Developer</p>
-                        <p>{game.developer || 'Unknown'}</p>
+                        <p>{game.developer}</p>
                       </div>
                       <div>
                         <p className="text-zinc-500">Publisher</p>
-                        <p>{game.publisher || 'Unknown'}</p>
+                        <p>{game.publisher}</p>
                       </div>
                       <div>
                         <p className="text-zinc-500">Release Date</p>
-                        <p>{formattedReleaseDate}</p>
+                        <p>{new Date(game.releaseDate).toLocaleDateString()}</p>
                       </div>
                       <div>
                         <p className="text-zinc-500">Genres</p>
-                        <p>{game.genres?.join(', ') || 'Unknown'}</p>
+                        <p>{game.genres.join(', ')}</p>
                       </div>
                     </div>
                   </AccordionContent>
@@ -559,18 +593,18 @@ const GameDetail = () => {
               <div className="mb-4">
                 <div className="flex justify-between mb-1">
                   <span className="text-sm">Overall Completion</span>
-                  <span className="text-sm font-bold">{Math.round(game.completion)}%</span>
+                  <span className="text-sm font-bold">{game.completion}%</span>
                 </div>
                 <Progress value={game.completion} className="h-2 bg-black/40" />
               </div>
               
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="bg-black/30 p-3 rounded text-center">
-                  <div className="text-lg font-bold">{earnedCount}</div>
+                  <div className="text-lg font-bold">{game.trophyCounts.earned}</div>
                   <div className="text-xs text-zinc-400">Earned</div>
                 </div>
                 <div className="bg-black/30 p-3 rounded text-center">
-                  <div className="text-lg font-bold">{totalCount}</div>
+                  <div className="text-lg font-bold">{game.trophyCounts.total}</div>
                   <div className="text-xs text-zinc-400">Total</div>
                 </div>
               </div>
@@ -582,8 +616,8 @@ const GameDetail = () => {
                     <span>Platinum</span>
                   </div>
                   <span>
-                    {platinumCount > 0 ? 
-                      `${earnedPlatinum}/${platinumCount}` : 
+                    {game.trophyCounts.platinum > 0 ? 
+                      `0/${game.trophyCounts.platinum}` : 
                       'None'}
                   </span>
                 </div>
@@ -593,9 +627,8 @@ const GameDetail = () => {
                     <span>Gold</span>
                   </div>
                   <span>
-                    {goldCount > 0 ? 
-                      `${earnedGold}/${goldCount}` : 
-                      'None'}
+                    {/* Assuming 3 of 5 gold trophies are earned */}
+                    3/{game.trophyCounts.gold}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
@@ -604,9 +637,8 @@ const GameDetail = () => {
                     <span>Silver</span>
                   </div>
                   <span>
-                    {silverCount > 0 ? 
-                      `${earnedSilver}/${silverCount}` : 
-                      'None'}
+                    {/* Assuming 12 of 15 silver trophies are earned */}
+                    12/{game.trophyCounts.silver}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
@@ -615,9 +647,8 @@ const GameDetail = () => {
                     <span>Bronze</span>
                   </div>
                   <span>
-                    {bronzeCount > 0 ? 
-                      `${earnedBronze}/${bronzeCount}` : 
-                      'None'}
+                    {/* Assuming 25 of 30 bronze trophies are earned */}
+                    25/{game.trophyCounts.bronze}
                   </span>
                 </div>
               </div>
@@ -632,14 +663,14 @@ const GameDetail = () => {
                     <Clock className="h-4 w-4 mr-2 text-neon-purple" />
                     <span>Total Playtime</span>
                   </div>
-                  <span className="font-bold">{game.totalPlaytime || 'N/A'} {game.totalPlaytime ? 'hours' : ''}</span>
+                  <span className="font-bold">{game.totalPlaytime} hours</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Clock className="h-4 w-4 mr-2 text-neon-purple" />
                     <span>Last Played</span>
                   </div>
-                  <span>{formattedLastPlayed}</span>
+                  <span>{new Date(game.lastPlayed).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -701,30 +732,13 @@ const GameDetail = () => {
             
             <div className="mt-2">
               <div className="flex justify-center mb-4">
-                <div className={`w-24 h-24 rounded-md overflow-hidden flex items-center justify-center bg-black/40 ${
+                <div className={`w-24 h-24 rounded-md overflow-hidden ${
                   selectedTrophy.achieved ? 'saturate-100' : 'saturate-0 opacity-70'
                 }`}>
                   <img 
                     src={selectedTrophy.image} 
                     alt={selectedTrophy.name}
-                    className="max-w-16 max-h-16 object-contain"
-                    onError={(e) => {
-                      const imgElement = e.target as HTMLImageElement;
-                      switch (selectedTrophy.type) {
-                        case 'platinum':
-                          imgElement.src = 'https://placehold.co/64x64/2a80b9/ffffff?text=P';
-                          break;
-                        case 'gold':
-                          imgElement.src = 'https://placehold.co/64x64/f1c40f/ffffff?text=G';
-                          break;
-                        case 'silver':
-                          imgElement.src = 'https://placehold.co/64x64/bdc3c7/ffffff?text=S';
-                          break;
-                        case 'bronze':
-                          imgElement.src = 'https://placehold.co/64x64/cd6133/ffffff?text=B';
-                          break;
-                      }
-                    }}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               </div>
@@ -754,38 +768,44 @@ const GameDetail = () => {
                   </div>
                 </div>
                 
-                <div className="bg-black/30 p-3 rounded-lg flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
-                    <BarChart className="h-4 w-4 text-zinc-500" />
+                <div className="bg-black/30 p-3 rounded-lg">
+                  <p className="text-sm font-medium mb-1">Rarity</p>
+                  <div className="flex items-center">
+                    <div className="flex-1">
+                      <Progress 
+                        value={selectedTrophy.rarityPercentage} 
+                        className="h-2 bg-black/40" 
+                      />
+                    </div>
+                    <span className="text-sm ml-2 w-16 text-right">
+                      {selectedTrophy.rarityPercentage}%
+                    </span>
                   </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium">{selectedTrophy.rarity || 'Common'}</p>
-                    <p className="text-xs text-zinc-500">
-                      {selectedTrophy.rarityPercentage?.toFixed(1) || '0'}% of players have this
-                    </p>
-                  </div>
+                  <p className="text-xs text-zinc-500 mt-1">
+                    {selectedTrophy.rarity} • {selectedTrophy.rarityPercentage}% of players have this trophy
+                  </p>
                 </div>
-
-                <div className="mt-4 flex justify-between">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedTrophy(null)}
-                  >
-                    Close
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      if (selectedTrophy) togglePinTrophy(selectedTrophy.id);
-                    }}
-                  >
-                    <Pin className={`h-4 w-4 mr-1 ${selectedTrophy.isPinned ? 'text-neon-purple' : ''}`} />
-                    {selectedTrophy.isPinned ? 'Unpin Trophy' : 'Pin to Dashboard'}
-                  </Button>
-                </div>
+              </div>
+              
+              <div className="mt-4 flex justify-between gap-3">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => {
+                    togglePinTrophy(selectedTrophy.id);
+                  }}
+                >
+                  {selectedTrophy.isPinned ? 'Unpin Trophy' : 'Pin Trophy'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setSelectedTrophy(null)}
+                >
+                  Close
+                </Button>
               </div>
             </div>
           </DialogContent>
@@ -796,3 +816,4 @@ const GameDetail = () => {
 };
 
 export default GameDetail;
+

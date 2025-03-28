@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Gamepad } from 'lucide-react';
+import { Gamepad, Info } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGamesStart, fetchGamesSuccess, fetchGamesFailure } from '../redux/slices/gamesSlice.js';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +12,7 @@ import PlatformCard from '@/components/platforms/PlatformCard';
 import PlatformModal from '@/components/platforms/PlatformModal';
 import { SteamIcon, XboxIcon, PlayStationIcon } from '@/components/platforms/PlatformIcons';
 import SEO from "../components/SEO";
+import { Button } from '@/components/ui/button';
 
 interface RootState {
   games: {
@@ -29,6 +30,7 @@ const LinkAccounts = () => {
   const [currentPlatform, setCurrentPlatform] = useState<string | null>(null);
   const [processingData, setProcessingData] = useState<boolean>(false);
   const [processingPlatform, setProcessingPlatform] = useState<string | null>(null);
+  const [platformHelpOpen, setPlatformHelpOpen] = useState<boolean>(false);
   const { toast } = useToast();
   const dispatch = useDispatch();
   const games = useSelector((state: RootState) => state.games);
@@ -131,13 +133,24 @@ const LinkAccounts = () => {
         }
       } else if (currentPlatform === 'Xbox') {
         try {
+          setProcessingData(true);
+          setProcessingPlatform('Xbox');
+          
           await fetchXboxData(updates.xbox_gamertag);
+          
+          toast({
+            title: 'Xbox Account Linked',
+            description: 'Your Xbox data has been successfully processed.',
+          });
         } catch (error: any) {
           toast({
             title: 'Error fetching Xbox data',
             description: error.message,
             variant: 'destructive',
           });
+        } finally {
+          setProcessingData(false);
+          setProcessingPlatform(null);
         }
       }
     } catch (error: any) {
@@ -226,6 +239,23 @@ const LinkAccounts = () => {
             <ProcessingIndicator platformName={processingPlatform} />
           )}
 
+          <div className="bg-black/30 rounded-lg p-4 mb-6 border border-neon-blue/30">
+            <div className="flex items-start">
+              <Info className="h-5 w-5 text-neon-blue mr-3 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-medium mb-1">Finding Your Steam ID</h3>
+                <p className="text-sm text-neutral-400 mb-2">
+                  Your Steam ID is a unique identifier for your Steam account. There are a few ways to find it:
+                </p>
+                <ol className="text-sm text-neutral-400 space-y-2 list-decimal pl-5">
+                  <li>Open your Steam profile in a web browser. Your Steam ID is the long number in the URL (e.g., <span className="text-neon-blue">76561198030841827</span>)</li>
+                  <li>In the Steam client, click your profile name → View Profile → The ID is in the URL</li>
+                  <li>You can also use 3rd party sites like <a href="https://steamid.io" target="_blank" rel="noopener noreferrer" className="text-neon-blue underline">steamid.io</a> to convert your Steam username to an ID</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-4">
             <PlatformCard
               platformName="Steam"
@@ -297,3 +327,4 @@ const LinkAccounts = () => {
 };
 
 export default LinkAccounts;
+
