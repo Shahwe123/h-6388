@@ -26,7 +26,7 @@ import { Game, GameTrophy } from '@/types/game';
 import { pinTrophy } from '@/redux/slices/gamesSlice';
 
 const GameDetail = () => {
-  const { gameId } = useParams();
+  const { id } = useParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [game, setGame] = useState<Game | null>(null);
@@ -40,53 +40,25 @@ const GameDetail = () => {
   const achievements = useSelector((state: any) => state.games?.achievements || {});
   
   useEffect(() => {
-    if (games.length > 0 && gameId) {
-      const currentGame = games.find((g: Game) => g.id === Number(gameId));
+    if (games.length > 0 && id) {
+      const gameId = parseInt(id, 10);
+      console.log("Looking for game with ID:", gameId, "in", games.length, "games");
+      
+      const currentGame = games.find((g: Game) => g.id === gameId);
       
       if (currentGame) {
+        console.log("Found game:", currentGame.name);
         setGame(currentGame);
         setFilteredTrophies(currentGame.trophies || []);
         setIsLoading(false);
       } else {
+        console.log("Game not found with ID:", gameId);
         setIsLoading(false);
       }
     } else if (games.length > 0) {
       setIsLoading(false);
     }
-  }, [games, gameId]);
-  
-  // Filter trophies when filter or sort changes
-  useEffect(() => {
-    if (!game) return;
-    
-    let result = [...(game.trophies || [])];
-    
-    // Apply trophy type filter (note: our data model might not have type field yet)
-    if (trophyFilter !== 'all') {
-      result = result.filter(trophy => trophy.type === trophyFilter);
-    }
-    
-    // Apply sorting
-    switch (trophySort) {
-      case 'name':
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'rarity':
-        result.sort((a, b) => (a.rarityPercentage || 0) - (b.rarityPercentage || 0));
-        break;
-      case 'achieved':
-        result.sort((a, b) => {
-          if (a.achieved === b.achieved) return 0;
-          return a.achieved ? -1 : 1;
-        });
-        break;
-      default:
-        // Default ordering (keep original order)
-        break;
-    }
-    
-    setFilteredTrophies(result);
-  }, [game, trophyFilter, trophySort]);
+  }, [games, id]);
   
   const togglePinTrophy = (trophyId: number, gamePlatformId?: number) => {
     if (!game || !gamePlatformId) return;
@@ -137,7 +109,6 @@ const GameDetail = () => {
     );
   }
   
-  // Calculate trophy counts
   const trophyCounts = {
     bronze: game.trophies?.filter(t => t.type === 'bronze').length || 0,
     silver: game.trophies?.filter(t => t.type === 'silver').length || 0,
@@ -178,7 +149,6 @@ const GameDetail = () => {
         <meta name="description" content={`View trophies and progress for ${game.name}`} />
       </Helmet>
       
-      {/* Game Banner */}
       <div 
         className="w-full h-64 bg-cover bg-center relative"
         style={{ backgroundImage: `url(${game.image || "https://placehold.co/1200x400?text=Game+Banner"})` }}
@@ -204,16 +174,13 @@ const GameDetail = () => {
       </div>
       
       <div className="max-w-7xl mx-auto container-padding mt-6">
-        {/* Back Button */}
         <Link to="/games" className="inline-flex items-center text-zinc-400 hover:text-white transition-colors mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" />
           <span>Back to Games</span>
         </Link>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main trophy content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Trophies Section */}
             <div className="glass-card">
               <div className="p-4 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-xl font-bold">Trophies</h2>
@@ -266,7 +233,6 @@ const GameDetail = () => {
                 </div>
               </div>
               
-              {/* Trophy Sorting */}
               <div className="px-4 py-2 border-b border-zinc-800 flex items-center justify-between">
                 <div className="text-sm text-zinc-400">
                   {filteredTrophies.length} {trophyFilter === 'all' ? 'trophies' : `${trophyFilter} trophies`}
@@ -286,7 +252,6 @@ const GameDetail = () => {
                 </div>
               </div>
               
-              {/* Trophy List */}
               <div className="p-4">
                 {filteredTrophies.length === 0 ? (
                   <div className="text-center py-10">
@@ -368,7 +333,6 @@ const GameDetail = () => {
               </div>
             </div>
             
-            {/* Game Description & Info */}
             <div className="glass-card">
               <Accordion type="single" collapsible defaultValue="description">
                 <AccordionItem value="description" className="border-b border-zinc-800">
@@ -389,9 +353,7 @@ const GameDetail = () => {
             </div>
           </div>
           
-          {/* Stats Sidebar */}
           <div className="space-y-6">
-            {/* Trophy Progress */}
             <div className="glass-card p-4">
               <h3 className="text-lg font-bold mb-3">Trophy Progress</h3>
               <div className="mb-4">
@@ -455,7 +417,6 @@ const GameDetail = () => {
               </div>
             </div>
             
-            {/* Playtime Stats */}
             <div className="glass-card p-4">
               <h3 className="text-lg font-bold mb-3">Playtime Stats</h3>
               <div className="space-y-4">
@@ -472,7 +433,6 @@ const GameDetail = () => {
         </div>
       </div>
       
-      {/* Trophy Detail Dialog */}
       <Dialog 
         open={!!selectedTrophy} 
         onOpenChange={(open) => !open && setSelectedTrophy(null)}

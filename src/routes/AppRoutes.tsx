@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -77,7 +76,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/games" element={<Games />} />
-        <Route path="/games/:id" element={<GameDetail />} />
+        <Route path="/games/:id" element={<GameDetail />} /> {/* Ensure we use :id instead of :gameId */}
         <Route path="/legacy-wall" element={<LegacyWall />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/friend/:friendId" element={<FriendComparison />} />

@@ -95,7 +95,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
         });
         
         return {
-          id: gp.games.id,
+          id: gp.games.id, // Make sure this is correctly mapped
           name: gp.games.name,
           platform: gp.platforms.name,
           image: gp.games.icon_url || '',
@@ -103,17 +103,18 @@ export const getGames = async (userId: string): Promise<Game[]> => {
           completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100,
           trophies: formattedAchievements,
           trophyCount: formattedAchievements.length,
-          gamePlatformId: gp.id, // Add this property to the Game object
+          gamePlatformId: gp.id,
           totalPlaytime: 0 // Default value for total playtime
         };
       });
       
+      console.log("Formatted games:", formattedGames.map(g => ({ id: g.id, name: g.name })));
       return formattedGames;
     }
     
     // If no achievements found, just return the games with basic info
     return gamePlatforms.map(gp => ({
-      id: gp.games.id,
+      id: gp.games.id, // Make sure this is correctly mapped
       name: gp.games.name,
       platform: gp.platforms.name,
       image: gp.games.icon_url || '',
@@ -121,7 +122,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       completion: 0,
       trophyCount: 0,
       trophies: [],
-      gamePlatformId: gp.id, // Add this property to the Game object
+      gamePlatformId: gp.id,
       totalPlaytime: 0 // Default value for total playtime
     }));
   } catch (error) {
