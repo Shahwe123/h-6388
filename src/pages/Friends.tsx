@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Gamepad2 } from 'lucide-react';
+import { Users, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FriendsList from '@/components/friends/FriendsList';
 import UserSearch from '@/components/friends/UserSearch';
