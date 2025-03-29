@@ -15,7 +15,7 @@ import { Game, GamePlatform, GameTrophy } from '@/types/game';
  */
 export const getGames = async (userId: string): Promise<Game[]> => {
   try {
-    // First, fetch the user's game platforms
+    // First, fetch the user's game 
     const { data: userGames, error: userGamesError } = await supabase
       .from('user_games')
       .select('game_platform_id')
@@ -34,7 +34,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
     if (gamePlatformIds.length === 0) {
       return [];
     }
-
+    // console.log(gamePlatformIds)
     // Fetch game platform details with related game and platform information
     const { data: gamePlatforms, error: gamePlatformsError } = await supabase
       .from('game_platforms')
@@ -52,24 +52,105 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       return [];
     }
 
+    // Fetch achievements for all the game platforms / array of objects
+    const { data: achievements, error: fetchAchievementsError } = await supabase
+      .from('achievements')
+      .select('id, name, description, game_platform_id, icon_url, locked_icon_url')
+      .in('game_platform_id', gamePlatformIds);
+      // console.log(achievements) TODO: check if all achievements come through
+
+    if (fetchAchievementsError) throw fetchAchievementsError;
+    console.log(achievements)
+
     // Fetch user achievements
-    const { data: userAchievements, error: achievementsError } = await supabase
+    const { data: userAchievementsIds, error: achievementsError } = await supabase
       .from('user_achievements')
       .select('achievement_id, unlock_time, unlocked')
       .eq('user_id', userId);
     
     if (achievementsError) throw achievementsError;
     
+    // Create a variable to store all the game data
+    const allGameData: Game[] = [];
+
+    // Loop through gamePlatforms (1st loop)
+    for (const gamePlatform of gamePlatforms) {
+      // Create a variable for the current game as an object
+      const gameObject: Game = {
+        id: gamePlatform.games.id,
+        name: gamePlatform.games.name,
+        platform: gamePlatform.platforms.name,
+        image: gamePlatform.games.icon_url || '',
+        description: gamePlatform.games.description,
+        completion: 0, // Default value for completion
+        trophyCount: 0, // Default value for trophy count
+        trophies: [], // Initialize an empty array for trophies
+        gamePlatformId: gamePlatform.id,
+        totalPlaytime: 0 // Default value for total playtime
+      };
+
+      // Loop through achievements (outer loop)
+      for (const achievement of achievements) {
+        // Check if the current achievement belongs to the current game platform
+        if (achievement.game_platform_id === gamePlatform.id) {
+          // Create a GameTrophy object for the current achievement
+          const gameTrophy: GameTrophy = {
+            id: achievement.id,
+            name: achievement.name,
+            description: achievement.description || '',
+            image: achievement.icon_url || '',
+            type: 'bronze', // Default type if not specified
+            rarity: 'common', // Default rarity if not specified
+            rarityPercentage: 100, // Default percentage if not specified
+            achieved: false, // Default achieved status
+            achievedDate: null, // Default achieved date
+            gamePlatformId: gamePlatform.id
+          };
+
+          // Loop through userAchievementsIds (inner loop)
+          for (const userAchievement of userAchievementsIds) {
+            // Check if the current user achievement matches the current achievement
+            if (userAchievement.achievement_id === achievement.id) {
+              console.log(achievement)
+              console.log(userAchievement)
+              // Tag the trophy as achieved and add the achieved time
+              gameTrophy.achieved = userAchievement.unlocked || false;
+              gameTrophy.achievedDate = userAchievement.unlock_time || null;
+              break; // Exit the inner loop once a match is found
+            }
+          }
+
+          // Add the GameTrophy to the game's trophies array
+          gameObject.trophies.push(gameTrophy);
+        }
+      }
+
+      // Calculate completion percentage and trophy count
+      gameObject.trophyCount = gameObject.trophies.length;
+      gameObject.completion =
+        gameObject.trophies.filter(trophy => trophy.achieved).length /
+        (gameObject.trophies.length || 1) *
+        100;
+
+      // Add the game object to the allGameData array
+      allGameData.push(gameObject);
+      break
+    }
+
+    // Log the final allGameData array for debugging
+    console.log('All Game Data:', allGameData);
+
     // If user has achievements, fetch their details and merge with games
-    if (userAchievements && userAchievements.length > 0) {
-      const achievementIds = userAchievements.map(a => a.achievement_id);
+    if (userAchievementsIds && userAchievementsIds.length > 0) {
+      const achievementId = userAchievementsIds.map(a => a.achievement_id);
       
       // Fetch achievement details
-      const { data: achievements, error: achievementDetailsError } = await supabase
+      const { data: userAchievements, error: achievementDetailsError } = await supabase
         .from('achievements')
         .select('id, name, description, game_platform_id, icon_url, locked_icon_url')
-        .in('id', achievementIds);
-        
+        .in('id', achievementId);
+      // console.log(gamePlatforms)
+      // console.log(userAchievements)
       if (achievementDetailsError) throw achievementDetailsError;
 
       // Transform gamePlatforms data to match the expected Game interface
@@ -79,7 +160,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
         
         // Format each achievement with user status
         const formattedAchievements: GameTrophy[] = gameAchievements.map(achievement => {
-          const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
+          const userAchievement = userAchievementsIds.find(ua => ua.achievement_id === achievement.id);
           return {
             id: achievement.id,
             name: achievement.name,
@@ -131,65 +212,4 @@ export const getGames = async (userId: string): Promise<Game[]> => {
   }
 };
 
-/**
- * Fetch comparison data between two users for shared games
- * 
- * @param {string} userId The primary user's ID
- * @param {string} friendId The friend's user ID to compare with
- * @returns {Promise<GamePlatform[]>} Array of GamePlatform objects with comparison data
- */
-export const getComparisonData = async (userId: string, friendId: string): Promise<GamePlatform[]> => {
-  try {
-    console.log(`Fetching comparison data for user ${userId} and friend ${friendId}`);
-    
-    // Get both users' games
-    const userGames = await getGames(userId);
-    const friendGames = await getGames(friendId);
-    
-    console.log(`User has ${userGames.length} games, friend has ${friendGames.length} games`);
-    
-    // Find shared games (games that both users have)
-    const sharedGames: GamePlatform[] = [];
-    
-    // Loop through user games and find matches in friend games
-    for (const userGame of userGames) {
-      // Find matching game by game ID
-      const friendGame = friendGames.find(fg => fg.id === userGame.id);
-      
-      // If both users have this game, add to comparison data
-      if (friendGame) {
-        console.log(`Found shared game: ${userGame.name}`);
-        
-        // Create a comparison object
-        const comparisonGame: GamePlatform = {
-          id: userGame.gamePlatformId || 0,
-          gameId: userGame.id,
-          platformId: 0, // We'll get this from the platform info where available
-          game: {
-            id: userGame.id,
-            name: userGame.name,
-            platform: userGame.platform,
-            image: userGame.image,
-            description: userGame.description,
-            completion: userGame.completion,
-          },
-          userTrophies: userGame.trophyCount || 0,
-          friendTrophies: friendGame.trophyCount || 0,
-          userPlaytime: userGame.totalPlaytime || 0,
-          friendPlaytime: friendGame.totalPlaytime || 0,
-          userCompletion: userGame.completion || 0,
-          friendCompletion: friendGame.completion || 0
-        };
-        
-        sharedGames.push(comparisonGame);
-      }
-    }
-    
-    console.log(`Found ${sharedGames.length} shared games for comparison`);
-    return sharedGames;
-  } catch (error) {
-    console.error('Error fetching comparison data:', error);
-    throw error;
-  }
-};
 

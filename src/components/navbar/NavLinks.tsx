@@ -48,7 +48,9 @@ const NavLinks: React.FC<NavLinksProps> = ({ isMobile, onClick }) => {
   // Define main navigation links - removed deleted pages
   const mainLinks = [
     { path: '/profile', label: 'Profile', icon: User },
-    { path: '/friends', label: 'Friends', icon: Users }
+    { path: '/friends', label: 'Friends', icon: Users },
+    { path: '/games', label: 'Games', icon: Users },
+    { path: '/link-accounts', label: 'Link', icon: Users },
   ];
 
   // If not authenticated, don't show navigation links

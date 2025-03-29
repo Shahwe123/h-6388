@@ -7,7 +7,6 @@ import ProfileNotFound from '@/components/profile/ProfileNotFound';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileStats from '@/components/profile/ProfileStats';
 import LevelProgress from '@/components/profile/LevelProgress';
-import TrophyCase from '@/components/profile/TrophyCase';
 import GameCollections from '@/components/profile/GameCollections';
 import { useSelector } from 'react-redux';
 import SocialShare from '@/components/profile/SocialShare';
@@ -110,7 +109,6 @@ const Profile = () => {
               hasLinkedAccounts={hasLinkedAccounts}
             />
             
-            <TrophyCase trophies={profile?.recentTrophies || []} />
             
             <GameCollections 
               profile={profile}

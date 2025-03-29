@@ -20,6 +20,9 @@ export interface Game {
   description?: string;
   trophyCount: number;
   completion: number;
+  trophies: GameTrophy[];
+  gamePlatformId?: number;
+  totalPlaytime: number; // Total playtime in hours
 }
 
 export interface GamePlatform {
