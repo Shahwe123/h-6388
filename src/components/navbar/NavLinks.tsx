@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, User, Gamepad, Users, BarChart, Trophy } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
 
@@ -45,14 +43,9 @@ const NavLinks: React.FC<NavLinksProps> = ({ isMobile, onClick }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Define main navigation links
+  // Define main navigation links - only keeping Friends
   const mainLinks = [
-    { path: '/dashboard', label: 'Dashboard', icon: Home },
-    { path: '/profile', label: 'Profile', icon: User },
-    { path: '/games', label: 'Games', icon: Gamepad },
-    { path: '/legacy-wall', label: 'Museum', icon: Trophy },
-    { path: '/friends', label: 'Friends', icon: Users },
-    { path: '/leaderboard', label: 'Leaderboard', icon: BarChart }
+    { path: '/friends', label: 'Friends', icon: Users }
   ];
 
   // If not authenticated, don't show navigation links

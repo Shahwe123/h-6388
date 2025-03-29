@@ -20,6 +20,7 @@ import Profile from '@/pages/Profile';
 import Settings from '@/pages/Settings';
 import LinkAccounts from '@/pages/LinkAccounts';
 import NotFound from '@/pages/NotFound';
+import Friends from '@/pages/Friends';
 
 // Components
 import AuthRequired from '@/components/AuthRequired';
@@ -63,6 +64,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/link-accounts" element={<LinkAccounts />} />
+        <Route path="/friends" element={<Friends />} />
       </Route>
 
       {/* Catch-all for unknown routes */}
