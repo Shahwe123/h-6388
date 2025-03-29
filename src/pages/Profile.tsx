@@ -10,7 +10,6 @@ import LevelProgress from '@/components/profile/LevelProgress';
 import TrophyCase from '@/components/profile/TrophyCase';
 import AchievementHighlights from '@/components/profile/AchievementHighlights';
 import GameCollections from '@/components/profile/GameCollections';
-import FriendsComparison from '@/components/profile/FriendsComparison';
 import { useSelector } from 'react-redux';
 import SocialShare from '@/components/profile/SocialShare';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -106,11 +105,6 @@ const Profile = () => {
             />
             
             <BadgeCollection userId={profile.id} />
-            
-            <FriendsComparison 
-              friendCount={friendCount}
-              isOwnProfile={isOwnProfile} 
-            />
           </div>
           
           <div className="lg:col-span-2 space-y-8">
