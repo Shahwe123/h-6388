@@ -8,14 +8,11 @@ import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileStats from '@/components/profile/ProfileStats';
 import LevelProgress from '@/components/profile/LevelProgress';
 import TrophyCase from '@/components/profile/TrophyCase';
-import AchievementHighlights from '@/components/profile/AchievementHighlights';
 import GameCollections from '@/components/profile/GameCollections';
-import FriendsComparison from '@/components/profile/FriendsComparison';
 import { useSelector } from 'react-redux';
 import SocialShare from '@/components/profile/SocialShare';
 import { useProfileData } from '@/hooks/useProfileData';
 import LinkedAccounts from '@/components/profile/LinkedAccounts';
-import BadgeCollection from '@/components/profile/BadgeCollection';
 import SEO from "../components/SEO";
 
 /**
@@ -104,13 +101,6 @@ const Profile = () => {
               nextLevelXp={playerStats.nextLevelXp}
               rank={playerStats.rank}
             />
-            
-            <BadgeCollection userId={profile.id} />
-            
-            <FriendsComparison 
-              friendCount={friendCount}
-              isOwnProfile={isOwnProfile} 
-            />
           </div>
           
           <div className="lg:col-span-2 space-y-8">
@@ -121,8 +111,6 @@ const Profile = () => {
             />
             
             <TrophyCase trophies={profile?.recentTrophies || []} />
-            
-            <AchievementHighlights achievements={profile?.achievements || []} />
             
             <GameCollections 
               profile={profile}

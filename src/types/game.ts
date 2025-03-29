@@ -1,3 +1,4 @@
+
 export interface GameTrophy {
   id: number;
   name: string;
