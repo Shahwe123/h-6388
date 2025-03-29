@@ -59,7 +59,7 @@ const Games = () => {
         case 'completion':
           return b.completion - a.completion;
         case 'trophyCount':
-          return (b.trophyCount || 0) - (a.trophyCount || 0);
+          return (b.trophiesObtained || 0) - (a.trophiesObtained || 0);
         case 'lastPlayed':
         default:
           return 0; // Default sort (we don't have lastPlayed in our data model yet)
@@ -210,7 +210,7 @@ const Games = () => {
                   <div className="p-3">
                     <h3 className="font-bold text-sm line-clamp-1">{game.name}</h3>
                     <div className="flex justify-between mt-2 text-xs text-zinc-400">
-                      <span>{game.trophyCount || 0} Trophies</span>
+                      <span>{game.trophiesObtained + " / " + game.trophyCount || 0} Trophies</span>
                     </div>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ const Games = () => {
                     <div className="flex items-center text-sm text-zinc-400">
                       <span>{game.platform}</span>
                       <span className="mx-2">•</span>
-                      <span>{game.trophyCount || 0} Trophies</span>
+                      <span>{game.trophiesObtained + " / " + game.trophyCount || 0} Trophies</span>
                     </div>
                   </div>
                   <div className="text-right mr-2">

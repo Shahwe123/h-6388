@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { fetchGamesStart, fetchGamesSuccess, fetchGamesFailure, setPlatforms, setGamePlatforms } from '../redux/slices/gamesSlice.js';
 
@@ -91,14 +90,14 @@ export const processAndStoreSteamData = async (steamData: any, userId: string, d
     // Process games from Steam
     if (steamData.games && Array.isArray(steamData.games)) {
       dispatch(fetchGamesSuccess(steamData.games))
+     
       for (const gameObject of steamData.games) {
-        console.log(gameObject);
         const game = gameObject.game
         if (!game.appid || typeof game.appid !== 'number') {
           console.warn('Invalid game appid:', game.appid, 'for game:', game.name);
           continue; // Skip this game
         }
-
+        
         // Check if game already exists
         const { data: existingGame, error: gameCheckError } = await supabase
           .from('games')
@@ -216,9 +215,9 @@ export const processAndStoreSteamData = async (steamData: any, userId: string, d
         // process achievements earned
         //TODO: some games like vrchat the gameObject is {} empty need to chcek for this
         if (Object.keys(gameObject.playerStats).length !== 0) {
+          
           if (gameObject.playerStats.playerstats.achievements && Array.isArray(gameObject.playerStats.playerstats.achievements)) {
             const playerAchievements = gameObject.playerStats.playerstats.achievements
-
             for (const achievement of playerAchievements) {
               const { data: existingAchievement, error: achievementCheckError } = await supabase
               .from('achievements')
@@ -249,6 +248,7 @@ export const processAndStoreSteamData = async (steamData: any, userId: string, d
           }
         }
       }
+
     }
     //TODO: should store all game data insdie the games redux
 

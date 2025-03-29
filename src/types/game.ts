@@ -19,6 +19,7 @@ export interface Game {
   image: string;
   description?: string;
   trophyCount: number;
+  trophiesObtained: number;
   completion: number;
   trophies: GameTrophy[];
   gamePlatformId?: number;

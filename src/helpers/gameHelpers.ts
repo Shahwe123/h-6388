@@ -69,76 +69,6 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       .eq('user_id', userId);
     
     if (achievementsError) throw achievementsError;
-    
-    // Create a variable to store all the game data
-    const allGameData: Game[] = [];
-
-    // Loop through gamePlatforms (1st loop)
-    for (const gamePlatform of gamePlatforms) {
-      // Create a variable for the current game as an object
-      const gameObject: Game = {
-        id: gamePlatform.games.id,
-        name: gamePlatform.games.name,
-        platform: gamePlatform.platforms.name,
-        image: gamePlatform.games.icon_url || '',
-        description: gamePlatform.games.description,
-        completion: 0, // Default value for completion
-        trophyCount: 0, // Default value for trophy count
-        trophies: [], // Initialize an empty array for trophies
-        gamePlatformId: gamePlatform.id,
-        totalPlaytime: 0 // Default value for total playtime
-      };
-
-      // Loop through achievements (outer loop)
-      for (const achievement of achievements) {
-        // Check if the current achievement belongs to the current game platform
-        if (achievement.game_platform_id === gamePlatform.id) {
-          // Create a GameTrophy object for the current achievement
-          const gameTrophy: GameTrophy = {
-            id: achievement.id,
-            name: achievement.name,
-            description: achievement.description || '',
-            image: achievement.icon_url || '',
-            type: 'bronze', // Default type if not specified
-            rarity: 'common', // Default rarity if not specified
-            rarityPercentage: 100, // Default percentage if not specified
-            achieved: false, // Default achieved status
-            achievedDate: null, // Default achieved date
-            gamePlatformId: gamePlatform.id
-          };
-
-          // Loop through userAchievementsIds (inner loop)
-          for (const userAchievement of userAchievementsIds) {
-            // Check if the current user achievement matches the current achievement
-            if (userAchievement.achievement_id === achievement.id) {
-              console.log(achievement)
-              console.log(userAchievement)
-              // Tag the trophy as achieved and add the achieved time
-              gameTrophy.achieved = userAchievement.unlocked || false;
-              gameTrophy.achievedDate = userAchievement.unlock_time || null;
-              break; // Exit the inner loop once a match is found
-            }
-          }
-
-          // Add the GameTrophy to the game's trophies array
-          gameObject.trophies.push(gameTrophy);
-        }
-      }
-
-      // Calculate completion percentage and trophy count
-      gameObject.trophyCount = gameObject.trophies.length;
-      gameObject.completion =
-        gameObject.trophies.filter(trophy => trophy.achieved).length /
-        (gameObject.trophies.length || 1) *
-        100;
-
-      // Add the game object to the allGameData array
-      allGameData.push(gameObject);
-      break
-    }
-
-    // Log the final allGameData array for debugging
-    console.log('All Game Data:', allGameData);
 
     // If user has achievements, fetch their details and merge with games
     if (userAchievementsIds && userAchievementsIds.length > 0) {
@@ -184,6 +114,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
           completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100,
           trophies: formattedAchievements,
           trophyCount: formattedAchievements.length,
+          trophiesObtained: formattedAchievements.filter(a => a.achieved).length,
           gamePlatformId: gp.id,
           totalPlaytime: 0 // Default value for total playtime
         };
@@ -202,6 +133,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       description: gp.games.description,
       completion: 0,
       trophyCount: 0,
+      trophiesObtained: 0,
       trophies: [],
       gamePlatformId: gp.id,
       totalPlaytime: 0 // Default value for total playtime
