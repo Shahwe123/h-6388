@@ -130,3 +130,66 @@ export const getGames = async (userId: string): Promise<Game[]> => {
     throw error;
   }
 };
+
+/**
+ * Fetch comparison data between two users for shared games
+ * 
+ * @param {string} userId The primary user's ID
+ * @param {string} friendId The friend's user ID to compare with
+ * @returns {Promise<GamePlatform[]>} Array of GamePlatform objects with comparison data
+ */
+export const getComparisonData = async (userId: string, friendId: string): Promise<GamePlatform[]> => {
+  try {
+    console.log(`Fetching comparison data for user ${userId} and friend ${friendId}`);
+    
+    // Get both users' games
+    const userGames = await getGames(userId);
+    const friendGames = await getGames(friendId);
+    
+    console.log(`User has ${userGames.length} games, friend has ${friendGames.length} games`);
+    
+    // Find shared games (games that both users have)
+    const sharedGames: GamePlatform[] = [];
+    
+    // Loop through user games and find matches in friend games
+    for (const userGame of userGames) {
+      // Find matching game by game ID
+      const friendGame = friendGames.find(fg => fg.id === userGame.id);
+      
+      // If both users have this game, add to comparison data
+      if (friendGame) {
+        console.log(`Found shared game: ${userGame.name}`);
+        
+        // Create a comparison object
+        const comparisonGame: GamePlatform = {
+          id: userGame.gamePlatformId || 0,
+          gameId: userGame.id,
+          platformId: 0, // We'll get this from the platform info where available
+          game: {
+            id: userGame.id,
+            name: userGame.name,
+            platform: userGame.platform,
+            image: userGame.image,
+            description: userGame.description,
+            completion: userGame.completion,
+          },
+          userTrophies: userGame.trophyCount || 0,
+          friendTrophies: friendGame.trophyCount || 0,
+          userPlaytime: userGame.totalPlaytime || 0,
+          friendPlaytime: friendGame.totalPlaytime || 0,
+          userCompletion: userGame.completion || 0,
+          friendCompletion: friendGame.completion || 0
+        };
+        
+        sharedGames.push(comparisonGame);
+      }
+    }
+    
+    console.log(`Found ${sharedGames.length} shared games for comparison`);
+    return sharedGames;
+  } catch (error) {
+    console.error('Error fetching comparison data:', error);
+    throw error;
+  }
+};
+

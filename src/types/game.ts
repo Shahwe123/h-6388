@@ -10,6 +10,9 @@ export interface GameTrophy {
   achieved: boolean;
   achievedDate?: string;
   gamePlatformId?: number;
+  isLegacy?: boolean;
+  isPinned?: boolean;
+  isFirstOfType?: boolean; // Added for legacy components
 }
 
 export interface GamePlatform {
@@ -45,4 +48,29 @@ export interface Game {
   gamePlatformId?: number;
   totalPlaytime?: number;
   platformSpecificId?: string;
+  yearEarned?: number;  // Added for legacy components
+  genres?: string[];  // Added for legacy components
+  milestoneInfo?: MilestoneInfo;  // Added for legacy components
+}
+
+// Added for legacy components
+export interface MilestoneInfo {
+  isFirstPlatinum?: boolean;
+  isRarest?: boolean;
+  isFastestCompletion?: boolean;
+  completionTime?: number;
+  personalNote?: string;
+}
+
+// Added for legacy components
+export type TrophyFilter = 'all' | 'platinum' | 'gold' | 'silver' | 'bronze' | 'legacy' | 'milestones';
+
+// Added for legacy components
+export interface LegacyWallFilter {
+  year: number | 'all';
+  platform: string | 'all';
+  genre: string | 'all';
+  type: TrophyFilter;
+  rarity: 'all' | 'common' | 'rare' | 'ultra-rare';
+  milestones: boolean;
 }
