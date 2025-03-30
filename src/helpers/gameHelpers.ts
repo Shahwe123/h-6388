@@ -55,12 +55,11 @@ export const getGames = async (userId: string): Promise<Game[]> => {
     // Fetch achievements for all the game platforms / array of objects
     const { data: achievements, error: fetchAchievementsError } = await supabase
       .from('achievements')
-      .select('id, name, description, game_platform_id, icon_url, locked_icon_url')
+      .select('id, name, description, game_platform_id, icon_url, locked_icon_url,type')
       .in('game_platform_id', gamePlatformIds);
       // console.log(achievements) TODO: check if all achievements come through
 
     if (fetchAchievementsError) throw fetchAchievementsError;
-    console.log(achievements)
 
     // Fetch user achievements
     const { data: userAchievementsIds, error: achievementsError } = await supabase
@@ -77,7 +76,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
       // Fetch achievement details
       const { data: userAchievements, error: achievementDetailsError } = await supabase
         .from('achievements')
-        .select('id, name, description, game_platform_id, icon_url, locked_icon_url')
+        .select('id, name, description, game_platform_id, icon_url, locked_icon_url, type')
         .in('id', achievementId);
       // console.log(gamePlatforms)
       // console.log(userAchievements)
@@ -96,7 +95,7 @@ export const getGames = async (userId: string): Promise<Game[]> => {
             name: achievement.name,
             description: achievement.description || '',
             image: achievement.icon_url || '',
-            type: 'bronze', // Default type if not specified
+            type: achievement.type || "bronze", // Default type if not specified
             rarity: 'common', // Default rarity if not specified
             rarityPercentage: 100, // Default percentage if not specified
             achieved: userAchievement?.unlocked || false,
@@ -120,7 +119,6 @@ export const getGames = async (userId: string): Promise<Game[]> => {
         };
       });
       
-      console.log("Formatted games:", formattedGames.map(g => ({ id: g.id, name: g.name })));
       return formattedGames;
     }
     
