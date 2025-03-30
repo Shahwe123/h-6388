@@ -4,7 +4,8 @@ export interface GameTrophy {
   name: string;
   description: string;
   image: string;
-  type: 'bronze' | 'silver' | 'gold' | 'platinum';
+  type: string;
+  // type: 'bronze' | 'silver' | 'gold' | 'platinum';
   rarity: 'common' | 'uncommon' | 'rare' | 'ultra rare';
   rarityPercentage: number;
   achieved: boolean;
