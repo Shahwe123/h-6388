@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { fetchGamesStart, fetchGamesSuccess, fetchGamesFailure, setPlatforms, setGamePlatforms } from '../redux/slices/gamesSlice.js';
+import { getGames } from './gameHelpers.js';
 
 /**
  * Fetch Steam game data using Steam ID
@@ -173,7 +174,8 @@ export const processAndStoreSteamData = async (steamData: any, userId: string, d
                     description: achievement.description || null,
                     icon_url: achievement.icon || null,
                     locked_icon_url: achievement.icongray || null,
-                    platform_api_name: achievement.name
+                    platform_api_name: achievement.name,
+                    type: achievement.type || null
                   })
                   .select('id')
                   .single();
@@ -345,119 +347,230 @@ export const fetchXboxData = async (gamerTag: string) => {
   }
 };
 
-/**
- * Helper function to fetch games with achievements
- * Imported from gameHelpers.ts to avoid circular dependencies
- */
-const getGames = async (userId: string) => {
+
+export const fetchPsnData = async (
+  psnId: string,
+  userId: string,
+  dispatch: any,
+  onSuccess?: () => void,
+  onError?: (error: Error) => void
+) => {
+
+  if (!psnId) {
+    onError?.(new Error("Steam ID not found"));
+    return;
+  }
+
   try {
-    // First, fetch the user's game platforms
-    const { data: userGames, error: userGamesError } = await supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
+    const response = await fetch("https://nvjjragekchczuxgdvvo.supabase.co/functions/v1/fetch-psn-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        "accountId": "me"
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`PSN API error (${response.status}): ${errorText}`);
+      throw new Error(`Failed to fetch PSN data: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('PSN data received:', data);
+
+    await processAndStorePsnData(data, userId, dispatch);
+    onSuccess?.();
+  } catch (error) {
+    console.error('Error fetching PlayStation data:', error);
+    dispatch(fetchGamesFailure());
+    onError?.(error instanceof Error ? error : new Error('Failed to process PlayStation data'));
+  }
+}
+
+export const processAndStorePsnData = async (psnData: any, userId: string, dispatch: any) => {
+  if (!psnData || !userId) return;
+
+  try {
+    // Fetch all platforms first
+    const { data: platforms, error: platformsError } = await supabase
+      .from('platforms')
+      .select('*');
+
+    if (platformsError) throw platformsError;
+
+    // Find the PlayStation platform
+    const psnPlatform = platforms.find(p => p.name.toLowerCase() === 'psn');
+    if (!psnPlatform) {
+      throw new Error('Steam platform not found in the database');
+    }
+
+    for (const gameObject of psnData.fullGameData) {
+      // Check if game already exists
+      const { data: existingGame, error: gameCheckError } = await supabase
+      .from('games')
+      .select('id')
+      .eq('name', gameObject.trophyTitle.trophyTitleName || 'Unknown Game')
+      .maybeSingle();
+
+      if (gameCheckError) throw gameCheckError;
+
+      let gameId;
+      let gamePlatformId;
+      // Add game if it doesn't exist
+      if (!existingGame) {
+        const { data: newGame, error: gameInsertError } = await supabase
+          .from('games')
+          .insert({
+            name: gameObject.trophyTitle.trophyTitleName || 'Unknown Game',
+            icon_url: gameObject.trophyTitle.trophyTitleIconUrl ,
+            description: gameObject.trophyTitle.description || null
+          })
+          .select('id')
+          .single();
+
+          if (gameInsertError) throw gameInsertError;
+          gameId = newGame.id;
+
+          const { data: newGamePlatform, error: gpInsertError } = await supabase
+          .from('game_platforms')
+          .insert({
+            game_id: gameId,
+            platform_id: psnPlatform.id,
+            // platform_specific_id: game.appId.toString()
+          })
+          .select('id')
+          .single();
+
+          if (gpInsertError) throw gpInsertError;
+          gamePlatformId = newGamePlatform.id;
+
+          breakme: if (gameObject.trophyData.trophies && Array.isArray(gameObject.trophyData.trophies)) {
+            if (!gameObject.trophyData.trophies || gameObject.trophyData.trophies.length === 0) {
+              console.warn('No achievements for game:', gameObject.trophyTitle.trophyTitleName);
+              break breakme; // Skip this game
+            }
+            for (const achievement of gameObject.trophyData.trophies) {
+              if (!achievement || !achievement.trophyName) continue;
+
+              // Check if achievement exists TODO: might not need this, for example, if a game already exists in database for steam, chec
+              const { data: existingAchievement, error: achievementCheckError } = await supabase
+                .from('achievements')
+                .select('id')
+                .eq('game_platform_id', gamePlatformId)
+                .eq('name', achievement.trophyName)
+                .maybeSingle();
+
+              if (achievementCheckError) throw achievementCheckError;
+
+              let achievementId;
+              const currentTrophyPSNId = achievement.trophyId;
+              // Create achievement if it doesn't exist
+              if (!existingAchievement) {
+                const { data: newAchievement, error: achievementInsertError } = await supabase
+                  .from('achievements')
+                  .insert({
+                    game_platform_id: gamePlatformId,
+                    name: achievement.trophyName || 'Unknown Achievement',
+                    description: achievement.trophyDetail || null,
+                    icon_url: achievement.trophyIconUrl || null,
+                    locked_icon_url: achievement.icongray || null,
+                    platform_api_name: achievement.name || null,
+                    type: achievement.trophyType || null
+                  })
+                  .select('id')
+                  .single();
+
+                if (achievementInsertError) throw achievementInsertError;
+                achievementId = newAchievement.id;
+              } else {
+                achievementId = existingAchievement.id;
+              }
+              //TODO: maybe look for more efficient method
+              for (const userAchievement of gameObject.userAchievements.trophies) {
+                if (userAchievement.trophyId === achievement.trophyId) {
+                  if (userAchievement.earned === true) {
+                    const { data: doesUserAchievement, error: doesUserAchievementError } = await supabase
+                    .from('user_achievements')
+                    .select('id')
+                    .eq("user_id", userId)
+                    .eq('achievement_id', achievementId)
+                    .maybeSingle();
+
+                    if (!doesUserAchievement) {
+                      const { error: userAchievementError } = await supabase
+                        .from('user_achievements')
+                        .upsert({
+                          user_id: userId,
+                          achievement_id: achievementId,
+                          unlocked: true,
+                          unlock_time: userAchievement.earnedDateTime
+                        });
+                    }
+                  }
+                }
+              }
+
+            }
+          }
+      } else {
+        gameId = existingGame.id
+      }
+
+      // Link user to this game-platform TODO: need to check if user has been linked
+      const { data: userHasGame, error: userHasGameError } = await supabase
       .from('user_games')
-      .select('game_platform_id')
-      .eq('user_id', userId);
+      .select('id')
+      .eq('user_id', userId)
+      .eq('game_id', gameId)
+      .maybeSingle();
 
-    if (userGamesError) throw userGamesError;
-
-    // If no games found, return empty array
-    if (!userGames || userGames.length === 0) {
-      return [];
-    }
-
-    // Extract the game platform IDs for the next query
-    const gamePlatformIds = userGames.map(g => g.game_platform_id).filter(id => id !== null);
-
-    if (gamePlatformIds.length === 0) {
-      return [];
-    }
-
-    // Fetch game platform details with related game and platform information
-    const { data: gamePlatforms, error: gamePlatformsError } = await supabase
-      .from('game_platforms')
-      .select(`
-        id,
-        platform_specific_id,
-        games!inner(id, name, icon_url, description),
-        platforms!inner(id, name)
-      `)
-      .in('id', gamePlatformIds);
-
-    if (gamePlatformsError) throw gamePlatformsError;
-
-    if (!gamePlatforms || gamePlatforms.length === 0) {
-      return [];
-    }
-
-    // Fetch user achievements
-    const { data: userAchievements, error: achievementsError } = await supabase
-      .from('user_achievements')
-      .select('achievement_id, unlock_time, unlocked')
-      .eq('user_id', userId);
-
-    if (achievementsError) throw achievementsError;
-
-    // If user has achievements, fetch their details and merge with games
-    if (userAchievements && userAchievements.length > 0) {
-      const achievementIds = userAchievements.map(a => a.achievement_id);
-
-      // Fetch achievement details
-      const { data: achievements, error: achievementDetailsError } = await supabase
-        .from('achievements')
-        .select('id, name, description, game_platform_id, icon_url, locked_icon_url')
-        .in('id', achievementIds);
-
-      if (achievementDetailsError) throw achievementDetailsError;
-
-      // Transform gamePlatforms data to match the expected Game interface
-      const formattedGames = gamePlatforms.map(gp => {
-        // Get achievements for this game platform
-        const gameAchievements = achievements.filter(a => a.game_platform_id === gp.id);
-
-        // Format each achievement with user status
-        const formattedAchievements = gameAchievements.map(achievement => {
-          const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
-          return {
-            id: achievement.id,
-            name: achievement.name,
-            description: achievement.description || '',
-            image: achievement.icon_url || '',
-            achieved: userAchievement?.unlocked || false,
-            achievedDate: userAchievement?.unlock_time,
-            gamePlatformId: gp.id
-          };
+      if (!userHasGame) {
+        const { error: userGameError } = await supabase
+        .from('user_games')
+        .upsert({
+          user_id: userId,
+          game_id: gameId,
+          platform_name: 'steam',
+          game_platform_id: gamePlatformId
         });
 
-        return {
-          id: gp.games.id,
-          name: gp.games.name,
-          platform: gp.platforms.name,
-          image: gp.games.icon_url || '',
-          platformSpecificId: gp.platform_specific_id,
-          description: gp.games.description,
-          gamePlatformId: gp.id,
-          trophies: formattedAchievements,
-          trophyCount: formattedAchievements.length,
-          completion: formattedAchievements.filter(a => a.achieved).length / (formattedAchievements.length || 1) * 100
-        };
-      });
+        if (userGameError) throw userGameError;
+      }
 
-      return formattedGames;
     }
 
-    // If no achievements found, just return the games with basic info
-    return gamePlatforms.map(gp => ({
-      id: gp.games.id,
-      name: gp.games.name,
-      platform: gp.platforms.name,
-      image: gp.games.icon_url || '',
-      platformSpecificId: gp.platform_specific_id,
-      description: gp.games.description,
-      gamePlatformId: gp.id,
-      completion: 0,
-      trophyCount: 0
-    }));
+    // // Fetch all updated game platforms
+    // const { data: userGamePlatforms, error: userGpError } = await supabase
+    //   .from('user_games')
+    //   .select(`
+    //     game_platform_id,
+    //     game_platforms!inner(
+    //       id,
+    //       platform_specific_id,
+    //       games!inner(id, name, icon_url, description),
+    //       platforms!inner(id, name)
+    //     )
+    //   `)
+    //   .eq('user_id', userId);
+
+    // if (userGpError) throw userGpError;
+
+    // Fetch user games with achievements
+    const userGames = await getGames(userId);
+    dispatch(fetchGamesSuccess(userGames));
+    
   } catch (error) {
-    console.error('Error fetching games:', error);
-    throw error;
+    console.error('Error processing PlayStation data:', error);
+    throw error instanceof Error ? error : new Error('Failed to process PlayStation data');
   }
-};
+}
