@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchGamesStart, fetchGamesSuccess, fetchGamesFailure } from '../redux/slices/gamesSlice.js';
 import { supabase } from '@/integrations/supabase/client';
 import { getCurrentSession, fetchUserProfile } from '@/helpers/authHelpers';
-import { fetchSteamData, fetchXboxData } from '@/helpers/platformHelpers';
+import { fetchPsnData, fetchSteamData, fetchXboxData } from '@/helpers/platformHelpers';
 import ProcessingIndicator from '@/components/platforms/ProcessingIndicator';
 import PlatformCard from '@/components/platforms/PlatformCard';
 import PlatformModal from '@/components/platforms/PlatformModal';
@@ -152,6 +152,34 @@ const LinkAccounts = () => {
           setProcessingData(false);
           setProcessingPlatform(null);
         }
+      } else if (currentPlatform === "PlayStation") {
+          // await fetchPsnData()
+          try {
+            setProcessingData(true);
+            setProcessingPlatform('PlayStation');
+
+            await fetchPsnData(
+              "me",
+              profile.id,
+              dispatch,
+              () => {
+                toast({
+                  title: 'PlayStation Account Linked',
+                  description: 'Your PlayStation data has been successfully processed.',
+                });
+              },
+              (error) => {
+                toast({
+                  title: 'Error Processing PlayStation Data',
+                  description: error.message || 'Failed to process PlayStation data',
+                  variant: 'destructive',
+                });
+              }
+            );
+          } finally {
+            setProcessingData(false);
+            setProcessingPlatform(null);
+          }
       }
     } catch (error: any) {
       toast({
