@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -60,6 +61,33 @@ const GameDetail = () => {
     }
   }, [games, id]);
   
+  useEffect(() => {
+    if (!game) return;
+    
+    let result = [...game.trophies];
+    
+    // Apply filter
+    if (trophyFilter !== 'all') {
+      result = result.filter(trophy => trophy.type === trophyFilter);
+    }
+    
+    // Apply sort
+    result.sort((a, b) => {
+      switch (trophySort) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'rarity':
+          return (a.rarityPercentage || 100) - (b.rarityPercentage || 100);
+        case 'achieved':
+          return a.achieved === b.achieved ? 0 : a.achieved ? -1 : 1;
+        default:
+          return 0;
+      }
+    });
+    
+    setFilteredTrophies(result);
+  }, [game, trophyFilter, trophySort]);
+
   const togglePinTrophy = (trophyId: number, gamePlatformId?: number) => {
     if (!game || !gamePlatformId) return;
     

@@ -11,6 +11,7 @@ export interface GameTrophy {
   achieved: boolean;
   achievedDate?: string;
   gamePlatformId?: number;
+  isPinned?: boolean;
 }
 
 export interface Game {

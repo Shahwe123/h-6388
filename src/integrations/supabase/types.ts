@@ -19,8 +19,8 @@ export type Database = {
           locked_icon_url: string | null
           name: string
           platform_api_name: string | null
-          updated_at: string | null
           type: string | null
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
@@ -31,8 +31,8 @@ export type Database = {
           locked_icon_url?: string | null
           name: string
           platform_api_name?: string | null
+          type?: string | null
           updated_at?: string | null
-          type: string | null
         }
         Update: {
           created_at?: string | null
@@ -43,8 +43,8 @@ export type Database = {
           locked_icon_url?: string | null
           name?: string
           platform_api_name?: string | null
+          type?: string | null
           updated_at?: string | null
-          type: string | null
         }
         Relationships: [
           {

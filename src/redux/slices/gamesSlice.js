@@ -35,6 +35,18 @@ const gamesSlice = createSlice({
     setAchievements: (state, action) => {
       const { gamePlatformId, achievements } = action.payload;
       state.achievements[gamePlatformId] = achievements;
+    },
+    pinTrophy: (state, action) => {
+      const { gamePlatformId, trophyId, isPinned } = action.payload;
+      
+      // Update the trophy isPinned property in the game
+      const game = state.games.find(g => g.gamePlatformId === gamePlatformId);
+      if (game && game.trophies) {
+        const trophy = game.trophies.find(t => t.id === trophyId);
+        if (trophy) {
+          trophy.isPinned = isPinned;
+        }
+      }
     }
   },
 });
@@ -45,7 +57,8 @@ export const {
   fetchGamesFailure, 
   setPlatforms,
   setGamePlatforms,
-  setAchievements
+  setAchievements,
+  pinTrophy
 } = gamesSlice.actions;
 
 export default gamesSlice.reducer;

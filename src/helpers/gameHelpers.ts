@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Game, GamePlatform, GameTrophy } from '@/types/game';
+import { Game, GameTrophy } from '@/types/game';
 
 /**
  * Fetch user games and achievements
@@ -100,7 +100,8 @@ export const getGames = async (userId: string): Promise<Game[]> => {
             rarityPercentage: 100, // Default percentage if not specified
             achieved: userAchievement?.unlocked || false,
             achievedDate: userAchievement?.unlock_time,
-            gamePlatformId: gp.id
+            gamePlatformId: gp.id,
+            isPinned: false
           };
         });
         
@@ -141,5 +142,3 @@ export const getGames = async (userId: string): Promise<Game[]> => {
     throw error;
   }
 };
-
-

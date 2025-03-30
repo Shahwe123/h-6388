@@ -24,6 +24,7 @@ import NotFound from '@/pages/NotFound';
 import AuthRequired from '@/components/AuthRequired';
 import { useToast } from '@/hooks/use-toast';
 import Games from '@/pages/Games';
+import GameDetail from '@/pages/GameDetail';
 
 const AppRoutes: React.FC = () => {
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/link-accounts" element={<LinkAccounts />} />
         <Route path="/games" element={<Games />} />
+        <Route path="/games/:id" element={<GameDetail />} />
       </Route>
 
       {/* Catch-all for unknown routes */}
