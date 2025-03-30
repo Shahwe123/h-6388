@@ -20,6 +20,7 @@ export type Database = {
           name: string
           platform_api_name: string | null
           updated_at: string | null
+          type: string | null
         }
         Insert: {
           created_at?: string | null
@@ -31,6 +32,7 @@ export type Database = {
           name: string
           platform_api_name?: string | null
           updated_at?: string | null
+          type: string | null
         }
         Update: {
           created_at?: string | null
@@ -42,6 +44,7 @@ export type Database = {
           name?: string
           platform_api_name?: string | null
           updated_at?: string | null
+          type: string | null
         }
         Relationships: [
           {
